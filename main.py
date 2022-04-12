@@ -13,10 +13,11 @@ sys.path.append(srcdir)
 
 #Imports
 import configuration
-from miscellaneous import createDirs
-from parameters import simulation_par
-from advection import adv_1d
-from error_convergence import error_convergence
+from miscellaneous        import createDirs
+from parameters           import simulation_par
+from advection            import adv_1d
+from error_adv            import error_analysis_adv1d
+from error_reconstruction import error_analysis_recon
 
 # Create directories
 createDirs()
@@ -31,8 +32,11 @@ if tc == 1:
    # Advection routine
    adv_1d(simulation, True)
 elif tc == 2:
-   # Error analysis
-   error_convergence(simulation)
+   # Advection error analysis
+   error_analysis_adv1d(simulation)
+elif tc == 3:
+   # Advection error analysis
+   error_analysis_recon(simulation)
 else:
    print('Invalid test case.')
    exit()

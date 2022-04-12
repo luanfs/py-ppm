@@ -24,7 +24,7 @@ import reconstruction as rec
 
 def adv_1d(simulation, plot):
    N  = simulation.N    # Number of cells
-   ic  = simulation.ic  # Initial condition
+   ic = simulation.ic   # Initial condition
    ξ  = simulation.x    # Grid
    ξc = simulation.xc
    ξ0 = simulation.x0
@@ -115,7 +115,7 @@ def adv_1d(simulation, plot):
          for i in range(0,N):
             x = (ξplot[neighbours==i]-ξ[i])/Δξ # Maps to [0,1]
             Ψ_parabolic[neighbours==i] = aL[i] + δa[i]*x+ x*(1.0-x)*a6[i]
-      
+
          # Compute exact solution
          Ψ_exact = Ψexact(ξplot, t*Δt, simulation)
 

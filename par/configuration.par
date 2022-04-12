@@ -13,6 +13,7 @@
 #Possible test cases
 #  case(1) - Advection simulation
 #  case(2) - Convergence of error for advection equation
+#  case(3) - Convergence of error for PPM reconstruction
 #Possible initial conditions
 #  case(1) - sine wave
 #  case(2) - gaussian wave

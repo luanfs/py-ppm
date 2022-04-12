@@ -11,7 +11,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from parameters import simulation_par, graphdir
 
-def error_convergence(simulation):
+def error_analysis_adv1d(simulation):
    # adv velocity
    u = simulation.u
 
