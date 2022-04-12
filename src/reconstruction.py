@@ -85,16 +85,26 @@ def ppm_reconstruction(Ψ_average, N):
    a2 = 6.0*((Ψ_R[0:N]+Ψ_L[0:N])*0.5 - Ψ_average[0:N])
    
    # Monotonization
-   for i in range(0,N):
-      if local_maximum[i]==False:
-         if abs(a2[i])>=10**(-12):
-            x_extreme = -a1[i]/(2*a2[i])
-         else:
-            x_extreme = float('inf')
-         if (x_extreme>-0.5 and x_extreme<0.0):
-            Ψ_R[i] = 3.0*Ψ_average[i]-2.0*Ψ_L[i] 
-         elif (x_extreme>0.0 and x_extreme<0.5):
-            Ψ_L[i] = 3.0*Ψ_average[i]-2.0*Ψ_R[i] 
+   x_extreme = np.zeros(N)
+   mask_a2not0 = abs(a2)>=10**(-12)
+   x_extreme[mask_a2not0==True] = -a1[mask_a2not0==True]/(2*a2[mask_a2not0==True])
+   x_extreme[mask_a2not0==False] =  float('inf')
+   
+   mask1 = np.logical_and(x_extreme>-0.5, x_extreme<0.0)
+   Ψ_R[0:N][mask1==True] = 3.0*Ψ_average[0:N][mask1==True]-2.0*Ψ_L[0:N][mask1==True] 
+   mask2 = np.logical_and(x_extreme>0.0, x_extreme<0.5)  
+   Ψ_L[0:N][mask2==True] = 3.0*Ψ_average[0:N][mask2==True]-2.0*Ψ_R[0:N][mask2==True]
+   #exit()
+   #for i in range(0,N):
+   #   if local_maximum[i]==False:
+   #      if abs(a2[i])>=10**(-12):
+   #         x_extreme = -a1[i]/(2*a2[i])
+   #      else:
+   #         x_extreme = float('inf')
+   #      if (x_extreme>-0.5 and x_extreme<0.0):
+   #         Ψ_R[i] = 3.0*Ψ_average[i]-2.0*Ψ_L[i] 
+   #      elif (x_extreme>0.0 and x_extreme<0.5):
+   #         Ψ_L[i] = 3.0*Ψ_average[i]-2.0*Ψ_R[i] 
 
    # Update the polynomial coefs 
    δa[0:N] = Ψ_R[0:N] - Ψ_L[0:N]
