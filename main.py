@@ -26,17 +26,16 @@ createDirs()
 N, dt, Tf, tc, ic = configuration.get_parameters()
 simulation = simulation_par(N, dt, Tf, ic)
 
-
 # Select test case
 if tc == 1:
-   # Advection routine
-   adv_1d(simulation, True)
+    # Advection routine
+    adv_1d(simulation, True)
 elif tc == 2:
-   # Advection error analysis
-   error_analysis_adv1d(simulation)
+    # Advection error analysis
+    error_analysis_adv1d(simulation)
 elif tc == 3:
-   # Advection error analysis
-   error_analysis_recon(simulation)
+    # Advection error analysis
+    error_analysis_recon(simulation)
 else:
-   print('Invalid test case.')
-   exit()
+    print('Invalid test case.')
+    exit()
