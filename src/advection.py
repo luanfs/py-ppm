@@ -160,18 +160,12 @@ def adv_1d(simulation, plot):
         # Compute exact solution
         Q_exact = qexact(xplot, t*dt, simulation)
     
-        #Relative errors in different metrics
+        # Relative errors in different metrics
         error_inf, error_1, error_2 = compute_errors(Q_parabolic, Q_exact)
 
         # Plot the graph
-        plt.plot(xplot, Q_exact, color='black',label='Exact')
-        plt.plot(xplot, Q_parabolic, color='blue',label='PPM')
-        plt.ylim(1.1*ymin, 1.1*ymax)
-        plt.ylabel('y')
-        plt.xlabel('x') 
-        plt.legend()
-        plt.title(name+' - 1d advection, time='+str(t*dt)+', CFL='+str(CFL))
-        plt.savefig(graphdir+'adv1d_ppm_ic'+str(ic)+'_t'+str(t+1)+'_N'+str(N)+'.png', format='png')
-        plt.close() 
+        title = name+' - 1d advection, time='+str(t*dt)+', CFL='+str(CFL)
+        filename = graphdir+'adv1d_ppm_ic'+str(ic)+'_t'+str(t+1)+'_N'+str(N)+'.png'
+        plot_sol_graphs(Q_exact, Q_parabolic, xplot, ymin, ymax, filename, title)
         return error_inf, error_1, error_2
 
