@@ -57,30 +57,27 @@ def error_analysis_recon(simulation):
         Q = np.zeros(N+5)
 
         if (simulation.ic == 0 or simulation.ic == 1 or simulation.ic == 3 or simulation.ic == 4 or simulation.ic == 5):
-            Q[0:N] = (q0_antiderivative(x[1:N+1], simulation) - q0_antiderivative(x[0:N], simulation))/dx
+            Q[2:N+2] = (q0_antiderivative(x[1:N+1], simulation) - q0_antiderivative(x[0:N], simulation))/dx
         elif (simulation.ic == 2):
-            Q[0:N] = q0(xc,simulation)
-        #print(np.amax(abs( Q[0:N]- Qexact(xc,0,simulation))))
+            Q[2:N+2] = q0(xc, simulation)
       
         # Periodic boundary conditions
-        Q[N]   = Q[0]
-        Q[N+1] = Q[1]
-        Q[N+2] = Q[3]
-        Q[-2]  = Q[N-2]
-        Q[-1]  = Q[N-1]
+        Q[N+2:N+5] = Q[2:5]
+        Q[0:2]    = Q[N:N+2]
+        
         #Q[N]   = (q0_antiderivative(xf+1.0*dx, simulation) - q0_antiderivative(xf+0.0*dx, simulation))/dx
         #Q[N+1] = (q0_antiderivative(xf+2.0*dx, simulation) - q0_antiderivative(xf+1.0*dx, simulation))/dx
         #Q[N+2] = (q0_antiderivative(xf+3.0*dx, simulation) - q0_antiderivative(xf+2.0*dx, simulation))/dx
-        #Q[-1]  = (q0_antiderivative(x0-0.0*dx, simulation) - q0_antiderivative(x0-1.0*dx, simulation))/dx
-        #Q[-2]  = (q0_antiderivative(x0-1.0*dx, simulation) - q0_antiderivative(x0-2.0*dx, simulation))/dx
+        #Q[1]   = (q0_antiderivative(x0-0.0*dx, simulation) - q0_antiderivative(x0-1.0*dx, simulation))/dx
+        #Q[0]   = (q0_antiderivative(x0-1.0*dx, simulation) - q0_antiderivative(x0-2.0*dx, simulation))/dx
 
         # Reconstructs the values of Q using a piecewise parabolic polynomial
         da, a6, aL, aR = rec.ppm_reconstruction(Q, N)
 
         # Compute the parabola
-        for k in range(0,N):
+        for k in range(0, N):
             z = (xplot[neighbours==k]-x[k])/dx # Maps to [0,1]
-            Q_parabolic[neighbours==k] = aL[k] + da[k]*z+ z*(1.0-z)*a6[k]
+            Q_parabolic[neighbours==k] = aL[k+2] + da[k+2]*z+ z*(1.0-z)*a6[k+2]
 
         # Compute exact solution
         q_exact = qexact(xplot, 0, simulation)

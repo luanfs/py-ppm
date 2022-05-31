@@ -44,26 +44,23 @@ def adv_1d(simulation, plot):
     Nsteps = int(Tf/dt)
 
     # Compute average values of Q (initial condition)
-    Q_average = np.zeros(N+5)
+    Q = np.zeros(N+5)
     if (simulation.ic == 0 or simulation.ic == 1 or simulation.ic == 3 or simulation.ic == 4):
-        Q_average[0:N] = (q0_antiderivative(x[1:N+1], simulation) - q0_antiderivative(x[0:N], simulation))/dx
+        Q[2:N+2] = (q0_antiderivative(x[1:N+1], simulation) - q0_antiderivative(x[0:N], simulation))/dx
     elif (simulation.ic == 2):
-        Q_average[0:N] = q0(xc,simulation)
+        Q[2:N+2] = q0(xc,simulation)
 
     # Periodic boundary conditions
-    Q_average[N]   = Q_average[0]
-    Q_average[N+1] = Q_average[1]
-    Q_average[N+2] = Q_average[3]
-    Q_average[-2]  = Q_average[N-2]
-    Q_average[-1]  = Q_average[N-1]
+    Q[N+2:N+5] = Q[2:5]
+    Q[0:2]     = Q[N:N+2]
 
     # Plotting variables
     Nplot = 10000
     xplot = np.linspace(x0, xf, Nplot)
-    Q_parabolic = np.zeros(Nplot)
-    Q_exact = q0(xplot, simulation)
-    ymin = np.amin(Q_exact)
-    ymax = np.amax(Q_exact)
+    q_parabolic = np.zeros(Nplot)
+    q_exact = q0(xplot, simulation)
+    ymin = np.amin(q_exact)
+    ymax = np.amax(q_exact)
     dists = abs(np.add.outer(xplot,-xc))
     neighbours = dists.argmin(axis=1)
 
@@ -76,57 +73,54 @@ def adv_1d(simulation, plot):
     minus1toN = np.linspace(-1, N-2 ,N,dtype=np.int32)
 
     # Compute initial mass
-    total_mass0, mass_change =  diagnostics(Q_average, simulation, 1.0)
+    total_mass0, mass_change =  diagnostics(Q, simulation, 1.0)
 
     # Errors variable
     error_linf = np.zeros(Nsteps)
-    error_l1  = np.zeros(Nsteps)
-    error_l2  = np.zeros(Nsteps)
+    error_l1   = np.zeros(Nsteps)
+    error_l2   = np.zeros(Nsteps)
 
     # Time looping
     for t in range(0, Nsteps):
         # Reconstructs the values of Q using a piecewise parabolic polynomial
-        da, a6, aL, aR = rec.ppm_reconstruction(Q_average, N)
+        da, a6, Q_L, Q_R = rec.ppm_reconstruction(Q, N)
 
         # Compute the fluxes (formula 1.11 from Collela and Woodward 1983)
         y = u*dt/dx
         
         if u>=0:
-            f_L = aR[0:N]   - y*0.5*(da[0:N]   - (1.0-2.0/3.0*y)*a6[0:N])
+            f_L = Q_R[2:N+2] - y*0.5*(da[2:N+2] - (1.0-2.0/3.0*y)*a6[2:N+2])
             abar[0:N] = f_L
         else:
             y = -y
-            f_R = aL[1:N+1] + y*0.5*(da[1:N+1] + (1.0-2.0/3.0*y)*a6[1:N+1])
+            f_R = Q_L[3:N+3] + y*0.5*(da[3:N+3] + (1.0-2.0/3.0*y)*a6[3:N+3])
             abar[0:N] = f_R
 
         # Periodic boundary conditions
         abar[-1] = abar[N-1]
 
         # Update the values of Q_average (formula 1.12 from Collela and Woodward 1983)
-        Q_average[0:N] = Q_average[0:N] + (u*dt/dx)*(abar[minus1toN]-abar[0:N])
+        Q[2:N+2] = Q[2:N+2] + (u*dt/dx)*(abar[minus1toN]-abar[0:N])
 
         # Periodic boundary conditions
-        Q_average[N]   = Q_average[0]
-        Q_average[N+1] = Q_average[1]
-        Q_average[N+2] = Q_average[3]
-        Q_average[-2]  = Q_average[N-2]
-        Q_average[-1]  = Q_average[N-1]
+        Q[N+2:N+5] = Q[2:5]
+        Q[0:2]     = Q[N:N+2]
 
         # Output and plot
         if plot:
             # Compute the parabola
             for i in range(0, N):
                 z = (xplot[neighbours==i]-x[i])/dx # Maps to [0,1]
-                Q_parabolic[neighbours==i] = aL[i] + da[i]*z+ z*(1.0-z)*a6[i]
+                q_parabolic[neighbours==i] = Q_L[i+2] + da[i+2]*z+ z*(1.0-z)*a6[i+2]
 
             # Compute exact solution
-            Q_exact = qexact(xplot, t*dt, simulation)
+            q_exact = qexact(xplot, t*dt, simulation)
     
             # Diagnostic computation
-            total_mass, mass_change =  diagnostics(Q_average, simulation, total_mass0)
+            total_mass, mass_change = diagnostics(Q, simulation, total_mass0)
 
             # Relative errors in different metrics
-            error_linf[t], error_l1[t], error_l2[t] = compute_errors(Q_parabolic, Q_exact)
+            error_linf[t], error_l1[t], error_l2[t] = compute_errors(q_parabolic, q_exact)
 
             if error_linf[t] > 10**(4):
                 print('\nStopping due to large errors.')
@@ -136,7 +130,7 @@ def adv_1d(simulation, plot):
             # Plot the graph and print diagnostic
             title = name+' - 1d advection, time='+str(t*dt)+', CFL='+str(CFL)
             filename = graphdir+'adv1d_ppm_ic'+str(ic)+'_t'+str(t+1)+'.png'
-            plot_sol_graphs(Q_exact, Q_parabolic, xplot, ymin, ymax, filename, title)
+            plot_sol_graphs(q_exact, q_parabolic, xplot, ymin, ymax, filename, title)
             print_diagnostics(error_linf[t], error_l1[t], error_l2[t], mass_change, t, Nsteps)
 
     if plot:
@@ -148,7 +142,7 @@ def adv_1d(simulation, plot):
         # Plot the solution graph
         title = name+' - 1d advection, time='+str(t*dt)+', CFL='+str(CFL)
         filename = graphdir+'adv1d_ppm_ic'+str(ic)+'_t'+str(t+1)+'.png'
-        plot_sol_graphs(Q_exact, Q_parabolic, xplot, ymin, ymax, filename, title)
+        plot_sol_graphs(q_exact, q_parabolic, xplot, ymin, ymax, filename, title)
         print('\nGraphs have been ploted in '+ graphdir)
         print('Error evolution is shown in '+ graphdir + 'adv1d_ppm_ic' + str(ic) + '_error.png')      
    
@@ -156,16 +150,16 @@ def adv_1d(simulation, plot):
         # Compute the parabola
         for i in range(0, N):
             z = (xplot[neighbours==i]-x[i])/dx # Maps to [0,1]
-            Q_parabolic[neighbours==i] = aL[i] + da[i]*z+ z*(1.0-z)*a6[i]
+            q_parabolic[neighbours==i] = Q_L[i+2] + da[i+2]*z+ z*(1.0-z)*a6[i+2]
         # Compute exact solution
-        Q_exact = qexact(xplot, t*dt, simulation)
+        q_exact = qexact(xplot, t*dt, simulation)
     
         # Relative errors in different metrics
-        error_inf, error_1, error_2 = compute_errors(Q_parabolic, Q_exact)
+        error_inf, error_1, error_2 = compute_errors(q_parabolic, q_exact)
 
         # Plot the graph
         title = name+' - 1d advection, time='+str(t*dt)+', CFL='+str(CFL)
         filename = graphdir+'adv1d_ppm_ic'+str(ic)+'_t'+str(t+1)+'_N'+str(N)+'.png'
-        plot_sol_graphs(Q_exact, Q_parabolic, xplot, ymin, ymax, filename, title)
+        plot_sol_graphs(q_exact, q_parabolic, xplot, ymin, ymax, filename, title)
         return error_inf, error_1, error_2
 
