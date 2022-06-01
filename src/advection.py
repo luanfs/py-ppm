@@ -142,8 +142,8 @@ def adv_1d(simulation, plot):
         plot_time_evolution([error_linf, error_l1, error_l2], Tf, ['$L_\infty}$','$L_1$','$L_2$'], 'Error', filename, title)
  
         # Plot the solution graph
-        title = name+' - 1d advection, time='+str(t*dt)+', CFL='+str(CFL)
-        filename = graphdir+'adv1d_ppm_ic'+str(ic)+'_t'+str(t)+'.png'
+        title = name+' - 1d advection, time='+str(t*dt)+', CFL='+str(CFL)+', N='+str(N)
+        filename = graphdir+'adv1d_ppm_ic'+str(ic)+'_t'+str(t)+'_N'+str(N)+'.png'
         plot_field_graphs([q_exact, q_parabolic], ['Exact', 'Parabolic'], xplot, ymin, ymax, filename, title)
         print('\nGraphs have been ploted in '+ graphdir)
         print('Error evolution is shown in '+ graphdir + 'adv1d_ppm_ic' + str(ic) + '_error.png')      
@@ -161,7 +161,7 @@ def adv_1d(simulation, plot):
         error_inf, error_1, error_2 = compute_errors(q_parabolic, q_exact)
 
         # Plot the graph
-        title = name+' - 1d advection, time='+str(t*dt)+', CFL='+str(CFL)
+        title = name+' - 1d advection, time='+str(t*dt)+', CFL='+str(CFL)+', N='+str(N)
         filename = graphdir+'adv1d_ppm_ic'+str(ic)+'_t'+str(t)+'_N'+str(N)+'.png'
         plot_field_graphs([q_exact, q_parabolic], ['Exact', 'Parabolic'], xplot, ymin, ymax, filename, title)
         return error_inf, error_1, error_2
