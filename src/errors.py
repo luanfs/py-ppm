@@ -75,16 +75,18 @@ def compute_errors(Q, Qref):
     return error_inf, error_1, error_2
 
 ####################################################################################
-# Plot the L_inf, L_1 and L_2 errors evolution with time
+# Plot evolution with time of the values given in the list values
 ####################################################################################
-def plot_errors_evolution(error_linf, error_l1, error_l2, Tf, filename, title):
+def plot_time_evolution(values, Tf, vlabels, ylabel, filename, title):
     # Plot the error graph
-    Nsteps = len(error_linf)
+    n = len(values)
+    Nsteps = len(values[0])
     times = np.linspace(0, Tf, Nsteps)
-    plt.semilogy(times, error_linf, color='green', label = '$L_\infty$')
-    plt.semilogy(times, error_l1  , color='blue' , label = '$L_1$')
-    plt.semilogy(times, error_l2  , color='red'  , label = '$L_2$')
-    plt.ylabel('Error')
+    colors = ('black', 'blue', 'green', 'red', 'purple')
+    for k in range(0, n):
+        plt.semilogy(times, values[k], color=colors[k], label = vlabels[k])
+
+    plt.ylabel(ylabel)
     plt.xlabel('Time (seconds)')
     plt.legend()
     plt.grid(True, which="both")

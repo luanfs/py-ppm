@@ -51,16 +51,19 @@ def diagnostics(Q_average, simulation, total_mass0):
 # Print the diagnostics variables on the screen
 #################################################################################### 
 def print_diagnostics(error_linf, error_l1, error_l2, mass_change, t, Nsteps):
-    print('\nStep',t+1, 'from', Nsteps)
+    print('\nStep', t, 'from', Nsteps)
     print('Error (Linf, L1, L2) :',"{:.2e}".format(error_linf), "{:.2e}".format(error_l1), "{:.2e}".format(error_l2))
     print('Total mass variation:', "{:.2e}".format(mass_change))
 
 ####################################################################################
-# Plot the numerical and the exact solution
+# Plot the graphs given in the list fields 
 ####################################################################################
-def plot_sol_graphs(Q_exact, Q_parabolic, xplot, ymin, ymax, filename, title):
-    plt.plot(xplot, Q_exact, color='black',label='Exact')
-    plt.plot(xplot, Q_parabolic, color='blue',label='PPM')
+def plot_field_graphs(fields, labels, xplot, ymin, ymax, filename, title):
+    n = len(fields)
+    colors = ('black', 'blue', 'green', 'red', 'purple')
+    for k in range(0, n):
+        plt.plot(xplot, fields[k], color = colors[k], label = labels[k])
+    
     plt.ylim(-0.1, 1.1*ymax)
     plt.ylabel('y')
     plt.xlabel('x')
