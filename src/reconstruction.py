@@ -51,68 +51,29 @@ def ppm_reconstruction(Q, N):
     Q_edges[0:N+4] = 0.5*(Q[0:N+4] + Q[1:N+5]) - (dQ[1:N+5] - dQ[0:N+4])/6.0
 
     # Assign values of Q_R and Q_L
-    Q_R = np.zeros(N+5)
-    Q_R[2:N+2] = Q_edges[2:N+2]
-    Q_L = np.zeros(N+5)
-    Q_L[2:N+2] = Q_edges[1:N+1]
+    q_R = np.zeros(N+5)
+    q_R[2:N+2] = Q_edges[2:N+2]
+    q_L = np.zeros(N+5)
+    q_L[2:N+2] = Q_edges[1:N+1]
 
-    # In each cell, check if Q is a local maximum
-    # See First equation in formula 1.10 from Collela and Woodward 1983
-    local_maximum = (Q_R[2:N+2]-Q[2:N+2])*(Q[2:N+2]-Q_L[2:N+2])<=0
-
-    # In this case (local maximum), the interpolation is a constant equal to Q
-    Q_R[2:N+2][local_maximum==True] = Q[2:N+2][local_maximum==True]
-    Q_L[2:N+2][local_maximum==True] = Q[2:N+2][local_maximum==True]
-
-    # Compute the polynomial coefs (we are using the formulation from Carpenter et al 89)
-    # a(x)  = <a> + da*x + a6*(1/12-x*x), x in [-0.5,0.5]
-    da = np.zeros(N+5)
-    a6 = np.zeros(N+5)
-    da[2:N+2] = Q_R[2:N+2] - Q_L[2:N+2]
-    a6[2:N+2] = 6*Q[2:N+2] - 3*(Q_R[2:N+2] + Q_L[2:N+2])
-
-    # Auxiliary variables
-    a0 = 1.5*Q[2:N+2] - 0.5*(Q_R[2:N+2]+Q_L[2:N+2])*0.5 
-    a1 = Q_R[2:N+2] - Q_L[2:N+2]
-    a2 = 6.0*((Q_R[2:N+2]+Q_L[2:N+2])*0.5 - Q[2:N+2])
-
-    # Monotonization
-    x_extreme = np.zeros(N)
-    mask_a2not0 = abs(a2)>=10**(-12)
-    x_extreme[mask_a2not0==True] = -a1[mask_a2not0==True]/(2*a2[mask_a2not0==True])
-    x_extreme[mask_a2not0==False] =  float('inf')
-
-    mask1 = np.logical_and(x_extreme>-0.5, x_extreme<0.0)
-    Q_R[2:N+2][mask1==True] = 3.0*Q[2:N+2][mask1==True]-2.0*Q_L[2:N+2][mask1==True] 
-    mask2 = np.logical_and(x_extreme>0.0, x_extreme<0.5)  
-    Q_L[2:N+2][mask2==True] = 3.0*Q[2:N+2][mask2==True]-2.0*Q_R[2:N+2][mask2==True]
-
-    for i in range(0, N):
-        if local_maximum[i]==False:
-            if abs(a2[i])>=10**(-12):
-                x_extreme = -a1[i]/(2*a2[i])
-            else:
-                x_extreme = float('inf')
-            if (x_extreme>-0.5 and x_extreme<0.0):
-                Q_R[i+2] = 3.0*Q[i+2]-2.0*Q_L[i+2] 
-            elif (x_extreme>0.0 and x_extreme<0.5):
-                Q_L[i+2] = 3.0*Q[i+2]-2.0*Q_R[i+2] 
-
-    # Update the polynomial coefs 
-    da[2:N+2] = Q_R[2:N+2] - Q_L[2:N+2]
-    a6[2:N+2] = 6*Q[2:N+2] - 3*(Q_R[2:N+2] + Q_L[2:N+2])
+    # Compute the polynomial coefs
+    # q(x) = q_L + z*(dq + q6*(1-z)) z in [0,1]
+    dq = np.zeros(N+5)
+    q6 = np.zeros(N+5)
+    dq[2:N+2] = q_R[2:N+2] - q_L[2:N+2]
+    q6[2:N+2] = 6*Q[2:N+2] - 3*(q_R[2:N+2] + q_L[2:N+2])
 
     # Periodic boundary conditions
-    Q_L[N+2:N+5] = Q_L[2:5]
-    Q_L[0:2]     = Q_L[N:N+2]
+    q_L[N+2:N+5] = q_L[2:5]
+    q_L[0:2]     = q_L[N:N+2]
 
-    Q_R[N+2:N+5] = Q_R[2:5]
-    Q_R[0:2]     = Q_R[N:N+2]
+    q_R[N+2:N+5] = q_R[2:5]
+    q_R[0:2]     = q_R[N:N+2]
 
-    a6[N+2:N+5] = a6[2:5]
-    a6[0:2]     = a6[N:N+2]
+    q6[N+2:N+5] = q6[2:5]
+    q6[0:2]     = q6[N:N+2]
 
-    da[N+2:N+5] = da[2:5]
-    da[0:2]     = da[N:N+2]
+    dq[N+2:N+5] = dq[2:5]
+    dq[0:2]     = dq[N:N+2]
 
-    return da, a6, Q_L, Q_R
+    return dq, q6, q_L, q_R
