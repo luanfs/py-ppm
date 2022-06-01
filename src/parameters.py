@@ -39,9 +39,9 @@ class simulation_par:
 
         # Define the interval extremes, advection velocity, etc
         if ic == 1:
-            x0 = -1
-            xf =  1
-            u  =  0.5
+            x0 = 0
+            xf = 40
+            u  = 0.5
             name = 'Sine wave'
 
         elif ic == 2:
@@ -97,11 +97,11 @@ def q0(x, simulation):
 ####################################################################################
 def q0_antiderivative(x, simulation):
     if simulation.ic == 1:
-        y = -np.cos(np.pi*x)/(np.pi) + 1.0*x
+        y = -20.0*np.cos(np.pi*x/20.0)/(np.pi) + 1.0*x
 
     elif simulation.ic == 2:
         x0 = 40
-        sigma = 1
+        sigma = 10
         y = np.exp(-((x-x0)/sigma)**2)
 
     elif simulation.ic == 3:
@@ -138,11 +138,11 @@ def qexact(x, t, simulation):
     X[mask] = (X[mask]-x0)%(xf-x0) + x0 # maps back to [x0,xf]
 
     if simulation.ic == 1:
-        y = np.sin(np.pi*X) + 1.0
+        y = np.sin(np.pi*X/20.0) + 1.0
 
     elif simulation.ic == 2:
         x0 = 40
-        sigma = 1
+        sigma = 10
         y = np.exp(-((X-x0)/sigma)**2)
 
     elif simulation.ic == 3:

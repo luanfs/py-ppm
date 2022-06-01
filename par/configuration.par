@@ -1,6 +1,6 @@
 #Parameters 
 #Number of cells N 
-40
+80
 #Total period definition (seconds)
 80
 #Time step (seconds)
@@ -8,7 +8,7 @@
 #Test case
 1
 #Initial condition
-2
+1
 #-----------Description of parameters -------------------------------------
 #Possible test cases
 #  case(1) - Advection simulation
