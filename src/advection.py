@@ -83,17 +83,17 @@ def adv_1d(simulation, plot):
     # Time looping
     for t in range(0, Nsteps+1):
         # Reconstructs the values of Q using a piecewise parabolic polynomial
-        da, a6, Q_L, Q_R = rec.ppm_reconstruction(Q, N)
+        dq, q6, q_L, q_R = rec.ppm_reconstruction(Q, N)
 
         # Compute the fluxes (formula 1.11 from Collela and Woodward 1983)
         y = u*dt/dx
         
         if u>=0:
-            f_L = Q_R[2:N+2] - y*0.5*(da[2:N+2] - (1.0-2.0/3.0*y)*a6[2:N+2])
+            f_L = q_R[2:N+2] - y*0.5*(dq[2:N+2] - (1.0-2.0/3.0*y)*q6[2:N+2])
             abar[0:N] = f_L
         else:
             y = -y
-            f_R = Q_L[3:N+3] + y*0.5*(da[3:N+3] + (1.0-2.0/3.0*y)*a6[3:N+3])
+            f_R = q_L[3:N+3] + y*0.5*(dq[3:N+3] + (1.0-2.0/3.0*y)*q6[3:N+3])
             abar[0:N] = f_R
 
         # Periodic boundary conditions
@@ -111,7 +111,7 @@ def adv_1d(simulation, plot):
             # Compute the parabola
             for i in range(0, N):
                 z = (xplot[neighbours==i]-x[i])/dx # Maps to [0,1]
-                q_parabolic[neighbours==i] = Q_L[i+2] + da[i+2]*z+ z*(1.0-z)*a6[i+2]
+                q_parabolic[neighbours==i] = q_L[i+2] + dq[i+2]*z+ z*(1.0-z)*q6[i+2]
 
             # Compute exact solution
             q_exact = qexact(xplot, t*dt, simulation)
@@ -152,7 +152,7 @@ def adv_1d(simulation, plot):
         # Compute the parabola
         for i in range(0, N):
             z = (xplot[neighbours==i]-x[i])/dx # Maps to [0,1]
-            q_parabolic[neighbours==i] = Q_L[i+2] + da[i+2]*z+ z*(1.0-z)*a6[i+2]
+            q_parabolic[neighbours==i] = q_L[i+2] + dq[i+2]*z+ z*(1.0-z)*q6[i+2]
 
         # Compute exact solution
         q_exact = qexact(xplot, Tf, simulation)
