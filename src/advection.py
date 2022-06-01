@@ -22,7 +22,7 @@ import matplotlib.pyplot as plt
 from parameters import q0, qexact, q0_antiderivative, graphdir
 import reconstruction as rec
 from errors import *
-from miscellaneous import diagnostics, print_diagnostics, plot_sol_graphs
+from miscellaneous import diagnostics, print_diagnostics, plot_field_graphs
 
 def adv_1d(simulation, plot):
     N  = simulation.N    # Number of cells
@@ -73,15 +73,15 @@ def adv_1d(simulation, plot):
     minus1toN = np.linspace(-1, N-2 ,N,dtype=np.int32)
 
     # Compute initial mass
-    total_mass0, mass_change =  diagnostics(Q, simulation, 1.0)
+    total_mass0, mass_change = diagnostics(Q, simulation, 1.0)
 
     # Errors variable
-    error_linf = np.zeros(Nsteps)
-    error_l1   = np.zeros(Nsteps)
-    error_l2   = np.zeros(Nsteps)
+    error_linf = np.zeros(Nsteps+1)
+    error_l1   = np.zeros(Nsteps+1)
+    error_l2   = np.zeros(Nsteps+1)
 
     # Time looping
-    for t in range(0, Nsteps):
+    for t in range(0, Nsteps+1):
         # Reconstructs the values of Q using a piecewise parabolic polynomial
         da, a6, Q_L, Q_R = rec.ppm_reconstruction(Q, N)
 
@@ -128,21 +128,23 @@ def adv_1d(simulation, plot):
                 exit()
 
             # Plot the graph and print diagnostic
-            title = name+' - 1d advection, time='+str(t*dt)+', CFL='+str(CFL)
-            filename = graphdir+'adv1d_ppm_ic'+str(ic)+'_t'+str(t+1)+'.png'
-            plot_sol_graphs(q_exact, q_parabolic, xplot, ymin, ymax, filename, title)
+            title = name+' - 1d advection, time='+str(t*dt)+', CFL='+str(CFL)+', N='+str(N)
+            filename = graphdir+'adv1d_ppm_ic'+str(ic)+'_t'+str(t)+'_N'+str(N)+'.png'
+            plot_field_graphs([q_exact, q_parabolic], ['Exact', 'Parabolic'], xplot, ymin, ymax, filename, title)
             print_diagnostics(error_linf[t], error_l1[t], error_l2[t], mass_change, t, Nsteps)
+
+    #---------------------------------------End of time loop---------------------------------------
 
     if plot:
         # Plot the error graph
-        title = name+' - 1d advection errors - CFL='+str(CFL)
-        filename = graphdir+'adv1d_ppm_ic'+str(ic)+'_error.png'
-        plot_errors_evolution(error_linf, error_l1, error_l2, Tf, filename, title)
-        
+        title = name+' - 1d advection, time='+str(t*dt)+', CFL='+str(CFL)+', N='+str(N)
+        filename = graphdir+'adv1d_ppm_ic'+str(ic)+'_t'+str(t)+'_N'+str(N)+'.png'    
+        plot_time_evolution([error_linf, error_l1, error_l2], Tf, ['$L_\infty}$','$L_1$','$L_2$'], 'Error', filename, title)
+ 
         # Plot the solution graph
         title = name+' - 1d advection, time='+str(t*dt)+', CFL='+str(CFL)
-        filename = graphdir+'adv1d_ppm_ic'+str(ic)+'_t'+str(t+1)+'.png'
-        plot_sol_graphs(q_exact, q_parabolic, xplot, ymin, ymax, filename, title)
+        filename = graphdir+'adv1d_ppm_ic'+str(ic)+'_t'+str(t)+'.png'
+        plot_field_graphs([q_exact, q_parabolic], ['Exact', 'Parabolic'], xplot, ymin, ymax, filename, title)
         print('\nGraphs have been ploted in '+ graphdir)
         print('Error evolution is shown in '+ graphdir + 'adv1d_ppm_ic' + str(ic) + '_error.png')      
    
@@ -151,15 +153,16 @@ def adv_1d(simulation, plot):
         for i in range(0, N):
             z = (xplot[neighbours==i]-x[i])/dx # Maps to [0,1]
             q_parabolic[neighbours==i] = Q_L[i+2] + da[i+2]*z+ z*(1.0-z)*a6[i+2]
+
         # Compute exact solution
-        q_exact = qexact(xplot, t*dt, simulation)
+        q_exact = qexact(xplot, Tf, simulation)
     
         # Relative errors in different metrics
         error_inf, error_1, error_2 = compute_errors(q_parabolic, q_exact)
 
         # Plot the graph
         title = name+' - 1d advection, time='+str(t*dt)+', CFL='+str(CFL)
-        filename = graphdir+'adv1d_ppm_ic'+str(ic)+'_t'+str(t+1)+'_N'+str(N)+'.png'
-        plot_sol_graphs(q_exact, q_parabolic, xplot, ymin, ymax, filename, title)
+        filename = graphdir+'adv1d_ppm_ic'+str(ic)+'_t'+str(t)+'_N'+str(N)+'.png'
+        plot_field_graphs([q_exact, q_parabolic], ['Exact', 'Parabolic'], xplot, ymin, ymax, filename, title)
         return error_inf, error_1, error_2
 
