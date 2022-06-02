@@ -27,11 +27,13 @@ def get_parameters():
         confpar.readline()
         dt = confpar.readline()
         confpar.readline()
-        tc = confpar.readline()
-        confpar.readline()
         ic = confpar.readline()
         confpar.readline()
-
+        tc = confpar.readline()
+        confpar.readline()
+        mono = confpar.readline()
+        confpar.readline()
+ 
         # Close the file
         confpar.close()
 
@@ -39,20 +41,22 @@ def get_parameters():
         N  = int(N)
         Tf = float(Tf)
         dt = float(dt)
-        tc = int(tc)
         ic = int(ic)
+        tc = int(tc)
+        mono = int(mono)
 
-        # Print the parameters on the screen
+        #Print the parameters on the screen
         print("\n--------------------------------------------------------")
         print("Parameters from file", file_path,"\n")
         print("Number of cells: ", N)
         print("Time step ", dt)
         print("Total period definition ", Tf)
-        print("Test case: ", tc)
         print("Initial condition: ", ic)
+        print("Test case: ", tc)
+        print("Monotonization: ", mono)
         print("--------------------------------------------------------\n")
     
     else:   # The file does not exist
         print("ERROR in get_grid_parameters: file configuration.par not found in /par.")
         exit()
-    return N, dt, Tf, tc, ic
+    return N, dt, Tf, tc, ic, mono

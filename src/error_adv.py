@@ -21,6 +21,12 @@ def error_analysis_adv1d(simulation):
     # Initial condition
     ic = simulation.ic
 
+    # Monotonization method
+    mono = simulation.mono
+
+    # Test case
+    tc = simulation.tc
+
     # CFL number for all simulations
     CFL = 0.5
 
@@ -52,7 +58,7 @@ def error_analysis_adv1d(simulation):
     # Let us test and compute the error
     for i in range(0, Ntest):
         # Update simulation parameters
-        simulation = simulation_par(int(N[i]), dt[i], Tf, ic)
+        simulation = simulation_par(int(N[i]), dt[i], Tf, ic, tc, mono)
 
         # Run advection routine and get the errors
         error_linf[i], error_l1[i], error_l2[i] = adv_1d(simulation, False)
@@ -62,10 +68,10 @@ def error_analysis_adv1d(simulation):
         print_errors_simul(error_linf, error_l1, error_l2, i)
 
     # Plot the errors
-    filename = graphdir+'adv1d_ppm_ic'+str(ic)+'_errors.png'
-    title = simulation.name+' - 1d advection errors - CFL='+str(CFL)
+    title = simulation.title + '- ' + simulation.fvmethod + ' - ' + simulation.icname + ' - monotonization = ' + simulation.monot
+    filename = graphdir+'tc'+str(tc)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'_ic'+str(ic)+'_errors.png'
     plot_errors_loglog(N, error_linf, error_l1, error_l2, filename, title)
 
     # Print final message
     print('\nGraphs have been ploted in '+graphdir)
-    print('Convergence graphs has been ploted in '+graphdir+'adv1d_ppm_ic'+str(ic)+'_errors.png')
+    print('Convergence graphs has been ploted in '+filename)

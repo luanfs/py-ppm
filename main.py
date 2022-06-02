@@ -23,8 +23,8 @@ from error_reconstruction import error_analysis_recon
 createDirs()
 
 # Get parameters
-N, dt, Tf, tc, ic = configuration.get_parameters()
-simulation = simulation_par(N, dt, Tf, ic)
+N, dt, Tf, tc, ic, mono = configuration.get_parameters()
+simulation = simulation_par(N, dt, Tf, ic, tc, mono)
 
 # Select test case
 if tc == 1:

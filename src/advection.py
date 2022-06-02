@@ -23,6 +23,7 @@ from parameters import q0, qexact, q0_antiderivative, graphdir
 import reconstruction as rec
 from errors import *
 from miscellaneous import diagnostics, print_diagnostics, plot_field_graphs
+from monotonization import monotonization
 
 def adv_1d(simulation, plot):
     N  = simulation.N    # Number of cells
@@ -35,7 +36,9 @@ def adv_1d(simulation, plot):
     dt = simulation.dt   # Time step
     Tf = simulation.Tf   # Total period definition
     u  = simulation.u    # Advection velocity
-    name = simulation.name
+    tc = simulation.tc
+    icname = simulation.icname
+    mono   = simulation.mono  # Monotonization scheme
 
     # CFL number
     CFL = u*dt/dx
@@ -85,6 +88,9 @@ def adv_1d(simulation, plot):
         # Reconstructs the values of Q using a piecewise parabolic polynomial
         dq, q6, q_L, q_R = rec.ppm_reconstruction(Q, N)
 
+        # Applies monotonization on the parabolas
+        monotonization(Q, q_L, q_R, dq, q6, N, mono)
+
         # Compute the fluxes (formula 1.11 from Collela and Woodward 1983)
         y = u*dt/dx
         
@@ -128,25 +134,24 @@ def adv_1d(simulation, plot):
                 exit()
 
             # Plot the graph and print diagnostic
-            title = name+' - 1d advection, time='+str(t*dt)+', CFL='+str(CFL)+', N='+str(N)
-            filename = graphdir+'adv1d_ppm_ic'+str(ic)+'_t'+str(t)+'_N'+str(N)+'.png'
-            plot_field_graphs([q_exact, q_parabolic], ['Exact', 'Parabolic'], xplot, ymin, ymax, filename, title)
+            #title = simulation.title +'- '+icname+' - time='+str(t*dt)+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.fvmethod+', mono = '+simulation.monot
+            #filename = graphdir+'tc'+str(tc)+'_ic'+str(ic)+'_t'+str(t)+'_N'+str(N)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'.png'
+            #plot_field_graphs([q_exact, q_parabolic], ['Exact', 'Parabolic'], xplot, ymin, ymax, filename, title)
             print_diagnostics(error_linf[t], error_l1[t], error_l2[t], mass_change, t, Nsteps)
 
     #---------------------------------------End of time loop---------------------------------------
 
     if plot:
         # Plot the error graph
-        title = name+' - 1d advection, time='+str(t*dt)+', CFL='+str(CFL)+', N='+str(N)
-        filename = graphdir+'adv1d_ppm_ic'+str(ic)+'_t'+str(t)+'_N'+str(N)+'.png'    
+        title = simulation.title +'- '+icname+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.fvmethod+', mono = '+simulation.monot
+        filename = graphdir+'tc'+str(tc)+'_ic'+str(ic)+'_N'+str(N)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'_erros.png'
         plot_time_evolution([error_linf, error_l1, error_l2], Tf, ['$L_\infty}$','$L_1$','$L_2$'], 'Error', filename, title)
- 
         # Plot the solution graph
-        title = name+' - 1d advection, time='+str(t*dt)+', CFL='+str(CFL)+', N='+str(N)
-        filename = graphdir+'adv1d_ppm_ic'+str(ic)+'_t'+str(t)+'_N'+str(N)+'.png'
+        title = simulation.title +'- '+icname+' - time='+str(t*dt)+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.fvmethod+', mono = '+simulation.monot
+        filename = graphdir+'tc'+str(tc)+'_ic'+str(ic)+'_t'+str(t)+'_N'+str(N)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'.png'
         plot_field_graphs([q_exact, q_parabolic], ['Exact', 'Parabolic'], xplot, ymin, ymax, filename, title)
         print('\nGraphs have been ploted in '+ graphdir)
-        print('Error evolution is shown in '+ graphdir + 'adv1d_ppm_ic' + str(ic) + '_error.png')      
+        print('Error evolution is shown in '+filename)      
    
     else:
         # Compute the parabola
@@ -161,8 +166,7 @@ def adv_1d(simulation, plot):
         error_inf, error_1, error_2 = compute_errors(q_parabolic, q_exact)
 
         # Plot the graph
-        title = name+' - 1d advection, time='+str(t*dt)+', CFL='+str(CFL)+', N='+str(N)
-        filename = graphdir+'adv1d_ppm_ic'+str(ic)+'_t'+str(t)+'_N'+str(N)+'.png'
+        title = simulation.title +'- '+icname+' - time='+str(t*dt)+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.fvmethod+', mono = '+simulation.monot
+        filename = graphdir+'tc'+str(tc)+'_ic'+str(ic)+'_t'+str(t)+'_N'+str(N)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'.png'
         plot_field_graphs([q_exact, q_parabolic], ['Exact', 'Parabolic'], xplot, ymin, ymax, filename, title)
         return error_inf, error_1, error_2
-

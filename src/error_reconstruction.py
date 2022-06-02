@@ -10,10 +10,17 @@ import numpy as np
 import reconstruction as rec
 from parameters import q0, qexact, q0_antiderivative, simulation_par, graphdir
 from errors import *
+from monotonization import monotonization
 
 def error_analysis_recon(simulation):
     # Initial condition
     ic = simulation.ic
+
+    # Test case
+    tc = simulation.tc
+
+    # Monotonization method
+    mono = simulation.mono
 
     # Interval
     x0 = simulation.x0
@@ -44,7 +51,7 @@ def error_analysis_recon(simulation):
     # Let us test and compute the error!
     for i in range(0, Ntest):
         # Update simulation parameters
-        simulation = simulation_par(int(Nc[i]), 1.0, 1.0, ic)
+        simulation = simulation_par(int(Nc[i]), 1.0, 1.0, ic, tc, mono)
         N  = simulation.N
         x  = simulation.x
         xc = simulation.xc
@@ -74,6 +81,9 @@ def error_analysis_recon(simulation):
         # Reconstructs the values of Q using a piecewise parabolic polynomial
         dq, q6, q_L, q_R = rec.ppm_reconstruction(Q, N)
 
+        # Applies monotonization on the parabolas
+        monotonization(Q, q_L, q_R, dq, q6, N, mono)
+
         # Compute the parabola
         for k in range(0, N):
             z = (xplot[neighbours==k]-x[k])/dx # Maps to [0,1]
@@ -92,9 +102,9 @@ def error_analysis_recon(simulation):
         print_errors_simul(error_linf, error_l1, error_l2, i)
 
     # Plot the error graph
-    title = simulation.name+' - 1d PPM reconstruction errors'
-    filename = graphdir+'recon_ppm_ic'+str(ic)+'_errors.png'
+    title = simulation.title + '- ' + simulation.fvmethod + ' - ' + simulation.icname + ' - monotonization = ' + simulation.monot
+    filename = graphdir+'tc'+str(tc)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'_ic'+str(ic)+'_errors.png'
     plot_errors_loglog(Nc, error_linf, error_l1, error_l2, filename, title)
 
     print('\nGraphs have been ploted in '+graphdir)
-    print('Convergence graphs has been ploted in '+graphdir+'recon_ppm_ic'+str(ic)+'_errors.png')
+    print('Convergence graphs has been ploted in '+filename)

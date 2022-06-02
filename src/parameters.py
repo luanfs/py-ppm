@@ -24,18 +24,24 @@ def grid(x0, xf, N):
 #  Simulation class
 ####################################################################################      
 class simulation_par:
-    def __init__(self, N, dt, Tf, ic):
+    def __init__(self, N, dt, Tf, ic, tc, mono):
         # Number of cells
         self.N  = N
 
         # Initial condition
         self.ic = ic
 
+        # Test case
+        self.tc = tc
+
         # Time step
         self.dt = dt
 
-        #Total period definition
+        # Total period definition
         self.Tf = Tf
+
+        # Monotonization
+        self.mono = mono
 
         # Define the interval extremes, advection velocity, etc
         if ic == 1:
@@ -72,6 +78,15 @@ class simulation_par:
             print("Error - invalid test case")
             exit()
 
+        # Monotonization:
+        if mono == 0:
+            monot = 'none'
+        elif mono == 1:
+            monot = 'WC84' # Woodward and Collela 84 paper
+        else:
+           print("Error - invalid monotization method")
+           exit()
+
         # Interval endpoints
         self.x0 = x0
         self.xf = xf
@@ -83,7 +98,24 @@ class simulation_par:
         self.x, self.xc, self.dx = grid(x0, xf, N)
 
         # IC name
-        self.name = name
+        self.icname = name
+
+        # Monotonization method
+        self.monot = monot
+
+        # Finite volume method
+        self.fvmethod = 'PPM'
+
+        # Simulation title
+        if tc == 1:
+            self.title = '1D Advection '
+        elif tc == 2:
+            self.title = '1D advection errors '
+        elif tc == 3:
+            self.title = '1D reconstruction errors '
+        else:
+            print("Error - invalid test case")
+            exit()
 
 ####################################################################################
 # Initial condition
