@@ -140,7 +140,7 @@ def q0_antiderivative(x, simulation):
         # Parameters
         N = len(x)-1
         x0 = 40
-        sigma = 10
+        sigma = 5
         
         # Integration extremes
         a = x[0:N]
@@ -193,7 +193,7 @@ def qexact(x, t, simulation):
 
     elif simulation.ic == 2:
         x0 = 40
-        sigma = 10
+        sigma = 5
         y = np.exp(-((X-x0)/sigma)**2)
 
     elif simulation.ic == 3:
