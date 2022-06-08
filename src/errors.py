@@ -28,14 +28,17 @@ def plot_errors_loglog(N, error_linf, error_l1, error_l2, filename, title):
     ref = np.amax(error_linf)
     order1[0], order2[0], order3[0] = ref, ref, ref
 
+    order4 = np.zeros(nref)
+    order4[0] = ref
     for i in range(1, nref):
         order1[i] = order1[i-1]/2.0
         order2[i] = order2[i-1]/4.0
         order3[i] = order3[i-1]/8.0
- 
+        order4[i] = order4[i-1]/16.0
     plt.loglog(Norder, order1 , ':' , color='black', label = '1st order')
     plt.loglog(Norder, order2 , '--', color='black', label = '2nd order')
     plt.loglog(Norder, order3 , '-.', color='black', label = '3rd order')
+    plt.loglog(Norder, order4 , '--', color='black', label = '4rd order')    
     plt.xlabel('N (number of cells)')
     plt.ylabel('Error')
     plt.legend()
