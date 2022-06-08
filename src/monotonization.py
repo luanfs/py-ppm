@@ -48,16 +48,16 @@ def monotonization(Q, q_L, q_R, dq, q6, N, mono):
         mask2 = np.logical_and(x_extreme>0.0, x_extreme<0.5)  
         q_L[2:N+2][mask2==True] = 3.0*Q[2:N+2][mask2==True]-2.0*q_R[2:N+2][mask2==True]
 
-        for i in range(0, N):
-            if local_maximum[i]==False:
-                if abs(a2[i])>=10**(-12):
-                    x_extreme = -a1[i]/(2*a2[i])
-                else:
-                    x_extreme = float('inf')
-                if (x_extreme>-0.5 and x_extreme<0.0):
-                    q_R[i+2] = 3.0*Q[i+2]-2.0*q_L[i+2] 
-                elif (x_extreme>0.0 and x_extreme<0.5):
-                    q_L[i+2] = 3.0*Q[i+2]-2.0*q_R[i+2] 
+        #for i in range(0, N):
+        #    if local_maximum[i]==False:
+        #        if abs(a2[i])>=10**(-12):
+        #            x_extreme = -a1[i]/(2*a2[i])
+        #        else:
+        #            x_extreme = float('inf')
+        #        if (x_extreme>-0.5 and x_extreme<0.0):
+        #            q_R[i+2] = 3.0*Q[i+2]-2.0*q_L[i+2] 
+        #        elif (x_extreme>0.0 and x_extreme<0.5):
+        #            q_L[i+2] = 3.0*Q[i+2]-2.0*q_R[i+2] 
 
         # Update the polynomial coefs 
         dq[2:N+2] = q_R[2:N+2] - q_L[2:N+2]

@@ -51,7 +51,8 @@ def adv_1d(simulation, plot):
     if (simulation.ic == 0 or simulation.ic == 1 or simulation.ic == 3 or simulation.ic == 4):
         Q[2:N+2] = (q0_antiderivative(x[1:N+1], simulation) - q0_antiderivative(x[0:N], simulation))/dx
     elif (simulation.ic == 2):
-        Q[2:N+2] = q0(xc,simulation)
+        #Q[2:N+2] = q0(xc,simulation)
+        Q[2:N+2] = q0_antiderivative(x, simulation)/dx
 
     # Periodic boundary conditions
     Q[N+2:N+5] = Q[2:5]
@@ -161,12 +162,14 @@ def adv_1d(simulation, plot):
 
         # Compute exact solution
         q_exact = qexact(xplot, Tf, simulation)
-    
+        q_exact_edges = qexact(x, 0, simulation)
+        
         # Relative errors in different metrics
         error_inf, error_1, error_2 = compute_errors(q_parabolic, q_exact)
-
+        error_ed_linf, error_ed_l1, error_ed_l2 = compute_errors(q_exact_edges[0:N], q_L[2:N+2])
+        
         # Plot the graph
         title = '1D advection - '+icname+' - time='+str(t*dt)+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.fvmethod+', mono = '+simulation.monot
         filename = graphdir+'tc'+str(tc)+'_ic'+str(ic)+'_t'+str(t)+'_N'+str(N)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'.png'
         plot_field_graphs([q_exact, q_parabolic], ['Exact', 'Parabolic'], xplot, ymin, ymax, filename, title)
-        return error_inf, error_1, error_2
+        return error_inf, error_1, error_2, error_ed_linf, error_ed_l1, error_ed_l2
