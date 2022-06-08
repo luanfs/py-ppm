@@ -129,7 +129,7 @@ def q0(x, simulation):
 ####################################################################################
 def q0_antiderivative(x, simulation):
     if simulation.ic == 1:
-        y = -20.0*np.cos(np.pi*x/20.0)/(np.pi) + 1.0*x
+        y = -20.0*np.cos(2.0*np.pi*x/20.0)/(2.0*np.pi) + 1.0*x
 
     elif simulation.ic == 2:
         # Integration library
@@ -189,7 +189,7 @@ def qexact(x, t, simulation):
     X[mask] = (X[mask]-x0)%(xf-x0) + x0 # maps back to [x0,xf]
 
     if simulation.ic == 1:
-        y = np.sin(np.pi*X/20.0) + 1.0
+        y = np.sin(2.0*np.pi*X/20.0) + 1.0
 
     elif simulation.ic == 2:
         x0 = 40
