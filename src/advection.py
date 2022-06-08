@@ -24,6 +24,7 @@ import reconstruction as rec
 from errors import *
 from miscellaneous import diagnostics, print_diagnostics, plot_field_graphs
 from monotonization import monotonization
+from flux import numerical_flux
 
 def adv_1d(simulation, plot):
     N  = simulation.N    # Number of cells
@@ -41,7 +42,11 @@ def adv_1d(simulation, plot):
     mono   = simulation.mono  # Monotonization scheme
 
     # CFL number
-    CFL = u*dt/dx
+    CFL = abs(u*dt/dx)
+
+    # Velocity at edges
+    u_edges = np.zeros(N+1)
+    u_edges[0:N+1] = u
 
     # Number of time steps
     Nsteps = int(Tf/dt)
@@ -68,14 +73,13 @@ def adv_1d(simulation, plot):
     dists = abs(np.add.outer(xplot,-xc))
     neighbours = dists.argmin(axis=1)
 
-    # Fluxes
-    f_L = np.zeros(N)
-    f_R = np.zeros(N)
+    # Numerical fluxes at edges
+    f_L = np.zeros(N+1) # Left
+    f_R = np.zeros(N+1) # Rigth
 
     # Aux. variables
-    abar = np.zeros(N+1)   
-    minus1toN = np.linspace(-1, N-2 ,N,dtype=np.int32)
-
+    F = np.zeros(N+1) # Numerical flux
+  
     # Compute initial mass
     total_mass0, mass_change = diagnostics(Q, simulation, 1.0)
 
@@ -92,22 +96,11 @@ def adv_1d(simulation, plot):
         # Applies monotonization on the parabolas
         monotonization(Q, q_L, q_R, dq, q6, N, mono)
 
-        # Compute the fluxes (formula 1.11 from Collela and Woodward 1983)
-        y = u*dt/dx
-        
-        if u>=0:
-            f_L = q_R[2:N+2] - y*0.5*(dq[2:N+2] - (1.0-2.0/3.0*y)*q6[2:N+2])
-            abar[0:N] = f_L
-        else:
-            y = -y
-            f_R = q_L[3:N+3] + y*0.5*(dq[3:N+3] + (1.0-2.0/3.0*y)*q6[3:N+3])
-            abar[0:N] = f_R
+        # Compute the fluxes
+        numerical_flux(F, f_R, f_L, q_R, q_L, dq, q6, u_edges, simulation)
 
-        # Periodic boundary conditions
-        abar[-1] = abar[N-1]
-
-        # Update the values of Q_average (formula 1.12 from Collela and Woodward 1983)
-        Q[2:N+2] = Q[2:N+2] + (u*dt/dx)*(abar[minus1toN]-abar[0:N])
+        # Update the values of Q_average (formula 1.12 from Collela and Woodward 1984)
+        Q[2:N+2] = Q[2:N+2] - (u*dt/dx)*(F[1:N+1] - F[0:N])
 
         # Periodic boundary conditions
         Q[N+2:N+5] = Q[2:5]
@@ -147,6 +140,7 @@ def adv_1d(simulation, plot):
         title = simulation.title +'- '+icname+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.fvmethod+', mono = '+simulation.monot
         filename = graphdir+'tc'+str(tc)+'_ic'+str(ic)+'_N'+str(N)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'_erros.png'
         plot_time_evolution([error_linf, error_l1, error_l2], Tf, ['$L_\infty}$','$L_1$','$L_2$'], 'Error', filename, title)
+        
         # Plot the solution graph
         title = simulation.title +'- '+icname+' - time='+str(t*dt)+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.fvmethod+', mono = '+simulation.monot
         filename = graphdir+'tc'+str(tc)+'_ic'+str(ic)+'_t'+str(t)+'_N'+str(N)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'.png'

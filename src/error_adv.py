@@ -16,7 +16,7 @@ def error_analysis_adv1d(simulation):
     u = simulation.u
 
     # Period
-    Tf = (simulation.xf-simulation.x0)/u
+    Tf = (simulation.xf-simulation.x0)/abs(u)
 
     # Initial condition
     ic = simulation.ic
@@ -43,7 +43,7 @@ def error_analysis_adv1d(simulation):
 
     # Array of time steps
     dt = np.zeros(Ntest)
-    dt[0] = CFL/(N[0]*u)*(xf-x0)
+    dt[0] = CFL/(N[0]*abs(u))*(xf-x0)
 
     # Errors array
     error_linf = np.zeros(Ntest)
