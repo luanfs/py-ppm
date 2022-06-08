@@ -46,32 +46,6 @@ def monotonization(Q, q_L, q_R, dq, q6, N, mono):
 
         q_L[2:N+2][overshoot_move_left]  = 3.0*Q[2:N+2][overshoot_move_left]  - 2.0*q_R[2:N+2][overshoot_move_left]
         q_R[2:N+2][overshoot_move_right] = 3.0*Q[2:N+2][overshoot_move_right] - 2.0*q_L[2:N+2][overshoot_move_right]
-       #Auxiliary variables
-        #a0 = 1.5*Q[2:N+2] - 0.5*(q_R[2:N+2]+q_L[2:N+2])*0.5 
-        #a1 = q_R[2:N+2] - q_L[2:N+2]
-        #a2 = 6.0*((q_R[2:N+2]+q_L[2:N+2])*0.5 - Q[2:N+2])
-
-        # Monotonization
-        #x_extreme = np.zeros(N)
-        #mask_a2not0 = abs(a2)>=10**(-12)
-        #x_extreme[mask_a2not0==True] = -a1[mask_a2not0==True]/(2*a2[mask_a2not0==True])
-        #x_extreme[mask_a2not0==False] =  float('inf')
-
-        #mask1 = np.logical_and(x_extreme>-0.5, x_extreme<0.0)
-        #q_R[2:N+2][mask1==True] = 3.0*Q[2:N+2][mask1==True]-2.0*q_L[2:N+2][mask1==True] 
-        #mask2 = np.logical_and(x_extreme>0.0, x_extreme<0.5)  
-        #q_L[2:N+2][mask2==True] = 3.0*Q[2:N+2][mask2==True]-2.0*q_R[2:N+2][mask2==True]
-
-        #for i in range(0, N):
-        #    if local_maximum[i]==False:
-        #        if abs(a2[i])>=10**(-12):
-        #            x_extreme = -a1[i]/(2*a2[i])
-        #        else:
-        #            x_extreme = float('inf')
-        #        if (x_extreme>-0.5 and x_extreme<0.0):
-        #            q_R[i+2] = 3.0*Q[i+2]-2.0*q_L[i+2] 
-        #        elif (x_extreme>0.0 and x_extreme<0.5):
-        #            q_L[i+2] = 3.0*Q[i+2]-2.0*q_R[i+2] 
 
         # Update the polynomial coefs 
         dq[2:N+2] = q_R[2:N+2] - q_L[2:N+2]
