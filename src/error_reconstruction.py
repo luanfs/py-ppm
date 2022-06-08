@@ -27,7 +27,7 @@ def error_analysis_recon(simulation):
     xf = simulation.xf
 
     # Number of tests
-    Ntest = 12
+    Ntest = 14
 
     # Number of cells
     Nc = np.zeros(Ntest)
@@ -71,17 +71,23 @@ def error_analysis_recon(simulation):
         if (simulation.ic == 0 or simulation.ic == 1 or simulation.ic == 3 or simulation.ic == 4 or simulation.ic == 5):
             Q[2:N+2] = (q0_antiderivative(x[1:N+1], simulation) - q0_antiderivative(x[0:N], simulation))/dx
         elif (simulation.ic == 2):
-            Q[2:N+2] = q0(xc, simulation)
-
+            Q[2:N+2] = q0_antiderivative(x, simulation)/dx
+       
         # Periodic boundary conditions
-        Q[N+2:N+5] = Q[2:5]
-        Q[0:2]    = Q[N:N+2]
-
-        Q[N+2]   = (q0_antiderivative(xf+1.0*dx, simulation) - q0_antiderivative(xf+0.0*dx, simulation))/dx
-        Q[N+3] = (q0_antiderivative(xf+2.0*dx, simulation) - q0_antiderivative(xf+1.0*dx, simulation))/dx
-        Q[N+4] = (q0_antiderivative(xf+3.0*dx, simulation) - q0_antiderivative(xf+2.0*dx, simulation))/dx
-        Q[1]   = (q0_antiderivative(x0-0.0*dx, simulation) - q0_antiderivative(x0-1.0*dx, simulation))/dx
-        Q[0]   = (q0_antiderivative(x0-1.0*dx, simulation) - q0_antiderivative(x0-2.0*dx, simulation))/dx
+	    #Q[N+2:N+5] = Q[2:5]
+        #Q[0:2]    = Q[N:N+2]
+        if (simulation.ic == 0 or simulation.ic == 1 or simulation.ic == 3 or simulation.ic == 4 or simulation.ic == 5):
+            Q[N+2] = (q0_antiderivative(xf+1.0*dx, simulation) - q0_antiderivative(xf+0.0*dx, simulation))/dx
+            Q[N+3] = (q0_antiderivative(xf+2.0*dx, simulation) - q0_antiderivative(xf+1.0*dx, simulation))/dx
+            Q[N+4] = (q0_antiderivative(xf+3.0*dx, simulation) - q0_antiderivative(xf+2.0*dx, simulation))/dx
+            Q[1]   = (q0_antiderivative(x0-0.0*dx, simulation) - q0_antiderivative(x0-1.0*dx, simulation))/dx
+            Q[0]   = (q0_antiderivative(x0-1.0*dx, simulation) - q0_antiderivative(x0-2.0*dx, simulation))/dx
+        elif (simulation.ic == 2):
+            Q[N+2] = q0_antiderivative([xf+0.0*dx, xf+1.0*dx], simulation)
+            Q[N+3] = q0_antiderivative([xf+1.0*dx, xf+2.0*dx], simulation)
+            Q[N+4] = q0_antiderivative([xf+2.0*dx, xf+3.0*dx], simulation)
+            Q[1]   = q0_antiderivative([x0-1.0*dx, x0-0.0*dx], simulation)
+            Q[0]   = q0_antiderivative([x0-2.0*dx, x0-1.0*dx], simulation)
 
         # Reconstructs the values of Q using a piecewise parabolic polynomial
         dq, q6, q_L, q_R = rec.ppm_reconstruction(Q, N)
@@ -106,8 +112,8 @@ def error_analysis_recon(simulation):
         print('\nParameters: N = '+str(N))
         
         # Output
-        print_errors_simul(error_linf, error_l1, error_l2, i)
-        #print_errors_simul(error_ed_linf, error_ed_l1, error_ed_l2, i)
+        #print_errors_simul(error_linf, error_l1, error_l2, i)
+        print_errors_simul(error_ed_linf, error_ed_l1, error_ed_l2, i)
 
     # Plot the error graph
     title = 'Parabola errors\n ' + simulation.title + '- ' + simulation.fvmethod + ' - ' + simulation.icname + ' - monotonization = ' + simulation.monot

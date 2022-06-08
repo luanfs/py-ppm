@@ -35,7 +35,7 @@ def error_analysis_adv1d(simulation):
     xf = simulation.xf
 
     # Number of tests
-    Ntest = 10
+    Ntest = 11
 
     # Number of cells
     N = np.zeros(Ntest)
@@ -47,8 +47,13 @@ def error_analysis_adv1d(simulation):
 
     # Errors array
     error_linf = np.zeros(Ntest)
-    error_l1  = np.zeros(Ntest)
-    error_l2  = np.zeros(Ntest)
+    error_l1   = np.zeros(Ntest)
+    error_l2   = np.zeros(Ntest)
+
+    # Error at edges
+    error_ed_linf = np.zeros(Ntest)
+    error_ed_l1   = np.zeros(Ntest)
+    error_ed_l2   = np.zeros(Ntest)
 
     # Compute number of cells and time step for each simulation
     for i in range(1, Ntest):
@@ -61,17 +66,23 @@ def error_analysis_adv1d(simulation):
         simulation = simulation_par(int(N[i]), dt[i], Tf, ic, tc, mono)
 
         # Run advection routine and get the errors
-        error_linf[i], error_l1[i], error_l2[i] = adv_1d(simulation, False)
+        error_linf[i], error_l1[i], error_l2[i], error_ed_linf[i], error_ed_l1[i], error_ed_l2[i] =  adv_1d(simulation, False)
         print('\nParameters: N = '+str(int(N[i]))+', dt = '+str(dt[i]))
 
         # Output
-        print_errors_simul(error_linf, error_l1, error_l2, i)
+        #print_errors_simul(error_linf, error_l1, error_l2, i)
+        print_errors_simul(error_ed_linf, error_ed_l1, error_ed_l2, i)
 
     # Plot the errors
     title = simulation.title + '- ' + simulation.fvmethod + ' - ' + simulation.icname + ' - monotonization = ' + simulation.monot
-    filename = graphdir+'tc'+str(tc)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'_ic'+str(ic)+'_errors.png'
+    filename = graphdir+'tc'+str(tc)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'_ic'+str(ic)+'_parabola_errors.png'
     plot_errors_loglog(N, error_linf, error_l1, error_l2, filename, title)
 
+    title = 'Edges error \n' + simulation.title + '- ' + simulation.fvmethod + ' - ' + simulation.icname + ' - monotonization = ' + simulation.monot
+    filename2 = graphdir+'tc'+str(tc)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'_ic'+str(ic)+'_edge_errors.png'
+    plot_errors_loglog(N, error_ed_linf, error_ed_l1, error_ed_l2, filename2, title)
+
+ 
     # Print final message
     print('\nGraphs have been ploted in '+graphdir)
-    print('Convergence graphs has been ploted in '+filename)
+    print('Convergence graphs has been ploted in '+filename+' and '+filename2)

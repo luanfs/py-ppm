@@ -132,9 +132,28 @@ def q0_antiderivative(x, simulation):
         y = -20.0*np.cos(np.pi*x/20.0)/(np.pi) + 1.0*x
 
     elif simulation.ic == 2:
+        # Integration library
+        from scipy.special import roots_legendre, eval_legendre
+        nroots = 15
+        roots, weights = roots_legendre(nroots)
+        
+        # Parameters
+        N = len(x)-1
         x0 = 40
         sigma = 10
-        y = np.exp(-((x-x0)/sigma)**2)
+        
+        # Integration extremes
+        a = x[0:N]
+        b = x[1:N+1]
+        y = np.zeros(N)
+
+        x_roots = np.zeros((N, nroots))
+        for k in range(0, N):
+            x_roots[k, :] = 0.5*(b[k] - a[k])*roots + 0.5*(b[k] + a[k])
+        
+        for k in range(0, N):
+            #print(a[k], b[k],  np.exp(-(x_roots[k, :]-x0)**2/sigma**2))
+            y[k] = 0.5*(b[k]-a[k])* np.dot(weights, np.exp(-(x_roots[k, :]-x0)**2/sigma**2))
 
     elif simulation.ic == 3:
         mask1 = np.logical_and(x>=15.0,x<=20.0)
@@ -152,9 +171,9 @@ def q0_antiderivative(x, simulation):
         mask2 = x>25.0
         y[mask2==True] = 10
 
-    #elif simulation.ic == 5:
-    #    n = 2
-    #    y = x**(n+1)/(n+1.0)
+    elif simulation.ic == 5:
+        n = 4
+        y = x**(n+1)/(n+1.0)
     return y
 
 ####################################################################################
@@ -188,8 +207,8 @@ def qexact(x, t, simulation):
         mask = np.logical_and(X>=15.0,X<=25.0)
         y = x*0
         y[mask==True] = 1.0
-    #elif simulation.ic == 5:
-    #    #y = np.ones(np.shape(x))
-    #    n = 2
-    #    y = x**n
+    elif simulation.ic == 5:
+        #y = np.ones(np.shape(x))
+        n = 4
+        y = x**n
     return y
