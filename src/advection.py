@@ -115,7 +115,7 @@ def adv_1d(simulation, plot):
 
             # Compute exact solution
             q_exact = qexact(xplot, t*dt, simulation)
-    
+
             # Diagnostic computation
             total_mass, mass_change = diagnostics(Q, simulation, total_mass0)
 
@@ -142,12 +142,14 @@ def adv_1d(simulation, plot):
         plot_time_evolution([error_linf, error_l1, error_l2], Tf, ['$L_\infty}$','$L_1$','$L_2$'], 'Error', filename, title)
         
         # Plot the solution graph
-        title = simulation.title +'- '+icname+' - time='+str(t*dt)+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.fvmethod+', mono = '+simulation.monot
+        qmin = str("{:.2e}".format(np.amin(q_parabolic)))
+        qmax = str("{:.2e}".format(np.amax(q_parabolic)))
+        title = '1D advection - '+icname+' - time='+str(t*dt)+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.fvmethod+', mono = '+simulation.monot+ ', Min = '+ qmin +', Max = '+qmax
         filename = graphdir+'tc'+str(tc)+'_ic'+str(ic)+'_t'+str(t)+'_N'+str(N)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'.png'
         plot_field_graphs([q_exact, q_parabolic], ['Exact', 'Parabolic'], xplot, ymin, ymax, filename, title)
         print('\nGraphs have been ploted in '+ graphdir)
-        print('Error evolution is shown in '+filename)      
-   
+        print('Error evolution is shown in '+filename)
+
     else:
         # Compute the parabola
         for i in range(0, N):
@@ -162,8 +164,10 @@ def adv_1d(simulation, plot):
         error_inf, error_1, error_2 = compute_errors(q_parabolic, q_exact)
         error_ed_linf, error_ed_l1, error_ed_l2 = compute_errors(q_exact_edges[0:N], q_L[2:N+2])
         
-        # Plot the graph
-        title = '1D advection - '+icname+' - time='+str(t*dt)+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.fvmethod+', mono = '+simulation.monot
+        # Plot the solution graph
+        qmin = str("{:.2e}".format(np.amin(q_parabolic)))
+        qmax = str("{:.2e}".format(np.amax(q_parabolic)))
+        title = '1D advection - '+icname+' - time='+str(t*dt)+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.fvmethod+', mono = '+simulation.monot+ ', Min = '+ qmin +', Max = '+qmax
         filename = graphdir+'tc'+str(tc)+'_ic'+str(ic)+'_t'+str(t)+'_N'+str(N)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'.png'
         plot_field_graphs([q_exact, q_parabolic], ['Exact', 'Parabolic'], xplot, ymin, ymax, filename, title)
         return error_inf, error_1, error_2, error_ed_linf, error_ed_l1, error_ed_l2
