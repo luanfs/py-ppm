@@ -6,7 +6,7 @@
 # 
 ####################################################################################
 
-from advection import adv_1d
+from advection_1d import adv_1d
 import numpy as np
 from errors import *
 from parameters import simulation_par_1d, graphdir
