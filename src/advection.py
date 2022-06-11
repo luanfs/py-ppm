@@ -18,13 +18,10 @@
 ####################################################################################
 
 import numpy as np
-import matplotlib.pyplot as plt
 from parameters import q0, qexact, q0_antiderivative, graphdir
-import reconstruction as rec
 from errors import *
 from miscellaneous import diagnostics, print_diagnostics, plot_field_graphs
-from monotonization import monotonization
-from flux import numerical_flux
+from timestep import time_step_adv1d_ppm
 
 def adv_1d(simulation, plot):
     N  = simulation.N    # Number of cells
@@ -72,39 +69,19 @@ def adv_1d(simulation, plot):
     ymax = np.amax(q_exact)
     dists = abs(np.add.outer(xplot,-xc))
     neighbours = dists.argmin(axis=1)
-
-    # Numerical fluxes at edges
-    f_L = np.zeros(N+1) # Left
-    f_R = np.zeros(N+1) # Rigth
-
-    # Aux. variables
-    F = np.zeros(N+1) # Numerical flux
   
     # Compute initial mass
     total_mass0, mass_change = diagnostics(Q, simulation, 1.0)
 
-    # Errors variable
+    # Error variables
     error_linf = np.zeros(Nsteps+1)
     error_l1   = np.zeros(Nsteps+1)
     error_l2   = np.zeros(Nsteps+1)
 
     # Time looping
     for t in range(0, Nsteps+1):
-        # Reconstructs the values of Q using a piecewise parabolic polynomial
-        dq, q6, q_L, q_R = rec.ppm_reconstruction(Q, N)
-
-        # Applies monotonization on the parabolas
-        monotonization(Q, q_L, q_R, dq, q6, N, mono)
-
-        # Compute the fluxes
-        numerical_flux(F, f_R, f_L, q_R, q_L, dq, q6, u_edges, simulation)
-
-        # Update the values of Q_average (formula 1.12 from Collela and Woodward 1984)
-        Q[2:N+2] = Q[2:N+2] - (u*dt/dx)*(F[1:N+1] - F[0:N])
-
-        # Periodic boundary conditions
-        Q[N+2:N+5] = Q[2:5]
-        Q[0:2]     = Q[N:N+2]
+        # Applies a PPM time step
+        Q, dq, q6, q_L = time_step_adv1d_ppm(Q, u_edges, u, N, simulation)
 
         # Output and plot
         if plot:
