@@ -8,7 +8,7 @@
 
 import numpy as np
 import reconstruction as rec
-from parameters import q0, qexact, q0_antiderivative, simulation_par_1d, graphdir
+from parameters import  qexact_adv, q0_antiderivative_adv, simulation_par_1d, graphdir
 from errors import *
 from monotonization import monotonization
 
@@ -69,25 +69,25 @@ def error_analysis_recon_1d(simulation):
         Q = np.zeros(N+5)
 
         if (simulation.ic == 0 or simulation.ic == 1 or simulation.ic == 3 or simulation.ic == 4 or simulation.ic == 5):
-            Q[2:N+2] = (q0_antiderivative(x[1:N+1], simulation) - q0_antiderivative(x[0:N], simulation))/dx
+            Q[2:N+2] = (q0_antiderivative_adv(x[1:N+1], simulation) - q0_antiderivative_adv(x[0:N], simulation))/dx
         elif (simulation.ic == 2):
-            Q[2:N+2] = q0_antiderivative(x, simulation)/dx
+            Q[2:N+2] = q0_antiderivative_adv(x, simulation)/dx
        
         # Periodic boundary conditions
 	    #Q[N+2:N+5] = Q[2:5]
         #Q[0:2]    = Q[N:N+2]
         if (simulation.ic == 0 or simulation.ic == 1 or simulation.ic == 3 or simulation.ic == 4 or simulation.ic == 5):
-            Q[N+2] = (q0_antiderivative(xf+1.0*dx, simulation) - q0_antiderivative(xf+0.0*dx, simulation))/dx
-            Q[N+3] = (q0_antiderivative(xf+2.0*dx, simulation) - q0_antiderivative(xf+1.0*dx, simulation))/dx
-            Q[N+4] = (q0_antiderivative(xf+3.0*dx, simulation) - q0_antiderivative(xf+2.0*dx, simulation))/dx
-            Q[1]   = (q0_antiderivative(x0-0.0*dx, simulation) - q0_antiderivative(x0-1.0*dx, simulation))/dx
-            Q[0]   = (q0_antiderivative(x0-1.0*dx, simulation) - q0_antiderivative(x0-2.0*dx, simulation))/dx
+            Q[N+2] = (q0_antiderivative_adv(xf+1.0*dx, simulation) - q0_antiderivative_adv(xf+0.0*dx, simulation))/dx
+            Q[N+3] = (q0_antiderivative_adv(xf+2.0*dx, simulation) - q0_antiderivative_adv(xf+1.0*dx, simulation))/dx
+            Q[N+4] = (q0_antiderivative_adv(xf+3.0*dx, simulation) - q0_antiderivative_adv(xf+2.0*dx, simulation))/dx
+            Q[1]   = (q0_antiderivative_adv(x0-0.0*dx, simulation) - q0_antiderivative_adv(x0-1.0*dx, simulation))/dx
+            Q[0]   = (q0_antiderivative_adv(x0-1.0*dx, simulation) - q0_antiderivative_adv(x0-2.0*dx, simulation))/dx
         elif (simulation.ic == 2):
-            Q[N+2] = q0_antiderivative([xf+0.0*dx, xf+1.0*dx], simulation)
-            Q[N+3] = q0_antiderivative([xf+1.0*dx, xf+2.0*dx], simulation)
-            Q[N+4] = q0_antiderivative([xf+2.0*dx, xf+3.0*dx], simulation)
-            Q[1]   = q0_antiderivative([x0-1.0*dx, x0-0.0*dx], simulation)
-            Q[0]   = q0_antiderivative([x0-2.0*dx, x0-1.0*dx], simulation)
+            Q[N+2] = q0_antiderivative_adv([xf+0.0*dx, xf+1.0*dx], simulation)
+            Q[N+3] = q0_antiderivative_adv([xf+1.0*dx, xf+2.0*dx], simulation)
+            Q[N+4] = q0_antiderivative_adv([xf+2.0*dx, xf+3.0*dx], simulation)
+            Q[1]   = q0_antiderivative_adv([x0-1.0*dx, x0-0.0*dx], simulation)
+            Q[0]   = q0_antiderivative_adv([x0-2.0*dx, x0-1.0*dx], simulation)
 
         # Reconstructs the values of Q using a piecewise parabolic polynomial
         dq, q6, q_L, q_R = rec.ppm_reconstruction(Q, N)
@@ -101,8 +101,8 @@ def error_analysis_recon_1d(simulation):
             q_parabolic[neighbours==k] = q_L[k+2] + dq[k+2]*z+ z*(1.0-z)*q6[k+2]
 
         # Compute exact solution
-        q_exact = qexact(xplot, 0, simulation)
-        q_exact_edges = qexact(x, 0, simulation)
+        q_exact = qexact_adv(xplot, 0, simulation)
+        q_exact_edges = qexact_adv(x, 0, simulation)
         ymin = np.amin(q_exact)
         ymax = np.amax(q_exact)
 

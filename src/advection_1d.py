@@ -18,7 +18,7 @@
 ####################################################################################
 
 import numpy as np
-from parameters import q0, qexact, q0_antiderivative, graphdir
+from parameters import q0_adv, qexact_adv, q0_antiderivative_adv, graphdir
 from errors import *
 from miscellaneous import diagnostics, print_diagnostics, plot_field_graphs
 from timestep import time_step_adv1d_ppm
@@ -51,10 +51,10 @@ def adv_1d(simulation, plot):
     # Compute average values of Q (initial condition)
     Q = np.zeros(N+5)
     if (simulation.ic == 0 or simulation.ic == 1 or simulation.ic == 3 or simulation.ic == 4):
-        Q[2:N+2] = (q0_antiderivative(x[1:N+1], simulation) - q0_antiderivative(x[0:N], simulation))/dx
+        Q[2:N+2] = (q0_antiderivative_adv(x[1:N+1], simulation) - q0_antiderivative_adv(x[0:N], simulation))/dx
     elif (simulation.ic == 2):
         #Q[2:N+2] = q0(xc,simulation)
-        Q[2:N+2] = q0_antiderivative(x, simulation)/dx
+        Q[2:N+2] = q0_antiderivative_adv(x, simulation)/dx
 
     # Periodic boundary conditions
     Q[N+2:N+5] = Q[2:5]
@@ -64,7 +64,7 @@ def adv_1d(simulation, plot):
     Nplot = 10000
     xplot = np.linspace(x0, xf, Nplot)
     q_parabolic = np.zeros(Nplot)
-    q_exact = q0(xplot, simulation)
+    q_exact = q0_adv(xplot, simulation)
     ymin = np.amin(q_exact)
     ymax = np.amax(q_exact)
     dists = abs(np.add.outer(xplot,-xc))
@@ -91,7 +91,7 @@ def adv_1d(simulation, plot):
                 q_parabolic[neighbours==i] = q_L[i+2] + dq[i+2]*z+ z*(1.0-z)*q6[i+2]
 
             # Compute exact solution
-            q_exact = qexact(xplot, t*dt, simulation)
+            q_exact = qexact_adv(xplot, t*dt, simulation)
 
             # Diagnostic computation
             total_mass, mass_change = diagnostics(Q, simulation, total_mass0)
@@ -134,8 +134,8 @@ def adv_1d(simulation, plot):
             q_parabolic[neighbours==i] = q_L[i+2] + dq[i+2]*z+ z*(1.0-z)*q6[i+2]
 
         # Compute exact solution
-        q_exact = qexact(xplot, Tf, simulation)
-        q_exact_edges = qexact(x, 0, simulation)
+        q_exact = qexact_adv(xplot, Tf, simulation)
+        q_exact_edges = qexact_adv(x, 0, simulation)
         
         # Relative errors in different metrics
         error_inf, error_1, error_2 = compute_errors(q_parabolic, q_exact)
