@@ -18,7 +18,7 @@
 ####################################################################################
 
 import numpy as np
-from parameters import q0_adv, qexact_adv, q0_antiderivative_adv, graphdir
+from parameters_1d import q0_adv, qexact_adv, q0_antiderivative_adv, graphdir
 from errors import *
 from miscellaneous import diagnostics, print_diagnostics, plot_field_graphs
 from timestep import time_step_adv1d_ppm

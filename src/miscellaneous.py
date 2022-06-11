@@ -8,7 +8,7 @@
 
 import os
 import numpy as np
-from parameters import pardir, graphdir
+from parameters_1d import pardir, graphdir
 import matplotlib.pyplot as plt
 
 ####################################################################################
