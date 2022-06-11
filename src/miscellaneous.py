@@ -38,7 +38,7 @@ def createDirs():
 ####################################################################################
 # Diagnostic variables computation
 #################################################################################### 
-def diagnostics(Q_average, simulation, total_mass0):
+def diagnostics_adv_1d(Q_average, simulation, total_mass0):
     total_mass =  np.sum(Q_average[0:simulation.N]*simulation.dx)  # Compute new mass
     if abs(total_mass0)>10**(-10):
         mass_change = abs(total_mass0-total_mass)/abs(total_mass0)
@@ -49,7 +49,7 @@ def diagnostics(Q_average, simulation, total_mass0):
 #################################################################################### 
 # Print the diagnostics variables on the screen
 #################################################################################### 
-def print_diagnostics(error_linf, error_l1, error_l2, mass_change, t, Nsteps):
+def print_diagnostics_adv_1d(error_linf, error_l1, error_l2, mass_change, t, Nsteps):
     print('\nStep', t, 'from', Nsteps)
     print('Error (Linf, L1, L2) :',"{:.2e}".format(error_linf), "{:.2e}".format(error_l1), "{:.2e}".format(error_l2))
     print('Total mass variation:', "{:.2e}".format(mass_change))

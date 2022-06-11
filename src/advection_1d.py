@@ -20,7 +20,7 @@
 import numpy as np
 from parameters_1d import q0_adv, qexact_adv, q0_antiderivative_adv, graphdir
 from errors import *
-from miscellaneous import diagnostics, print_diagnostics, plot_1dfield_graphs
+from miscellaneous import diagnostics_adv_1d, print_diagnostics_adv_1d, plot_1dfield_graphs
 from timestep import time_step_adv1d_ppm
 
 def adv_1d(simulation, plot):
@@ -71,7 +71,7 @@ def adv_1d(simulation, plot):
     neighbours = dists.argmin(axis=1)
   
     # Compute initial mass
-    total_mass0, mass_change = diagnostics(Q, simulation, 1.0)
+    total_mass0, mass_change = diagnostics_adv_1d(Q, simulation, 1.0)
 
     # Error variables
     error_linf = np.zeros(Nsteps+1)
@@ -94,7 +94,7 @@ def adv_1d(simulation, plot):
             q_exact = qexact_adv(xplot, t*dt, simulation)
 
             # Diagnostic computation
-            total_mass, mass_change = diagnostics(Q, simulation, total_mass0)
+            total_mass, mass_change = diagnostics_adv_1d(Q, simulation, total_mass0)
 
             # Relative errors in different metrics
             error_linf[t], error_l1[t], error_l2[t] = compute_errors(q_parabolic, q_exact)
@@ -108,7 +108,7 @@ def adv_1d(simulation, plot):
             #title = simulation.title +'- '+icname+' - time='+str(t*dt)+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.fvmethod+', mono = '+simulation.monot
             #filename = graphdir+'tc'+str(tc)+'_ic'+str(ic)+'_t'+str(t)+'_N'+str(N)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'.png'
             #plot_field_graphs([q_exact, q_parabolic], ['Exact', 'Parabolic'], xplot, ymin, ymax, filename, title)
-            print_diagnostics(error_linf[t], error_l1[t], error_l2[t], mass_change, t, Nsteps)
+            print_diagnostics_adv_1d(error_linf[t], error_l1[t], error_l2[t], mass_change, t, Nsteps)
 
     #---------------------------------------End of time loop---------------------------------------
 
