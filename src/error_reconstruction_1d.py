@@ -8,7 +8,7 @@
 
 import numpy as np
 import reconstruction_1d as rec
-from parameters import  qexact_adv, q0_antiderivative_adv, simulation_par_1d, graphdir
+from parameters_1d import  qexact_adv, q0_antiderivative_adv, simulation_par_1d, graphdir
 from errors import *
 from monotonization_1d import monotonization_1d
 
