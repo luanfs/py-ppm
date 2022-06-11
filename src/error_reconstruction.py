@@ -8,7 +8,7 @@
 
 import numpy as np
 import reconstruction as rec
-from parameters import q0, qexact, q0_antiderivative, simulation_par, graphdir
+from parameters import q0, qexact, q0_antiderivative, simulation_par_1d, graphdir
 from errors import *
 from monotonization import monotonization
 
@@ -56,7 +56,7 @@ def error_analysis_recon_1d(simulation):
     # Let us test and compute the error!
     for i in range(0, Ntest):
         # Update simulation parameters
-        simulation = simulation_par(int(Nc[i]), 1.0, 1.0, ic, tc, mono)
+        simulation = simulation_par_1d(int(Nc[i]), 1.0, 1.0, ic, tc, mono)
         N  = simulation.N
         x  = simulation.x
         xc = simulation.xc

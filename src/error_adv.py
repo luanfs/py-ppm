@@ -9,7 +9,7 @@
 from advection import adv_1d
 import numpy as np
 from errors import *
-from parameters import simulation_par, graphdir
+from parameters import simulation_par_1d, graphdir
 
 def error_analysis_adv1d(simulation):
     # adv velocity
@@ -63,7 +63,7 @@ def error_analysis_adv1d(simulation):
     # Let us test and compute the error
     for i in range(0, Ntest):
         # Update simulation parameters
-        simulation = simulation_par(int(N[i]), dt[i], Tf, ic, tc, mono)
+        simulation = simulation_par_1d(int(N[i]), dt[i], Tf, ic, tc, mono)
 
         # Run advection routine and get the errors
         error_linf[i], error_l1[i], error_l2[i], error_ed_linf[i], error_ed_l1[i], error_ed_l2[i] =  adv_1d(simulation, False)
