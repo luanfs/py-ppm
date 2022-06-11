@@ -1,6 +1,6 @@
 ####################################################################################
 #
-# Module for test case set up (grid, initial condition, exact solution and etc)
+# Module for 1D test case set up (grid, initial condition, exact solution and etc)
 #
 # Luan da Fonseca Santos - April 2022
 # (luan.santos@usp.br)
@@ -23,7 +23,7 @@ def grid(x0, xf, N):
 ####################################################################################
 #  Simulation class
 ####################################################################################      
-class simulation_par:
+class simulation_par_1d:
     def __init__(self, N, dt, Tf, ic, tc, mono):
         # Number of cells
         self.N  = N
@@ -120,14 +120,14 @@ class simulation_par:
 ####################################################################################
 # Initial condition
 ####################################################################################
-def q0(x, simulation):
-    y = qexact(x, 0, simulation)
+def q0_adv(x, simulation):
+    y = qexact_adv(x, 0, simulation)
     return y
 
 ####################################################################################
 # Initial condition antiderivative
 ####################################################################################
-def q0_antiderivative(x, simulation):
+def q0_antiderivative_adv(x, simulation):
     if simulation.ic == 1:
         y = -20.0*np.cos(2.0*np.pi*x/20.0)/(2.0*np.pi) + 1.0*x
 
@@ -179,7 +179,7 @@ def q0_antiderivative(x, simulation):
 ####################################################################################
 # Exact solution to the advection problem 
 ####################################################################################
-def qexact(x, t, simulation):
+def qexact_adv(x, t, simulation):
     u  = simulation.u
     x0 = simulation.x0
     xf = simulation.xf
