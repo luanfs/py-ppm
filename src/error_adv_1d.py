@@ -35,7 +35,7 @@ def error_analysis_adv1d(simulation):
     xf = simulation.xf
 
     # Number of tests
-    Ntest = 11
+    Ntest = 10
 
     # Number of cells
     N = np.zeros(Ntest)
@@ -75,11 +75,11 @@ def error_analysis_adv1d(simulation):
 
     # Plot the errors
     title = simulation.title + '- ' + simulation.fvmethod + ' - ' + simulation.icname + ' - monotonization = ' + simulation.monot
-    filename = graphdir+'tc'+str(tc)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'_ic'+str(ic)+'_parabola_errors.png'
+    filename = graphdir+'1d_adv_tc'+str(tc)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'_ic'+str(ic)+'_parabola_errors.png'
     plot_errors_loglog(N, error_linf, error_l1, error_l2, filename, title)
 
     title = 'Edges error \n' + simulation.title + '- ' + simulation.fvmethod + ' - ' + simulation.icname + ' - monotonization = ' + simulation.monot
-    filename2 = graphdir+'tc'+str(tc)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'_ic'+str(ic)+'_edge_errors.png'
+    filename2 = graphdir+'1d_adv_tc'+str(tc)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'_ic'+str(ic)+'_edge_errors.png'
     plot_errors_loglog(N, error_ed_linf, error_ed_l1, error_ed_l2, filename2, title)
 
  
