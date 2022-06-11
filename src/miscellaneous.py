@@ -8,7 +8,7 @@
 
 import os
 import numpy as np
-from parameters_1d import pardir, graphdir
+from parameters_1d import graphdir
 import matplotlib.pyplot as plt
 
 ####################################################################################
@@ -55,9 +55,9 @@ def print_diagnostics(error_linf, error_l1, error_l2, mass_change, t, Nsteps):
     print('Total mass variation:', "{:.2e}".format(mass_change))
 
 ####################################################################################
-# Plot the graphs given in the list fields 
+# Plot the 1d graphs given in the list fields 
 ####################################################################################
-def plot_field_graphs(fields, labels, xplot, ymin, ymax, filename, title):
+def plot_1dfield_graphs(fields, labels, xplot, ymin, ymax, filename, title):
     n = len(fields)
     colors = ('black', 'blue', 'green', 'red', 'purple')
     for k in range(0, n):

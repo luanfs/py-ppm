@@ -20,7 +20,7 @@
 import numpy as np
 from parameters_1d import q0_adv, qexact_adv, q0_antiderivative_adv, graphdir
 from errors import *
-from miscellaneous import diagnostics, print_diagnostics, plot_field_graphs
+from miscellaneous import diagnostics, print_diagnostics, plot_1dfield_graphs
 from timestep import time_step_adv1d_ppm
 
 def adv_1d(simulation, plot):
@@ -123,7 +123,7 @@ def adv_1d(simulation, plot):
         qmax = str("{:.2e}".format(np.amax(q_parabolic)))
         title = '1D advection - '+icname+' - time='+str(t*dt)+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.fvmethod+', mono = '+simulation.monot+ ', Min = '+ qmin +', Max = '+qmax
         filename = graphdir+'tc'+str(tc)+'_ic'+str(ic)+'_t'+str(t)+'_N'+str(N)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'.png'
-        plot_field_graphs([q_exact, q_parabolic], ['Exact', 'Parabolic'], xplot, ymin, ymax, filename, title)
+        plot_1dfield_graphs([q_exact, q_parabolic], ['Exact', 'Parabolic'], xplot, ymin, ymax, filename, title)
         print('\nGraphs have been ploted in '+ graphdir)
         print('Error evolution is shown in '+filename)
 
@@ -146,5 +146,5 @@ def adv_1d(simulation, plot):
         qmax = str("{:.2e}".format(np.amax(q_parabolic)))
         title = '1D advection - '+icname+' - time='+str(t*dt)+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.fvmethod+', mono = '+simulation.monot+ ', Min = '+ qmin +', Max = '+qmax
         filename = graphdir+'tc'+str(tc)+'_ic'+str(ic)+'_t'+str(t)+'_N'+str(N)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'.png'
-        plot_field_graphs([q_exact, q_parabolic], ['Exact', 'Parabolic'], xplot, ymin, ymax, filename, title)
+        plot_1dfield_graphs([q_exact, q_parabolic], ['Exact', 'Parabolic'], xplot, ymin, ymax, filename, title)
         return error_inf, error_1, error_2, error_ed_linf, error_ed_l1, error_ed_l2
