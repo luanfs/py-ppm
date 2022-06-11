@@ -65,15 +65,16 @@ def print_errors_simul(error_linf, error_l1, error_l2, i):
 def compute_errors(Q, Qref):
     # Relative errors in different metrics
     E = abs(Qref - Q)
+    n = E.size
 
     # L_inf error
     error_inf = np.amax(abs(E))/np.amax(abs(Qref))
 
     # L_1 error
-    error_1 = np.sum(E)/len(E)
+    error_1 = np.sum(E)/n
 
     # L_2 error
-    error_2 = np.sqrt(np.sum(E*E))/len(E)
+    error_2 = np.sqrt(np.sum(E*E))/n
 
     return error_inf, error_1, error_2
 
