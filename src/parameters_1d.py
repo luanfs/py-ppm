@@ -14,7 +14,7 @@ pardir   = "par/"               # Parameter files directory
 ####################################################################################
 # Create the grid
 ####################################################################################
-def grid(x0, xf, N):
+def grid_1d(x0, xf, N):
     x  = np.linspace(x0, xf, N+1) # Cell edges
     xc = (x[0:N] + x[1:N+1])/2    # Cell centers
     dx = (xf-x0)/N                # Grid length
@@ -95,7 +95,7 @@ class simulation_par_1d:
         self.u = u
 
         # Grid
-        self.x, self.xc, self.dx = grid(x0, xf, N)
+        self.x, self.xc, self.dx = grid_1d(x0, xf, N)
 
         # IC name
         self.icname = name
