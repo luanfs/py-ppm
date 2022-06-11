@@ -12,7 +12,7 @@ from parameters import q0, qexact, q0_antiderivative, simulation_par, graphdir
 from errors import *
 from monotonization import monotonization
 
-def error_analysis_recon(simulation):
+def error_analysis_recon_1d(simulation):
     # Initial condition
     ic = simulation.ic
 
