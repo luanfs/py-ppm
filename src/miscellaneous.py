@@ -46,7 +46,6 @@ def diagnostics(Q_average, simulation, total_mass0):
         mass_change = abs(total_mass0-total_mass)
     return total_mass, mass_change
 
-
 #################################################################################### 
 # Print the diagnostics variables on the screen
 #################################################################################### 
@@ -71,4 +70,3 @@ def plot_field_graphs(fields, labels, xplot, ymin, ymax, filename, title):
     plt.title(title)
     plt.savefig(filename)
     plt.close()
-
