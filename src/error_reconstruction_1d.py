@@ -7,10 +7,10 @@
 ####################################################################################
 
 import numpy as np
-import reconstruction as rec
+import reconstruction_1d as rec
 from parameters import  qexact_adv, q0_antiderivative_adv, simulation_par_1d, graphdir
 from errors import *
-from monotonization import monotonization
+from monotonization_1d import monotonization_1d
 
 def error_analysis_recon_1d(simulation):
     # Initial condition
@@ -93,7 +93,7 @@ def error_analysis_recon_1d(simulation):
         dq, q6, q_L, q_R = rec.ppm_reconstruction(Q, N)
 
         # Applies monotonization on the parabolas
-        monotonization(Q, q_L, q_R, dq, q6, N, mono)
+        monotonization_1d(Q, q_L, q_R, dq, q6, N, mono)
 
         # Compute the parabola
         for k in range(0, N):

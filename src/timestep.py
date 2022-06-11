@@ -5,8 +5,8 @@
 ####################################################################################
 
 import numpy as np
-import reconstruction as rec
-from monotonization import monotonization
+import reconstruction_1d as rec
+from monotonization_1d import monotonization_1d
 from flux import numerical_flux
 
 ####################################################################################
@@ -27,7 +27,7 @@ def time_step_adv1d_ppm(Q, u_edges, u, N, simulation):
     dq, q6, q_L, q_R = rec.ppm_reconstruction(Q, N)
 
     # Applies monotonization on the parabolas
-    monotonization(Q, q_L, q_R, dq, q6, N, simulation.mono)
+    monotonization_1d(Q, q_L, q_R, dq, q6, N, simulation.mono)
 
     # Compute the fluxes
     numerical_flux(F, f_R, f_L, q_R, q_L, dq, q6, u_edges, simulation)

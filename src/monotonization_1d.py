@@ -18,9 +18,9 @@
 import numpy as np
 
 ####################################################################################
-# Apply the PPM monotonization
+# Apply the 1D PPM monotonization
 ####################################################################################
-def monotonization(Q, q_L, q_R, dq, q6, N, mono):
+def monotonization_1d(Q, q_L, q_R, dq, q6, N, mono):
     if mono == 0:
         return 
     elif mono == 1:
@@ -63,4 +63,3 @@ def monotonization(Q, q_L, q_R, dq, q6, N, mono):
 
         dq[N+2:N+5] = dq[2:5]
         dq[0:2]     = dq[N:N+2]
-
