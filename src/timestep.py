@@ -30,7 +30,7 @@ def time_step_adv1d_ppm(Q, u_edges, u, N, simulation):
     monotonization_1d(Q, q_L, q_R, dq, q6, N, simulation.mono)
 
     # Compute the fluxes
-    numerical_flux(F, f_R, f_L, q_R, q_L, dq, q6, u_edges, simulation)
+    numerical_flux(F, f_R, f_L, q_R, q_L, dq, q6, u_edges, simulation, N)
 
     # Update the values of Q_average (formula 1.12 from Collela and Woodward 1984)
     Q[2:N+2] = Q[2:N+2] - (u*simulation.dt/simulation.dx)*(F[1:N+1] - F[0:N])
@@ -39,4 +39,4 @@ def time_step_adv1d_ppm(Q, u_edges, u, N, simulation):
     Q[N+2:N+5] = Q[2:5]
     Q[0:2]     = Q[N:N+2]
 
-    return Q, dq, q6, q_L
+    return Q, dq, q6, q_L, F
