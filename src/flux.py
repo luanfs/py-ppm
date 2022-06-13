@@ -16,10 +16,9 @@
 # (luan.santos@usp.br)
 ####################################################################################
 
-def numerical_flux(qbar, f_R, f_L, q_R, q_L, dq, q6, u_edges, simulation):
+def numerical_flux(qbar, f_R, f_L, q_R, q_L, dq, q6, u_edges, simulation, N):
     # Compute the fluxes (formula 1.12 from Collela and Woodward 1984)
     x = u_edges*(simulation.dt/simulation.dx)
-    N = simulation.N
 
     # Flux at left edges
     f_L[1:N+1] = q_R[2:N+2] - x[0:N]*0.5*(dq[2:N+2] - (1.0-2.0/3.0*x[0:N])*q6[2:N+2])

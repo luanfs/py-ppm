@@ -81,7 +81,7 @@ def adv_1d(simulation, plot):
     # Time looping
     for t in range(0, Nsteps+1):
         # Applies a PPM time step
-        Q, dq, q6, q_L = time_step_adv1d_ppm(Q, u_edges, u, N, simulation)
+        Q, dq, q6, q_L, _ = time_step_adv1d_ppm(Q, u_edges, u, N, simulation)
 
         # Output and plot
         if plot:
