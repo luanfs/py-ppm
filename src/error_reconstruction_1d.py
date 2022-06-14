@@ -90,7 +90,7 @@ def error_analysis_recon_1d(simulation):
             Q[0]   = q0_antiderivative_adv([x0-2.0*dx, x0-1.0*dx], simulation)
 
         # Reconstructs the values of Q using a piecewise parabolic polynomial
-        dq, q6, q_L, q_R = rec.ppm_reconstruction(Q, N)
+        dq, q6, q_L, q_R = rec.ppm_reconstruction(Q, N, simulation)
 
         # Applies monotonization on the parabolas
         monotonization_1d(Q, q_L, q_R, dq, q6, N, mono)

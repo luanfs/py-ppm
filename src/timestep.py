@@ -24,7 +24,7 @@ def time_step_adv1d_ppm(Q, u_edges, N, simulation):
     F = np.zeros(N+1) # Numerical flux
     
     # Reconstructs the values of Q using a piecewise parabolic polynomial
-    dq, q6, q_L, q_R = rec.ppm_reconstruction(Q, N)
+    dq, q6, q_L, q_R = rec.ppm_reconstruction(Q, N, simulation)
 
     # Applies monotonization on the parabolas
     monotonization_1d(Q, q_L, q_R, dq, q6, N, simulation.mono)

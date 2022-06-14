@@ -21,37 +21,34 @@ import numpy as np
 # Given the average values of a scalar field Q, this routine constructs 
 # a piecewise parabolic aproximation of Q using its average value.
 ####################################################################################
-def ppm_reconstruction(Q, N):
+def ppm_reconstruction(Q, N, simulation):
     # Compute the slopes dQ0 (centered finite difference)
     # Formula 1.7 from Collela and Woodward 1984 and Figure 2 from Carpenter et al 1990.
     dQ0 = np.zeros(N+5)
     dQ0[1:N+4] = 0.5*(Q[2:N+5] - Q[0:N+3]) # Interior values are in 2:N+2
 
-    # Compute the slopes dQ (1-sided finite difference)
-    # Formula 1.8 from Collela and Woodward 1984 and Figure 2 from Carpenter et al 1990.
-    dQ1 = np.zeros(N+5) # Right 1-sided difference
-    dQ2 = np.zeros(N+5) # Left  1-sided difference
+    if simulation.monot != 'none': #Avoid overshoot
+        # Compute the slopes dQ (1-sided finite difference)
+        # Formula 1.8 from Collela and Woodward 1984 and Figure 2 from Carpenter et al 1990.
+        dQ1 = np.zeros(N+5) # Right 1-sided difference
+        dQ2 = np.zeros(N+5) # Left  1-sided difference
 
-    # Right 1-sided finite difference
-    dQ1[1:N+4] = Q[2:N+5] - Q[1:N+4]
-    dQ1 = dQ1*2.0
+        # Right 1-sided finite difference
+        dQ1[1:N+4] = Q[2:N+5] - Q[1:N+4]
+        dQ1 = dQ1*2.0
 
-    # Left  1-sided finite difference
-    dQ2[1:N+4] = Q[1:N+4] - Q[0:N+3]
-    dQ2 = dQ2*2.0
+        # Left  1-sided finite difference
+        dQ2[1:N+4] = Q[1:N+4] - Q[0:N+3]
+        dQ2 = dQ2*2.0
 
-    #print(dQ0[1:N+4])
-    #print(dQ1[1:N+4])
-    #print(dQ2[1:N+4])
-    #exit()
-
-    # Final slope - Formula 1.8 from Collela and Woodward 1984
-    dQ = np.zeros(N+5)
-    dQ[1:N+4] = np.minimum(abs(dQ0[1:N+4]), abs(dQ1[1:N+4]))
-    dQ[1:N+4] = np.minimum(dQ[1:N+4], abs(dQ2[1:N+4]))*np.sign(dQ0[1:N+4])
-    mask = ( (Q[2:N+5] - Q[1:N+4]) * (Q[1:N+4] - Q[0:N+3]) > 0.0 ) # Indexes where (Q_{j+1}-Q_{j})*(Q_{j}-Q{j-1}) > 0
-    dQ[1:N+4][~mask] = 0.0
-    dQ = dQ0
+        # Final slope - Formula 1.8 from Collela and Woodward 1984
+        dQ = np.zeros(N+5)
+        dQ[1:N+4] = np.minimum(abs(dQ0[1:N+4]), abs(dQ1[1:N+4]))
+        dQ[1:N+4] = np.minimum(dQ[1:N+4], abs(dQ2[1:N+4]))*np.sign(dQ0[1:N+4])
+        mask = ( (Q[2:N+5] - Q[1:N+4]) * (Q[1:N+4] - Q[0:N+3]) > 0.0 ) # Indexes where (Q_{j+1}-Q_{j})*(Q_{j}-Q{j-1}) > 0
+        dQ[1:N+4][~mask] = 0.0
+    else:
+        dQ = dQ0
 
     # Values of Q at right edges (q_(j+1/2)) - Formula 1.6 from Collela and Woodward 1984
     Q_edges = np.zeros(N+1)
