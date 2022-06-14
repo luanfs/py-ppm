@@ -18,7 +18,7 @@
 ####################################################################################
 
 import numpy as np
-from parameters_1d import q0_adv, qexact_adv, q0_antiderivative_adv, graphdir
+from parameters_1d import q0_adv, qexact_adv, q0_antiderivative_adv, graphdir, velocity_adv_1d
 from errors import *
 from miscellaneous import diagnostics_adv_1d, print_diagnostics_adv_1d, plot_1dfield_graphs
 from timestep import time_step_adv1d_ppm
@@ -33,17 +33,16 @@ def adv_1d(simulation, plot):
     dx = simulation.dx   # Grid spacing
     dt = simulation.dt   # Time step
     Tf = simulation.Tf   # Total period definition
-    u  = simulation.u    # Advection velocity
     tc = simulation.tc
     icname = simulation.icname
     mono   = simulation.mono  # Monotonization scheme
 
-    # CFL number
-    CFL = abs(u*dt/dx)
-
     # Velocity at edges
     u_edges = np.zeros(N+1)
-    u_edges[0:N+1] = u
+    u_edges[0:N+1] = velocity_adv_1d(x, 0, simulation)
+
+    # CFL number
+    CFL = abs(np.amax(abs(u_edges)*dt/dx))
 
     # Number of time steps
     Nsteps = int(Tf/dt)
@@ -80,8 +79,11 @@ def adv_1d(simulation, plot):
 
     # Time looping
     for t in range(0, Nsteps+1):
+        # Velocity update
+        u_edges[0:N+1] = velocity_adv_1d(x, 0, simulation)
+
         # Applies a PPM time step
-        Q, dq, q6, q_L, _ = time_step_adv1d_ppm(Q, u_edges, u, N, simulation)
+        Q, dq, q6, q_L, _ = time_step_adv1d_ppm(Q, u_edges, N, simulation)
 
         # Output and plot
         if plot:
@@ -100,6 +102,8 @@ def adv_1d(simulation, plot):
             error_linf[t], error_l1[t], error_l2[t] = compute_errors(q_parabolic, q_exact)
 
             if error_linf[t] > 10**(4):
+                # CFL number
+                CFL = abs(np.amax(abs(u_edges)*dt/dx))
                 print('\nStopping due to large errors.')
                 print('The CFL number is', CFL)
                 exit()

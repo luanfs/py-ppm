@@ -9,15 +9,9 @@
 from advection_1d import adv_1d
 import numpy as np
 from errors import *
-from parameters_1d import simulation_par_1d, graphdir
+from parameters_1d import simulation_par_1d, graphdir, velocity_adv_1d
 
 def error_analysis_adv1d(simulation):
-    # adv velocity
-    u = simulation.u
-
-    # Period
-    Tf = (simulation.xf-simulation.x0)/abs(u)
-
     # Initial condition
     ic = simulation.ic
 
@@ -41,9 +35,15 @@ def error_analysis_adv1d(simulation):
     N = np.zeros(Ntest)
     N[0] = 10
 
-    # Array of time steps
-    dt = np.zeros(Ntest)
-    dt[0] = CFL/(N[0]*abs(u))*(xf-x0)
+    if simulation.ic >= 1 and simulation.ic <= 4: # constant velocity
+        u = velocity_adv_1d(x0, 0, simulation)
+        # Period
+        Tf = (simulation.xf-simulation.x0)/(abs(u))
+        # Array of time steps
+        dt = np.zeros(Ntest)
+        dt[0] = CFL/(N[0]*abs(u))*(xf-x0)
+    else:
+        exit()
 
     # Errors array
     error_linf = np.zeros(Ntest)
@@ -82,7 +82,6 @@ def error_analysis_adv1d(simulation):
     filename2 = graphdir+'1d_adv_tc'+str(tc)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'_ic'+str(ic)+'_edge_errors.png'
     plot_errors_loglog(N, error_ed_linf, error_ed_l1, error_ed_l2, filename2, title)
 
- 
     # Print final message
     print('\nGraphs have been ploted in '+graphdir)
     print('Convergence graphs has been ploted in '+filename+' and '+filename2)

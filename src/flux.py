@@ -16,7 +16,7 @@
 # (luan.santos@usp.br)
 ####################################################################################
 
-def numerical_flux(qbar, f_R, f_L, q_R, q_L, dq, q6, u_edges, simulation, N):
+def numerical_flux(F, f_R, f_L, q_R, q_L, dq, q6, u_edges, simulation, N):
     # Compute the fluxes (formula 1.12 from Collela and Woodward 1984)
     x = u_edges*(simulation.dt/simulation.dx)
 
@@ -29,6 +29,6 @@ def numerical_flux(qbar, f_R, f_L, q_R, q_L, dq, q6, u_edges, simulation, N):
     f_R[1:N+1] = q_L[3:N+3] + x[1:N+1]*0.5*(dq[3:N+3] + (1.0-2.0/3.0*x[1:N+1])*q6[3:N+3])
     f_R[0] = f_R[N] # Periodic bc
 
-    # qbar - Formula 1.13 from Collela and Woodward 1984)
-    qbar[u_edges >= 0] = f_L[u_edges >= 0]
-    qbar[u_edges <= 0] = f_R[u_edges <= 0]
+    # F - Formula 1.13 from Collela and Woodward 1984)
+    F[u_edges >= 0] = f_L[u_edges >= 0]
+    F[u_edges <= 0] = f_R[u_edges <= 0]

@@ -47,32 +47,27 @@ class simulation_par_1d:
         if ic == 1:
             x0 = 0
             xf = 40
-            u  = 0.5
             name = 'Sine wave'
 
         elif ic == 2:
             x0 = 0
             xf = 80
-            u  = 0.5
             name = 'Gaussian wave'
 
         elif ic == 3:
             x0 = 0
             xf = 40
-            u  = 0.5
             name = 'Triangular wave'
 
         elif ic == 4:
             x0 = 0
             xf = 40
-            u  = 0.5
             name = 'Rectangular wave'
 
-        elif ic == 5:
-            x0 = 0
-            xf = 1
-            u  = 0.1
-            name = 'Test wave'
+        #elif ic == 5:
+        #    x0 = 0
+        #    xf = 80
+        #    name = 'Gaussian  wave'
 
         else:
             print("Error - invalid test case")
@@ -90,9 +85,6 @@ class simulation_par_1d:
         # Interval endpoints
         self.x0 = x0
         self.xf = xf
-
-        # Advection velocity
-        self.u = u
 
         # Grid
         self.x, self.xc, self.dx = grid_1d(x0, xf, N)
@@ -171,44 +163,62 @@ def q0_antiderivative_adv(x, simulation):
         mask2 = x>25.0
         y[mask2==True] = 10
 
-    elif simulation.ic == 5:
-        n = 4
-        y = x**(n+1)/(n+1.0)
+    #elif simulation.ic == 5:
+    #    n = 4
+    #    y = x**(n+1)/(n+1.0)
     return y
 
 ####################################################################################
 # Exact solution to the advection problem 
 ####################################################################################
 def qexact_adv(x, t, simulation):
-    u  = simulation.u
     x0 = simulation.x0
     xf = simulation.xf
     ic = simulation.ic  
-    X = x-u*t
-    mask = (X != xf)
-    X[mask] = (X[mask]-x0)%(xf-x0) + x0 # maps back to [x0,xf]
 
-    if simulation.ic == 1:
-        y = np.sin(2.0*np.pi*X/20.0) + 1.0
+    if simulation.ic >=1 and simulation.ic <=4 : # constant speed
+        u = velocity_adv_1d(x, t, simulation)
+        X = x-u*t
+        mask = (X != xf)
+        X[mask] = (X[mask]-x0)%(xf-x0) + x0 # maps back to [x0,xf]
 
-    elif simulation.ic == 2:
-        x0 = 40
-        sigma = 5
-        y = np.exp(-((X-x0)/sigma)**2)
+        if simulation.ic == 1:
+            y = np.sin(2.0*np.pi*X/20.0) + 1.0
 
-    elif simulation.ic == 3:
-        mask1 = np.logical_and(X>=15.0,X<=20.0)
-        mask2 = np.logical_and(X>=20.0,X<=25.0)
-        y = x*0
-        y[mask1==True] = ( X[mask1==True] - 15.0)/5.0
-        y[mask2==True] = (-X[mask2==True] + 25.0)/5.0
+        elif simulation.ic == 2:
+            x0 = 40
+            sigma = 5
+            y = np.exp(-((X-x0)/sigma)**2)
 
-    elif simulation.ic == 4:
-        mask = np.logical_and(X>=15.0,X<=25.0)
-        y = x*0
-        y[mask==True] = 1.0
-    elif simulation.ic == 5:
-        #y = np.ones(np.shape(x))
-        n = 4
-        y = x**n
+        elif simulation.ic == 3:
+            mask1 = np.logical_and(X>=15.0,X<=20.0)
+            mask2 = np.logical_and(X>=20.0,X<=25.0)
+            y = x*0
+            y[mask1==True] = ( X[mask1==True] - 15.0)/5.0
+            y[mask2==True] = (-X[mask2==True] + 25.0)/5.0
+
+        elif simulation.ic == 4:
+            mask = np.logical_and(X>=15.0,X<=25.0)
+            y = x*0
+            y[mask==True] = 1.0
+    #elif simulation.ic == 5:
+    #    #y = np.ones(np.shape(x))
+    #    n = 4
+    #    y = x**n
     return y
+
+####################################################################################
+# Velocity field
+####################################################################################
+def velocity_adv_1d(x, t, simulation):
+    if simulation.ic == 1:
+        u = 0.5
+    elif simulation.ic == 2:
+        u = 0.5        
+    elif simulation.ic == 3:
+        u = 0.5
+    elif simulation.ic == 4:
+        u = 0.5
+    #elif simulation.ic == 5:
+    #    u = 0.5
+    return u
