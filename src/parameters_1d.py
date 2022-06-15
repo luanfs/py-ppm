@@ -64,11 +64,6 @@ class simulation_par_1d:
             xf = 40
             name = 'Rectangular wave'
 
-        #elif ic == 5:
-        #    x0 = 0
-        #    xf = 80
-        #    name = 'Gaussian  wave'
-
         else:
             print("Error - invalid test case")
             exit()
@@ -163,9 +158,6 @@ def q0_antiderivative_adv(x, simulation):
         mask2 = x>25.0
         y[mask2==True] = 10
 
-    #elif simulation.ic == 5:
-    #    n = 4
-    #    y = x**(n+1)/(n+1.0)
     return y
 
 ####################################################################################
@@ -176,7 +168,7 @@ def qexact_adv(x, t, simulation):
     xf = simulation.xf
     ic = simulation.ic  
 
-    if simulation.ic >=1 and simulation.ic <=4 : # constant speed
+    if simulation.ic >= 1 and simulation.ic <= 4 : # constant speed
         u = velocity_adv_1d(x, t, simulation)
         X = x-u*t
         mask = (X != xf)
@@ -201,10 +193,6 @@ def qexact_adv(x, t, simulation):
             mask = np.logical_and(X>=15.0,X<=25.0)
             y = x*0
             y[mask==True] = 1.0
-    #elif simulation.ic == 5:
-    #    #y = np.ones(np.shape(x))
-    #    n = 4
-    #    y = x**n
     return y
 
 ####################################################################################
@@ -219,6 +207,4 @@ def velocity_adv_1d(x, t, simulation):
         u = 0.5
     elif simulation.ic == 4:
         u = 0.5
-    #elif simulation.ic == 5:
-    #    u = 0.5
     return u
