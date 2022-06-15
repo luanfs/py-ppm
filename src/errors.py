@@ -38,7 +38,7 @@ def plot_errors_loglog(N, error_linf, error_l1, error_l2, filename, title):
     plt.loglog(Norder, order1 , ':' , color='black', label = '1st order')
     plt.loglog(Norder, order2 , '--', color='black', label = '2nd order')
     plt.loglog(Norder, order3 , '-.', color='black', label = '3rd order')
-    plt.loglog(Norder, order4 , '--', color='black', label = '4rd order')    
+    plt.loglog(Norder, order4 , '--', color='black', label = '4rd order')
     plt.xlabel('N (number of cells)')
     plt.ylabel('Error')
     plt.legend()
