@@ -1,11 +1,11 @@
 #Parameters 
 #Dimension (1 or 2)
-1
+2
 #Equation (adv or sw)
 adv
 #-----------Description of parameters -------------------------------------
-# For 1D problems, you need to set the parameters in par/ adv_1d.par.
-# For 2D problems, you need to set the parameters in par/ adv_2d.par (not implemented yet :().
+# For 1D problems, you need to set the parameters in par/adv_1d.par.
+# For 2D problems, you need to set the parameters in par/adv_2d.par.
 #Possible equations
 - adv (linear advection equation)
 - sw  (shallow-water - not implemented yet :()
