@@ -3,7 +3,7 @@
 # Piecewise Parabolic Method (PPM) advection module
 # Luan da Fonseca Santos - April 2022
 # Solves the PDE Q_t+ u*Q_x = 0 with periodic boundary conditions
-# The initial condition Q(x,0) is given in the module parameters.py
+# The initial condition Q(x,0) is given in the module parameters_1d.py
 #
 # References:
 # -  Phillip Colella, Paul R Woodward, The Piecewise Parabolic Method (PPM) for gas-dynamical simulations,
