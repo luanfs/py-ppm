@@ -93,11 +93,14 @@ def print_diagnostics_adv_2d(error_linf, error_l1, error_l2, mass_change, t, Nst
 ####################################################################################
 # Plot the 2d graphs given in the list fields 
 ####################################################################################
-def plot_2dfield_graphs(fields, xplot, yplot, filename, title):
-    n = len(fields)
+def plot_2dfield_graphs(scalar_fields, xplot, yplot, vector_fieldsu, vector_fieldsv, xv, yv, filename, title):
+    n = len(scalar_fields)
     for k in range(0, n):
-        plt.contourf(xplot, yplot, fields[k], cmap='jet', levels=100)
+        plt.contourf(xplot, yplot, scalar_fields[k], cmap='jet', levels=100)
         plt.colorbar(orientation='vertical', fraction=0.046, pad=0.04)
+        rnorm = 1.0
+        #rnorm = np.sqrt(vector_fieldsu[k]**2 + vector_fieldsv[k]**2)
+        plt.quiver(xv, yv, vector_fieldsu[k]/rnorm, vector_fieldsv[k]/rnorm)
         plt.xlabel('x')
         plt.ylabel('y')
         plt.title(title)
