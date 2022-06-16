@@ -8,9 +8,9 @@
 # Journal of Computational Physics, Volume 54, Issue 1, 1984, Pages 174-201, ISSN 0021-9991,
 # https://doi.org/10.1016/0021-9991(84)90143-8.
 #
-# -  Carpenter , R. L., Jr., Droegemeier, K. K., Woodward, P. R., & Hane, C. E. (1990). 
+# -  Carpenter , R. L., Jr., Droegemeier, K. K., Woodward, P. R., & Hane, C. E. (1990).
 # Application of the Piecewise Parabolic Method (PPM) to Meteorological Modeling, Monthly Weather Review, 118(3),
-# 586-612. Retrieved Mar 31, 2022, 
+# 586-612. Retrieved Mar 31, 2022,
 # from https://journals.ametsoc.org/view/journals/mwre/118/3/1520-0493_1990_118_0586_aotppm_2_0_co_2.xml
 #
 ####################################################################################
@@ -22,7 +22,7 @@ import numpy as np
 ####################################################################################
 def monotonization_1d(Q, q_L, q_R, dq, q6, N, mono):
     if mono == 0:
-        return 
+        return
     elif mono == 1:
         # In each cell, check if Q is a local maximum
         # See First equation in formula 1.10 from Collela and Woodward 1984
@@ -40,14 +40,14 @@ def monotonization_1d(Q, q_L, q_R, dq, q6, N, mono):
 
         # Move right
         move_right = (-((q_R[2:N+2]-q_L[2:N+2])**2)/6.0 > (q_R[2:N+2]-q_L[2:N+2])*(Q[2:N+2]-0.5*(q_R[2:N+2]+q_L[2:N+2])) )
- 
+
         overshoot_move_left  = np.logical_and(overshoot, move_left)
         overshoot_move_right = np.logical_and(overshoot, move_right)
 
         q_L[2:N+2][overshoot_move_left]  = 3.0*Q[2:N+2][overshoot_move_left]  - 2.0*q_R[2:N+2][overshoot_move_left]
         q_R[2:N+2][overshoot_move_right] = 3.0*Q[2:N+2][overshoot_move_right] - 2.0*q_L[2:N+2][overshoot_move_right]
 
-        # Update the polynomial coefs 
+        # Update the polynomial coefs
         dq[2:N+2] = q_R[2:N+2] - q_L[2:N+2]
         q6[2:N+2] = 6*Q[2:N+2] - 3*(q_R[2:N+2] + q_L[2:N+2])
 
