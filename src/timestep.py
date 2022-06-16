@@ -12,7 +12,7 @@ from flux import numerical_flux
 ####################################################################################
 # Applies a single timestep of PPM for the 1D advection equation
 # Q is an array of size [0:N+5] that store the average values of q.
-# The interior indexes are in [2:N+2], the other indexes are used for 
+# The interior indexes are in [2:N+2], the other indexes are used for
 # periodic boundary conditions.
 ####################################################################################
 def time_step_adv1d_ppm(Q, u_edges, N, simulation):
@@ -22,7 +22,7 @@ def time_step_adv1d_ppm(Q, u_edges, N, simulation):
 
     # Aux. variables
     F = np.zeros(N+1) # Numerical flux
-    
+
     # Reconstructs the values of Q using a piecewise parabolic polynomial
     dq, q6, q_L, q_R = rec.ppm_reconstruction(Q, N, simulation)
 
