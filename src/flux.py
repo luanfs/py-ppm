@@ -1,5 +1,5 @@
 ####################################################################################
-# 
+#
 # Module for PPM numerical flux computation
 #
 # References:
@@ -7,9 +7,9 @@
 # Journal of Computational Physics, Volume 54, Issue 1, 1984, Pages 174-201, ISSN 0021-9991,
 # https://doi.org/10.1016/0021-9991(84)90143-8.
 #
-# -  Carpenter , R. L., Jr., Droegemeier, K. K., Woodward, P. R., & Hane, C. E. (1990). 
+# -  Carpenter , R. L., Jr., Droegemeier, K. K., Woodward, P. R., & Hane, C. E. (1990).
 # Application of the Piecewise Parabolic Method (PPM) to Meteorological Modeling, Monthly Weather Review, 118(3),
-# 586-612. Retrieved Mar 31, 2022, 
+# 586-612. Retrieved Mar 31, 2022,
 # from https://journals.ametsoc.org/view/journals/mwre/118/3/1520-0493_1990_118_0586_aotppm_2_0_co_2.xml
 #
 # Luan da Fonseca Santos - June 2022
