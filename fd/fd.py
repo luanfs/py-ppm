@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------
 # Python script to test accuracy order of finite-difference (FD)  methods
-# Luan Santos - 2022
+# Luan Santos - 2022 
 #--------------------------------------------------------------------------------------
 # Source code directory
 srcdir = "../src/"
