@@ -191,17 +191,12 @@ def Qexact_adv(x, t, simulation):
             y = qexact_adv(simulation.xc, t, simulation)
 
         elif simulation.ic == 3:
-            mask1 = np.logical_and(X>=15.0,X<=20.0)
-            mask2 = np.logical_and(X>=20.0,X<=25.0)
-            y = x*0
-            y[mask1==True] = ( X[mask1==True] - 15.0)/5.0
-            y[mask2==True] = (-X[mask2==True] + 25.0)/5.0
+            y = qexact_adv(simulation.xc, t, simulation)
 
         elif simulation.ic == 4:
-            mask = np.logical_and(X>=15.0,X<=25.0)
-            y = x*0
-            y[mask==True] = 1.0
+            y = qexact_adv(simulation.xc, t, simulation)
     return y
+ 
 ####################################################################################
 # Velocity field
 ####################################################################################
