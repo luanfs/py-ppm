@@ -18,7 +18,7 @@
 ####################################################################################
 
 import numpy as np
-from parameters_1d import q0_adv, qexact_adv, q0_antiderivative_adv, graphdir, velocity_adv_1d
+from parameters_1d import q0_adv, qexact_adv, Qexact_adv, q0_antiderivative_adv, graphdir, velocity_adv_1d
 from errors import *
 from miscellaneous import diagnostics_adv_1d, print_diagnostics_adv_1d, plot_1dfield_graphs
 from timestep import time_step_adv1d_ppm
@@ -52,8 +52,8 @@ def adv_1d(simulation, plot):
     if (simulation.ic == 0 or simulation.ic == 1 or simulation.ic == 3 or simulation.ic == 4 or simulation.ic == 5):
         Q[2:N+2] = (q0_antiderivative_adv(x[1:N+1], simulation) - q0_antiderivative_adv(x[0:N], simulation))/dx
     elif (simulation.ic == 2):
-        #Q[2:N+2] = q0(xc,simulation)
-        Q[2:N+2] = q0_antiderivative_adv(x, simulation)/dx
+        Q[2:N+2] = q0_adv(xc,simulation)
+        #Q[2:N+2] = q0_antiderivative_adv(x, simulation)/dx
 
     # Periodic boundary conditions
     Q[N+2:N+5] = Q[2:5]
@@ -78,7 +78,7 @@ def adv_1d(simulation, plot):
     error_l2   = np.zeros(Nsteps+1)
 
     # Time looping
-    for t in range(0, Nsteps+1):
+    for t in range(1, Nsteps+1):
         # Velocity update
         u_edges[0:N+1] = velocity_adv_1d(x, t*dt, simulation)
 
@@ -95,12 +95,15 @@ def adv_1d(simulation, plot):
             # Compute exact solution
             q_exact = qexact_adv(xplot, t*dt, simulation)
 
+            # Compute exact averaged solution
+            Q_exact = Qexact_adv(x, t*dt, simulation)
+
             # Diagnostic computation
             total_mass, mass_change = diagnostics_adv_1d(Q, simulation, total_mass0)
 
             # Relative errors in different metrics
-            error_linf[t], error_l1[t], error_l2[t] = compute_errors(q_parabolic, q_exact)
-
+            #error_linf[t], error_l1[t], error_l2[t] = compute_errors(q_parabolic, q_exact)
+            error_linf[t], error_l1[t], error_l2[t] = compute_errors(Q_exact, Q[2:N+2])
             if error_linf[t] > 10**(4):
                 # CFL number
                 CFL = abs(np.amax(abs(u_edges)*dt/dx))
@@ -131,17 +134,23 @@ def adv_1d(simulation, plot):
         print('Error evolution is shown in '+filename)
 
     else:
+        # Compute exact solution
+        Q_exact = Qexact_adv(x, Tf, simulation)
+
+        q_exact_edges = qexact_adv(x, Tf, simulation)
+
+        # Relative errors in different metrics
+        error_inf, error_1, error_2 = compute_errors(Q[2:N+2], Q_exact)
+
+        # Applies a PPM time step
+        Q, dq, q6, q_L, _ = time_step_adv1d_ppm(Q, u_edges, N, simulation)
+
         # Compute the parabola
         for i in range(0, N):
             z = (xplot[neighbours==i]-x[i])/dx # Maps to [0,1]
             q_parabolic[neighbours==i] = q_L[i+2] + dq[i+2]*z+ z*(1.0-z)*q6[i+2]
-
-        # Compute exact solution
-        q_exact = qexact_adv(xplot, Tf, simulation)
-        q_exact_edges = qexact_adv(x, 0, simulation)
-
-        # Relative errors in different metrics
-        error_inf, error_1, error_2 = compute_errors(q_parabolic, q_exact)
+        
+        # Error at edges
         error_ed_linf, error_ed_l1, error_ed_l2 = compute_errors(q_exact_edges[0:N], q_L[2:N+2])
 
         # Plot the solution graph
