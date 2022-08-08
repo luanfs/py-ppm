@@ -8,7 +8,7 @@
 
 import numpy as np
 import reconstruction_1d as rec
-from parameters_1d import  qexact_adv, q0_antiderivative_adv, simulation_par_1d, graphdir
+from parameters_1d import  q0_adv, qexact_adv, q0_antiderivative_adv, simulation_par_1d, graphdir
 from errors import *
 from monotonization_1d import monotonization_1d
 
@@ -27,7 +27,7 @@ def error_analysis_recon_1d(simulation):
     xf = simulation.xf
 
     # Number of tests
-    Ntest = 10
+    Ntest = 13
 
     # Number of cells
     Nc = np.zeros(Ntest)
@@ -46,7 +46,7 @@ def error_analysis_recon_1d(simulation):
     # Compute number of cells for each simulation
     for i in range(1, Ntest):
         Nc[i] = Nc[i-1]*2.0
-    
+
     # Aux. variables
     Nplot = 10000
     x0 = simulation.x0
@@ -71,23 +71,17 @@ def error_analysis_recon_1d(simulation):
         if (simulation.ic == 0 or simulation.ic == 1 or simulation.ic == 3 or simulation.ic == 4 or simulation.ic == 5):
             Q[2:N+2] = (q0_antiderivative_adv(x[1:N+1], simulation) - q0_antiderivative_adv(x[0:N], simulation))/dx
         elif (simulation.ic == 2):
-            Q[2:N+2] = q0_antiderivative_adv(x, simulation)/dx
+            Q[2:N+2] = q0_adv(xc, simulation)
        
         # Periodic boundary conditions
-	    #Q[N+2:N+5] = Q[2:5]
-        #Q[0:2]    = Q[N:N+2]
-        if (simulation.ic == 0 or simulation.ic == 1 or simulation.ic == 3 or simulation.ic == 4 or simulation.ic == 5):
+        Q[N+2:N+5] = Q[2:5]
+        Q[0:2]     = Q[N:N+2]
+        if (simulation.ic == 0 or simulation.ic == 3 or simulation.ic == 4 or simulation.ic == 5):
             Q[N+2] = (q0_antiderivative_adv(xf+1.0*dx, simulation) - q0_antiderivative_adv(xf+0.0*dx, simulation))/dx
             Q[N+3] = (q0_antiderivative_adv(xf+2.0*dx, simulation) - q0_antiderivative_adv(xf+1.0*dx, simulation))/dx
             Q[N+4] = (q0_antiderivative_adv(xf+3.0*dx, simulation) - q0_antiderivative_adv(xf+2.0*dx, simulation))/dx
             Q[1]   = (q0_antiderivative_adv(x0-0.0*dx, simulation) - q0_antiderivative_adv(x0-1.0*dx, simulation))/dx
             Q[0]   = (q0_antiderivative_adv(x0-1.0*dx, simulation) - q0_antiderivative_adv(x0-2.0*dx, simulation))/dx
-        elif (simulation.ic == 2):
-            Q[N+2] = q0_antiderivative_adv([xf+0.0*dx, xf+1.0*dx], simulation)
-            Q[N+3] = q0_antiderivative_adv([xf+1.0*dx, xf+2.0*dx], simulation)
-            Q[N+4] = q0_antiderivative_adv([xf+2.0*dx, xf+3.0*dx], simulation)
-            Q[1]   = q0_antiderivative_adv([x0-1.0*dx, x0-0.0*dx], simulation)
-            Q[0]   = q0_antiderivative_adv([x0-2.0*dx, x0-1.0*dx], simulation)
 
         # Reconstructs the values of Q using a piecewise parabolic polynomial
         dq, q6, q_L, q_R = rec.ppm_reconstruction(Q, N, simulation)
@@ -123,7 +117,6 @@ def error_analysis_recon_1d(simulation):
     title2 = 'Edge errors\n' + simulation.title + '- ' + simulation.fvmethod + ' - ' + simulation.icname + ' - monotonization = ' + simulation.monot
     filename2 = graphdir+'1d_adv_tc'+str(tc)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'_ic'+str(ic)+'_edge_errors.png'
     plot_errors_loglog(Nc, error_ed_linf, error_ed_l1, error_ed_l2, filename2, title2)
-
 
     print('\nGraphs have been ploted in '+graphdir)
     print('Convergence graphs has been ploted in '+filename+' and in '+filename2)
