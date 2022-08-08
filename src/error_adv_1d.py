@@ -22,7 +22,7 @@ def error_analysis_adv1d(simulation):
     tc = simulation.tc
 
     # CFL number for all simulations
-    CFL = 0.5
+    CFL = 0.8
 
     # Interval
     x0 = simulation.x0
@@ -70,8 +70,8 @@ def error_analysis_adv1d(simulation):
         print('\nParameters: N = '+str(int(N[i]))+', dt = '+str(dt[i]))
 
         # Output
-        #print_errors_simul(error_linf, error_l1, error_l2, i)
-        print_errors_simul(error_ed_linf, error_ed_l1, error_ed_l2, i)
+        print_errors_simul(error_linf, error_l1, error_l2, i)
+        #print_errors_simul(error_ed_linf, error_ed_l1, error_ed_l2, i)
 
     # Plot the errors
     title = simulation.title + '- ' + simulation.fvmethod + ' - ' + simulation.icname + ' - monotonization = ' + simulation.monot
