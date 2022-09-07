@@ -118,5 +118,9 @@ def error_analysis_recon_1d(simulation):
     filename2 = graphdir+'1d_adv_tc'+str(tc)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'_ic'+str(ic)+'_edge_errors.png'
     plot_errors_loglog(Nc, error_ed_linf, error_ed_l1, error_ed_l2, filename2, title2)
 
-    print('\nGraphs have been ploted in '+graphdir)
+    # Plot the convergence rate
+    title = 'Convergence rate - ' + simulation.fvmethod + ' - ' + simulation.icname + ' - monotonization = ' + simulation.monot
+    filename = graphdir+'1d_adv_tc'+str(tc)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'_ic'+str(ic)+'_convergence_rate.png'
+    plot_convergence_rate(Nc, error_linf, error_l1, error_l2, filename, title)
+
     print('Convergence graphs has been ploted in '+filename+' and in '+filename2)
