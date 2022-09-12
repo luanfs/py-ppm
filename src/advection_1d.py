@@ -20,7 +20,7 @@
 import numpy as np
 from parameters_1d import q0_adv, qexact_adv, Qexact_adv, q0_antiderivative_adv, graphdir, velocity_adv_1d
 from errors import *
-from miscellaneous import diagnostics_adv_1d, print_diagnostics_adv_1d, plot_1dfield_graphs
+from miscellaneous import diagnostics_adv_1d, print_diagnostics_adv_1d, plot_1dfield_graphs, output_adv
 from timestep import time_step_adv1d_ppm
 
 def adv_1d(simulation, plot):
@@ -59,16 +59,6 @@ def adv_1d(simulation, plot):
     Q[N+2:N+5] = Q[2:5]
     Q[0:2]     = Q[N:N+2]
 
-    # Plotting variables
-    Nplot = 10000
-    xplot = np.linspace(x0, xf, Nplot)
-    q_parabolic = np.zeros(Nplot)
-    q_exact = q0_adv(xplot, simulation)
-    ymin = np.amin(q_exact)
-    ymax = np.amax(q_exact)
-    dists = abs(np.add.outer(xplot,-xc))
-    neighbours = dists.argmin(axis=1)
-
     # Compute initial mass
     total_mass0, mass_change = diagnostics_adv_1d(Q, simulation, 1.0)
 
@@ -76,88 +66,33 @@ def adv_1d(simulation, plot):
     error_linf = np.zeros(Nsteps+1)
     error_l1   = np.zeros(Nsteps+1)
     error_l2   = np.zeros(Nsteps+1)
+    
+    # Plot timestep
+    plotstep = 100
 
-    # Time looping
-    for t in range(1, Nsteps+1):
+    #-------------------Time looping-------------------
+    for k in range(1, Nsteps+1):
+        # Time
+        t = k*dt
+
         # Velocity update
         u_edges[0:N+1] = velocity_adv_1d(x, t*dt, simulation)
 
         # Applies a PPM time step
         Q, dq, q6, q_L, _ = time_step_adv1d_ppm(Q, u_edges, N, simulation)
+        
+        # Output
+        output_adv(x, xc, simulation, Q, dq, q6, q_L, error_linf, error_l1, error_l2, plot, k, t, Nsteps, plotstep, total_mass0, CFL)
+    # -------------------End of time loop-------------------
 
-        # Output and plot
-        if plot:
-            # Compute the parabola
-            for i in range(0, N):
-                z = (xplot[neighbours==i]-x[i])/dx # Maps to [0,1]
-                q_parabolic[neighbours==i] = q_L[i+2] + dq[i+2]*z+ z*(1.0-z)*q6[i+2]
-
-            # Compute exact solution
-            q_exact = qexact_adv(xplot, t*dt, simulation)
-
-            # Compute exact averaged solution
-            Q_exact = Qexact_adv(x, t*dt, simulation)
-
-            # Diagnostic computation
-            total_mass, mass_change = diagnostics_adv_1d(Q, simulation, total_mass0)
-
-            # Relative errors in different metrics
-            #error_linf[t], error_l1[t], error_l2[t] = compute_errors(q_parabolic, q_exact)
-            error_linf[t], error_l1[t], error_l2[t] = compute_errors(Q_exact, Q[2:N+2])
-            if error_linf[t] > 10**(4):
-                # CFL number
-                CFL = abs(np.amax(abs(u_edges)*dt/dx))
-                print('\nStopping due to large errors.')
-                print('The CFL number is', CFL)
-                exit()
-
-            # Plot the graph and print diagnostic
-            #title = simulation.title +'- '+icname+' - time='+str(t*dt)+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.fvmethod+', mono = '+simulation.monot
-            #filename = graphdir+'1d_adv_tc'+str(tc)+'_ic'+str(ic)+'_t'+str(t)+'_N'+str(N)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'.png'
-            #plot_1dfield_graphs([q_exact, q_parabolic], ['Exact', 'Parabolic'], xplot, ymin, ymax, filename, title)
-            print_diagnostics_adv_1d(error_linf[t], error_l1[t], error_l2[t], mass_change, t, Nsteps)
-    #---------------------------------------End of time loop---------------------------------------
-
+    #-------------------Final plot and outputs -------------------
     if plot:
         # Plot the error graph
         title = simulation.title +'- '+icname+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.fvmethod+', mono = '+simulation.monot
         filename = graphdir+'1d_adv_tc'+str(tc)+'_ic'+str(ic)+'_N'+str(N)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'_erros.png'
         plot_time_evolution([error_linf, error_l1, error_l2], Tf, ['$L_\infty}$','$L_1$','$L_2$'], 'Error', filename, title)
-
-        # Plot the solution graph
-        qmin = str("{:.2e}".format(np.amin(q_parabolic)))
-        qmax = str("{:.2e}".format(np.amax(q_parabolic)))
-        title = '1D advection - '+icname+' - time='+str(t*dt)+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.fvmethod+', mono = '+simulation.monot+ ', Min = '+ qmin +', Max = '+qmax
-        filename = graphdir+'1d_adv_tc'+str(tc)+'_ic'+str(ic)+'_t'+str(t)+'_N'+str(N)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'.png'
-        plot_1dfield_graphs([q_exact, q_parabolic], ['Exact', 'Parabolic'], xplot, ymin, ymax, filename, title)
         print('\nGraphs have been ploted in '+ graphdir)
         print('Error evolution is shown in '+filename)
-
     else:
-        # Compute exact solution
-        Q_exact = Qexact_adv(x, Tf, simulation)
-
-        q_exact_edges = qexact_adv(x, Tf, simulation)
-
-        # Relative errors in different metrics
-        error_inf, error_1, error_2 = compute_errors(Q[2:N+2], Q_exact)
-
-        # Applies a PPM time step
-        Q, dq, q6, q_L, _ = time_step_adv1d_ppm(Q, u_edges, N, simulation)
-
-        # Compute the parabola
-        for i in range(0, N):
-            z = (xplot[neighbours==i]-x[i])/dx # Maps to [0,1]
-            q_parabolic[neighbours==i] = q_L[i+2] + dq[i+2]*z+ z*(1.0-z)*q6[i+2]
-        
-        # Error at edges
-        error_ed_linf, error_ed_l1, error_ed_l2 = compute_errors(q_exact_edges[0:N], q_L[2:N+2])
-
-        # Plot the solution graph
-        qmin = str("{:.2e}".format(np.amin(q_parabolic)))
-        qmax = str("{:.2e}".format(np.amax(q_parabolic)))
-        title = '1D advection - '+icname+' - time='+str(t*dt)+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.fvmethod+', mono = '+simulation.monot+ ', Min = '+ qmin +', Max = '+qmax
-        filename = graphdir+'1d_adv_tc'+str(tc)+'_ic'+str(ic)+'_t'+str(t)+'_N'+str(N)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'.png'
-        plot_1dfield_graphs([q_exact, q_parabolic], ['Exact', 'Parabolic'], xplot, ymin, ymax, filename, title)
-
-        return error_inf, error_1, error_2, error_ed_linf, error_ed_l1, error_ed_l2
+        # Return final errors
+        return error_linf[Nsteps], error_l1[Nsteps], error_l2[Nsteps]
