@@ -72,7 +72,7 @@ class simulation_par_1d:
         if mono == 0:
             monot = 'none'
         elif mono == 1:
-            monot = 'WC84' # Woodward and Collela 84 paper
+            monot = 'CW84' # Collela and Woodward 84 paper
         else:
            print("Error - invalid monotization method")
            exit()
