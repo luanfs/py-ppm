@@ -34,18 +34,12 @@ def adv_1d(simulation, plot):
     dt = simulation.dt   # Time step
     Tf = simulation.Tf   # Total period definition
     tc = simulation.tc
-    icname   = simulation.icname
-    mono     = simulation.mono  # Monotonization scheme
-
-    i0    = simulation.i0         # Interior of grid indexes
-    iend  = simulation.iend
-    ng    = simulation.ng         # Total number of ghost cells
-    ngr   = simulation.ng_right   # Number of ghost cells at right
-    ngl   = simulation.ng_left    # Number of ghost cells at left
+    icname = simulation.icname
+    mono   = simulation.mono  # Monotonization scheme
 
     # Velocity at edges
-    u_edges = np.zeros(N+ng+1)
-    u_edges[:] = velocity_adv_1d(x, 0, simulation)
+    u_edges = np.zeros(N+1)
+    u_edges[0:N+1] = velocity_adv_1d(x, 0, simulation)
 
     # CFL number
     CFL = abs(np.amax(abs(u_edges)*dt/dx))
@@ -54,15 +48,16 @@ def adv_1d(simulation, plot):
     Nsteps = int(Tf/dt)
 
     # Compute average values of Q (initial condition)
-    Q = np.zeros(N+ng)
+    Q = np.zeros(N+5)
     if (simulation.ic == 0 or simulation.ic == 1 or simulation.ic == 3 or simulation.ic == 4 or simulation.ic == 5):
-        Q[i0:iend] = (q0_antiderivative_adv(x[i0+1:iend+1], simulation) - q0_antiderivative_adv(x[i0:iend], simulation))/dx
+        Q[2:N+2] = (q0_antiderivative_adv(x[1:N+1], simulation) - q0_antiderivative_adv(x[0:N], simulation))/dx
     elif (simulation.ic == 2):
-        Q[i0:iend] = q0_adv(xc[i0:iend],simulation)
+        Q[2:N+2] = q0_adv(xc,simulation)
+        #Q[2:N+2] = q0_antiderivative_adv(x, simulation)/dx
 
     # Periodic boundary conditions
-    Q[iend:N+ng+1] = Q[i0:i0+ngr]
-    Q[0:i0]        = Q[iend-ngl:iend]
+    Q[N+2:N+5] = Q[2:5]
+    Q[0:2]     = Q[N:N+2]
 
     # Compute initial mass
     total_mass0, mass_change = diagnostics_adv_1d(Q, simulation, 1.0)
@@ -71,7 +66,7 @@ def adv_1d(simulation, plot):
     error_linf = np.zeros(Nsteps+1)
     error_l1   = np.zeros(Nsteps+1)
     error_l2   = np.zeros(Nsteps+1)
-
+    
     # Plot timestep
     plotstep = 100
 
@@ -81,11 +76,11 @@ def adv_1d(simulation, plot):
         t = k*dt
 
         # Velocity update
-        u_edges[:] = velocity_adv_1d(x, t*dt, simulation)
+        u_edges[0:N+1] = velocity_adv_1d(x, t*dt, simulation)
 
         # Applies a PPM time step
         Q, dq, q6, q_L, _ = time_step_adv1d_ppm(Q, u_edges, N, simulation)
-
+        
         # Output
         output_adv(x, xc, simulation, Q, dq, q6, q_L, error_linf, error_l1, error_l2, plot, k, t, Nsteps, plotstep, total_mass0, CFL)
     # -------------------End of time loop-------------------

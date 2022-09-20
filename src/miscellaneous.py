@@ -41,9 +41,7 @@ def createDirs():
 # Diagnostic variables computation
 ####################################################################################
 def diagnostics_adv_1d(Q_average, simulation, total_mass0):
-    i0   = simulation.i0
-    iend = simulation.iend
-    total_mass =  np.sum(Q_average[i0:iend]*simulation.dx)  # Compute new mass
+    total_mass =  np.sum(Q_average[0:simulation.N]*simulation.dx)  # Compute new mass
     if abs(total_mass0)>10**(-10):
         mass_change = abs(total_mass0-total_mass)/abs(total_mass0)
     else:
@@ -82,19 +80,14 @@ def output_adv(x, xc, simulation, Q, dq, q6, q_L, error_linf, error_l1, error_l2
     N = simulation.N
     dx = simulation.dx
     dt = simulation.dt
-    i0    = simulation.i0         # Interior of grid indexes
-    iend  = simulation.iend
-    ng    = simulation.ng         # Total number of ghost cells
-    ngr   = simulation.ng_right   # Number of ghost cells at right
-    ngl   = simulation.ng_left    # Number of ghost cells at left
 
     if plot or k==Nsteps:
         # Compute exact averaged solution
         Q_exact = Qexact_adv(x, t, simulation)
 
         # Relative errors in different metrics
-        error_linf[k], error_l1[k], error_l2[k] = compute_errors(Q_exact[i0:iend], Q[i0:iend])
-
+        #error_linf[k], error_l1[k], error_l2[k] = compute_errors(q_parabolic, q_exact)
+        error_linf[k], error_l1[k], error_l2[k] = compute_errors(Q_exact, Q[2:N+2])
         if error_linf[k] > 10**(4):
             # CFL number
             CFL = abs(np.amax(abs(u_edges)*dt/dx))
@@ -103,7 +96,7 @@ def output_adv(x, xc, simulation, Q, dq, q6, q_L, error_linf, error_l1, error_l2
             exit()
 
         # Diagnostic computation
-        total_mass, mass_change = diagnostics_adv_1d(Q,	 simulation, total_mass0)
+        total_mass, mass_change = diagnostics_adv_1d(Q, simulation, total_mass0)
 
         if plot:
             # Print diagnostics on the screen
@@ -116,7 +109,7 @@ def output_adv(x, xc, simulation, Q, dq, q6, q_L, error_linf, error_l1, error_l2
             Nplot = 10000
             xplot = np.linspace(x0, xf, Nplot)
             q_parabolic = np.zeros(Nplot)
-            dists = abs(np.add.outer(xplot,-xc[i0:iend]))
+            dists = abs(np.add.outer(xplot,-xc))
             neighbours = dists.argmin(axis=1)
 
             if k!=Nsteps:
@@ -131,8 +124,8 @@ def output_adv(x, xc, simulation, Q, dq, q6, q_L, error_linf, error_l1, error_l2
 
             # Compute the parabola
             for i in range(0, N):
-                z = (xplot[neighbours==i]-x[i+i0])/dx # Maps to [0,1]
-                q_parabolic[neighbours==i] = q_L[i+i0] + dq[i+i0]*z+ z*(1.0-z)*q6[i+i0]
+                z = (xplot[neighbours==i]-x[i])/dx # Maps to [0,1]
+                q_parabolic[neighbours==i] = q_L[i+2] + dq[i+2]*z+ z*(1.0-z)*q6[i+2]
 
             # Additional plotting variables
             ymin = np.amin(q_exact)

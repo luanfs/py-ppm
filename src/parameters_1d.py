@@ -14,28 +14,19 @@ pardir   = "par/"               # Parameter files directory
 ####################################################################################
 # Create the grid
 ####################################################################################
-def grid_1d(x0, xf, N, ng_left, ng_right):
-    ng = ng_left + ng_right         # Total of ghost cells
-    dx = (xf-x0)/N                  # Grid length
-    x  = np.linspace(x0-ng_left*dx, xf+ng_right*dx, N+ng+1)   # Cell edges
-    xc = (x[0:N+ng] + x[1:N+ng+1])/2   # Cell centers
+def grid_1d(x0, xf, N):
+    x  = np.linspace(x0, xf, N+1) # Cell edges
+    xc = (x[0:N] + x[1:N+1])/2    # Cell centers
+    dx = (xf-x0)/N                # Grid length
     return x, xc, dx
 
 ####################################################################################
 #  Simulation class
-####################################################################################
+####################################################################################      
 class simulation_par_1d:
     def __init__(self, N, dt, Tf, ic, tc, mono):
         # Number of cells
         self.N  = N
-
-        # Number of ghost cells
-        self.ng_left  = 3
-        self.ng_right = 3
-        self.ng = self.ng_left + self.ng_right
-
-        # Interior indexes
-        self.i0, self.iend = self.ng_left, self.ng_left + N
 
         # Initial condition
         self.ic = ic
@@ -91,7 +82,7 @@ class simulation_par_1d:
         self.xf = xf
 
         # Grid
-        self.x, self.xc, self.dx = grid_1d(x0, xf, N, self.ng_left, self.ng_right)
+        self.x, self.xc, self.dx = grid_1d(x0, xf, N)
 
         # IC name
         self.icname = name
@@ -146,12 +137,12 @@ def q0_antiderivative_adv(x, simulation):
     return y
 
 ####################################################################################
-# Exact solution to the advection problem
+# Exact solution to the advection problem 
 ####################################################################################
 def qexact_adv(x, t, simulation):
     x0 = simulation.x0
     xf = simulation.xf
-    ic = simulation.ic
+    ic = simulation.ic  
 
     if simulation.ic >= 1 and simulation.ic <= 4 : # constant speed
         u = velocity_adv_1d(x, t, simulation)
@@ -179,16 +170,14 @@ def qexact_adv(x, t, simulation):
     return y
 
 ####################################################################################
-# Exact average solution to the advection problem
+# Exact average solution to the advection problem 
 ####################################################################################
 def Qexact_adv(x, t, simulation):
     x0 = simulation.x0
     xf = simulation.xf
-    ic = simulation.ic
+    ic = simulation.ic  
     N  = simulation.N
-    ng = simulation.ng       # Interior of grid indexes
 
-    #exit()
     if simulation.ic >= 1 and simulation.ic <= 4 : # constant speed
         u = velocity_adv_1d(x, t, simulation)
         X = x-u*t
@@ -196,7 +185,7 @@ def Qexact_adv(x, t, simulation):
         #X[mask] = (X[mask]-x0)%(xf-x0) + x0 # maps back to [x0,xf]
         #X[N] = xf
         if simulation.ic == 1:
-            y = (q0_antiderivative_adv(X[1:N+ng+1], simulation)-q0_antiderivative_adv(X[0:N+ng], simulation))/simulation.dx
+            y = (q0_antiderivative_adv(X[1:N+1], simulation)-q0_antiderivative_adv(X[0:N], simulation))/simulation.dx
 
         elif simulation.ic == 2:
             y = qexact_adv(simulation.xc, t, simulation)
@@ -207,7 +196,7 @@ def Qexact_adv(x, t, simulation):
         elif simulation.ic == 4:
             y = qexact_adv(simulation.xc, t, simulation)
     return y
-
+ 
 ####################################################################################
 # Velocity field
 ####################################################################################
@@ -215,7 +204,7 @@ def velocity_adv_1d(x, t, simulation):
     if simulation.ic == 1:
         u = 0.1
     elif simulation.ic == 2:
-        u = 0.1
+        u = 0.1       
     elif simulation.ic == 3:
         u = 0.5
     elif simulation.ic == 4:
