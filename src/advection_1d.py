@@ -48,19 +48,18 @@ def adv_1d(simulation, plot):
     Nsteps = int(Tf/dt)
 
     # Compute average values of Q (initial condition)
-    Q = np.zeros(N+5)
+    Q = np.zeros(N+6)
     if (simulation.ic == 0 or simulation.ic == 1 or simulation.ic == 3 or simulation.ic == 4 or simulation.ic == 5):
-        Q[2:N+2] = (q0_antiderivative_adv(x[1:N+1], simulation) - q0_antiderivative_adv(x[0:N], simulation))/dx
+        Q[3:N+3] = (q0_antiderivative_adv(x[1:N+1], simulation) - q0_antiderivative_adv(x[0:N], simulation))/dx
     elif (simulation.ic == 2):
-        Q[2:N+2] = q0_adv(xc,simulation)
-        #Q[2:N+2] = q0_antiderivative_adv(x, simulation)/dx
+        Q[3:N+3] = q0_adv(xc,simulation)
 
     # Periodic boundary conditions
-    Q[N+2:N+5] = Q[2:5]
-    Q[0:2]     = Q[N:N+2]
+    Q[N+3:N+6] = Q[3:6]
+    Q[0:3]     = Q[N:N+3]
 
     # Compute initial mass
-    total_mass0, mass_change = diagnostics_adv_1d(Q, simulation, 1.0)
+    total_mass0, mass_change = diagnostics_adv_1d(Q[3:N+3], simulation, 1.0)
 
     # Error variables
     error_linf = np.zeros(Nsteps+1)

@@ -87,7 +87,7 @@ def output_adv(x, xc, simulation, Q, dq, q6, q_L, error_linf, error_l1, error_l2
 
         # Relative errors in different metrics
         #error_linf[k], error_l1[k], error_l2[k] = compute_errors(q_parabolic, q_exact)
-        error_linf[k], error_l1[k], error_l2[k] = compute_errors(Q_exact, Q[2:N+2])
+        error_linf[k], error_l1[k], error_l2[k] = compute_errors(Q_exact, Q[3:N+3])
         if error_linf[k] > 10**(4):
             # CFL number
             CFL = abs(np.amax(abs(u_edges)*dt/dx))
@@ -125,7 +125,7 @@ def output_adv(x, xc, simulation, Q, dq, q6, q_L, error_linf, error_l1, error_l2
             # Compute the parabola
             for i in range(0, N):
                 z = (xplot[neighbours==i]-x[i])/dx # Maps to [0,1]
-                q_parabolic[neighbours==i] = q_L[i+2] + dq[i+2]*z+ z*(1.0-z)*q6[i+2]
+                q_parabolic[neighbours==i] = q_L[i+3] + dq[i+3]*z+ z*(1.0-z)*q6[i+3]
 
             # Additional plotting variables
             ymin = np.amin(q_exact)
