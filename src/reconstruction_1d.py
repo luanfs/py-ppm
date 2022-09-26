@@ -21,7 +21,9 @@ import numpy as np
 # Given the average values of a scalar field Q, this routine constructs 
 # a piecewise parabolic aproximation of Q using its average value.
 ####################################################################################
-def ppm_reconstruction(Q, N, simulation):
+def ppm_reconstruction(Q, simulation):
+    N = simulation.N
+
     # Compute the slopes dQ0 (centered finite difference)
     # Formula 1.7 from Collela and Woodward 1984 and Figure 2 from Carpenter et al 1990.
     dQ0 = np.zeros(N+6)

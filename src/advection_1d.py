@@ -38,8 +38,8 @@ def adv_1d(simulation, plot):
     mono   = simulation.mono  # Monotonization scheme
 
     # Velocity at edges
-    u_edges = np.zeros(N+1)
-    u_edges[0:N+1] = velocity_adv_1d(x, 0, simulation)
+    u_edges = np.zeros(N+7)
+    u_edges[0:N+7] = velocity_adv_1d(x[0:N+7], 0, simulation)
 
     # CFL number
     CFL = abs(np.amax(abs(u_edges)*dt/dx))
@@ -49,10 +49,10 @@ def adv_1d(simulation, plot):
 
     # Compute average values of Q (initial condition)
     Q = np.zeros(N+6)
-    if (simulation.ic == 0 or simulation.ic == 1 or simulation.ic == 3 or simulation.ic == 4 or simulation.ic == 5):
-        Q[3:N+3] = (q0_antiderivative_adv(x[1:N+1], simulation) - q0_antiderivative_adv(x[0:N], simulation))/dx
-    elif (simulation.ic == 2):
-        Q[3:N+3] = q0_adv(xc,simulation)
+    if (simulation.ic == 0 or simulation.ic == 1 or simulation.ic == 3 or simulation.ic == 4):
+        Q[3:N+3] = (q0_antiderivative_adv(x[4:N+4], simulation) - q0_antiderivative_adv(x[3:N+3], simulation))/dx
+    elif (simulation.ic == 2 or simulation.ic == 5):
+        Q[3:N+3] = q0_adv(xc[3:N+3],simulation)
 
     # Periodic boundary conditions
     Q[N+3:N+6] = Q[3:6]
@@ -65,7 +65,7 @@ def adv_1d(simulation, plot):
     error_linf = np.zeros(Nsteps+1)
     error_l1   = np.zeros(Nsteps+1)
     error_l2   = np.zeros(Nsteps+1)
-    
+
     # Plot timestep
     plotstep = 100
 
@@ -74,11 +74,11 @@ def adv_1d(simulation, plot):
         # Time
         t = k*dt
 
-        # Velocity update
-        u_edges[0:N+1] = velocity_adv_1d(x, t*dt, simulation)
-
         # Applies a PPM time step
-        Q, dq, q6, q_L, _ = time_step_adv1d_ppm(Q, u_edges, N, simulation)
+        Q, dq, q6, q_L, _ = time_step_adv1d_ppm(Q, u_edges, simulation)
+
+        # Velocity update
+        u_edges[0:N+7] = velocity_adv_1d(x, t*dt, simulation)
         
         # Output
         output_adv(x, xc, simulation, Q, dq, q6, q_L, error_linf, error_l1, error_l2, plot, k, t, Nsteps, plotstep, total_mass0, CFL)

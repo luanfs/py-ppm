@@ -96,7 +96,7 @@ def output_adv(x, xc, simulation, Q, dq, q6, q_L, error_linf, error_l1, error_l2
             exit()
 
         # Diagnostic computation
-        total_mass, mass_change = diagnostics_adv_1d(Q, simulation, total_mass0)
+        total_mass, mass_change = diagnostics_adv_1d(Q[3:N+3], simulation, total_mass0)
 
         if plot:
             # Print diagnostics on the screen
@@ -109,7 +109,7 @@ def output_adv(x, xc, simulation, Q, dq, q6, q_L, error_linf, error_l1, error_l2
             Nplot = 10000
             xplot = np.linspace(x0, xf, Nplot)
             q_parabolic = np.zeros(Nplot)
-            dists = abs(np.add.outer(xplot,-xc))
+            dists = abs(np.add.outer(xplot,-xc[3:N+3]))
             neighbours = dists.argmin(axis=1)
 
             if k!=Nsteps:
@@ -117,14 +117,14 @@ def output_adv(x, xc, simulation, Q, dq, q6, q_L, error_linf, error_l1, error_l2
                 time = t-dt
             else:
                 time = t
-                dq, q6, q_L,_ = ppm_reconstruction(Q, N, simulation) #update parabola coeffs for final step
+                dq, q6, q_L,_ = ppm_reconstruction(Q, simulation) #update parabola coeffs for final step
 
             # Compute exact solution
             q_exact = qexact_adv(xplot, time, simulation) 
 
             # Compute the parabola
             for i in range(0, N):
-                z = (xplot[neighbours==i]-x[i])/dx # Maps to [0,1]
+                z = (xplot[neighbours==i]-x[i+3])/dx # Maps to [0,1]
                 q_parabolic[neighbours==i] = q_L[i+3] + dq[i+3]*z+ z*(1.0-z)*q6[i+3]
 
             # Additional plotting variables

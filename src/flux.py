@@ -16,25 +16,84 @@
 # (luan.santos@usp.br)
 ####################################################################################
 import numpy as np
-def numerical_flux(Q, q_R, q_L, dq, q6, u_edges, simulation, N):
+def numerical_flux(Q, q_R, q_L, dq, q6, u_edges, simulation):
+    N = simulation.N
+
     # Numerical fluxes at edges
-    f_L = np.zeros(N+1) # Left
-    f_R = np.zeros(N+1) # Right
+    f_L = np.zeros(N+7) # Left
+    f_R = np.zeros(N+7) # Right
 
     # Aux. variables
-    F = np.zeros(N+1) # Numerical flux
+    F = np.zeros(N+7) # Numerical flux
 
     # Compute the fluxes (formula 1.12 from Collela and Woodward 1984)
     c = u_edges*(simulation.dt/simulation.dx) #cfl number
     c2 = c*c
     # Flux at left edges
-    f_L[0:N+1] = q_R[2:N+3] - c[0:N+1]*0.5*(dq[2:N+3] - (1.0-(2.0/3.0)*c[0:N+1])*q6[2:N+3])
+    f_L[3:N+4] = q_R[2:N+3] - c[3:N+4]*0.5*(dq[2:N+3] - (1.0-(2.0/3.0)*c[3:N+4])*q6[2:N+3])
 
     # Flux at right edges
     c = -c
-    f_R[0:N+1] = q_L[3:N+4] + c[0:N+1]*0.5*(dq[3:N+4] + (1.0-2.0/3.0*c[0:N+1])*q6[3:N+4])
+    f_R[3:N+4] = q_L[3:N+4] + c[3:N+4]*0.5*(dq[3:N+4] + (1.0-2.0/3.0*c[3:N+4])*q6[3:N+4])
 
     # F - Formula 1.13 from Collela and Woodward 1984)
     F[u_edges >= 0] = f_L[u_edges >= 0]
     F[u_edges <= 0] = f_R[u_edges <= 0]
+    return F
+    
+ 
+####################################################################################
+# Compute the 1d flux operator from PPM using its stencil
+# Inputs: Q (average values),  u_edges (velocity at edges)
+####################################################################################
+def flux_ppm_stencil(Q, u_edges, simulation):
+    N = simulation.N
+    dx = simulation.dx
+    dt = simulation.dt
+
+    # CFL at edges - x direction
+    c = np.sign(u_edges)*u_edges*dt/dx
+    c2 = c*c
+
+    # Stencil coefficients
+    a = np.zeros((6, N+7))
+    upositive = u_edges>=0
+    unegative = ~upositive
+
+    a[0, upositive] =  c[upositive] - c2[upositive]
+    a[0, unegative] =  0.0
+
+    a[1, upositive] = -1.0 - 5.0*c[upositive] + 6.0*c2[upositive]
+    a[1, unegative] = -1.0 + 2.0*c[unegative] - c2[unegative] 
+
+    a[2, upositive] =  7.0 + 15.0*c[upositive] - 10.0*c2[upositive]
+    a[2, unegative] =  7.0 - 13.0*c[unegative] + 6.0*c2[unegative] 
+
+    a[3, upositive] =  7.0 - 13.0*c[upositive] + 6.0*c2[upositive]
+    a[3, unegative] =  7.0 + 15.0*c[unegative] - 10.0*c2[unegative] 
+
+    a[4, upositive] = -1.0 + 2.0*c[upositive] - c2[upositive]
+    a[4, unegative] = -1.0 - 5.0*c[unegative] + 6.0*c2[unegative] 
+
+    a[5, upositive] =  0.0
+    a[5, unegative] =  c[unegative] - c2[unegative] 
+
+    F = np.zeros((N+7))
+
+    F[3:N+4] =  a[0,3:N+4]*Q[0:N+1] +\
+                a[1,3:N+4]*Q[1:N+2] +\
+                a[2,3:N+4]*Q[2:N+3] +\
+                a[3,3:N+4]*Q[3:N+4] +\
+                a[4,3:N+4]*Q[4:N+5] +\
+                a[5,3:N+4]*Q[5:N+6]
+
+    #F[3,:] = F[N+3,:] #boundary condition
+    #print(np.shape(F[3:N+4,:]))
+    #print(u_edges[3:N+4,:])
+    #print(F[3:N+4,:]/12.0)
+    #exit()
+
+    F[3:N+4]  = u_edges[3:N+4]*F[3:N+4]/12.0
+    #print(F[3:N+4,:])
+    #exit()
     return F

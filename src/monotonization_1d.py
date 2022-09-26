@@ -20,7 +20,9 @@ import numpy as np
 ####################################################################################
 # Apply the 1D PPM monotonization
 ####################################################################################
-def monotonization_1d(Q, q_L, q_R, dq, q6, N, mono):
+def monotonization_1d(Q, q_L, q_R, dq, q6, simulation):
+    N = simulation.N
+    mono = simulation.mono
     if mono == 0:
         return
     elif mono == 1:

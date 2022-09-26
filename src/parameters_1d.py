@@ -12,12 +12,14 @@ graphdir = "graphs/"            # Graphs directory
 pardir   = "par/"               # Parameter files directory
 
 ####################################################################################
-# Create the grid
+# Create the 1d grid
 ####################################################################################
 def grid_1d(x0, xf, N):
-    x  = np.linspace(x0, xf, N+1) # Cell edges
-    xc = (x[0:N] + x[1:N+1])/2    # Cell centers
-    dx = (xf-x0)/N                # Grid length
+    ngl = 3 # Ghost cells on left
+    ngr = 3 # Ghost cells on right
+    dx  = (xf-x0)/N                # Grid length
+    x   = np.linspace(x0-3.0*dx, xf+3.0*dx, N+1+ngl+ngl) # Cell edges
+    xc  = (x[0:N+ngl+ngl] + x[1:N+1+ngl+ngl])/2    # Cell centers
     return x, xc, dx
 
 ####################################################################################
@@ -64,8 +66,12 @@ class simulation_par_1d:
             xf = 40
             name = 'Rectangular wave'
 
+        elif ic == 5:
+            x0 = -1.0
+            xf =  1.0
+            name = 'Gaussian wave - variable speed'
         else:
-            print("Error - invalid test case")
+            print("Error - invalid initial condition")
             exit()
 
         # Monotonization:
@@ -144,7 +150,7 @@ def qexact_adv(x, t, simulation):
     xf = simulation.xf
     ic = simulation.ic  
 
-    if simulation.ic >= 1 and simulation.ic <= 4 : # constant speed
+    if simulation.ic >= 1 and simulation.ic <= 5 : # constant speed
         u = velocity_adv_1d(x, t, simulation)
         X = x-u*t
         mask = (X != xf)
@@ -153,7 +159,7 @@ def qexact_adv(x, t, simulation):
         if simulation.ic == 1:
             y = np.sin(2.0*np.pi*X) + 1.0
 
-        elif simulation.ic == 2:
+        elif simulation.ic == 2 or simulation.ic == 5:
             y = np.exp(-10*(np.sin(-np.pi*X))**2)
 
         elif simulation.ic == 3:
@@ -178,23 +184,17 @@ def Qexact_adv(x, t, simulation):
     ic = simulation.ic  
     N  = simulation.N
 
-    if simulation.ic >= 1 and simulation.ic <= 4 : # constant speed
+    if simulation.ic >= 1 and simulation.ic <= 5 : # constant speed
         u = velocity_adv_1d(x, t, simulation)
         X = x-u*t
         #mask = (X != xf)
         #X[mask] = (X[mask]-x0)%(xf-x0) + x0 # maps back to [x0,xf]
         #X[N] = xf
         if simulation.ic == 1:
-            y = (q0_antiderivative_adv(X[1:N+1], simulation)-q0_antiderivative_adv(X[0:N], simulation))/simulation.dx
+            y = (q0_antiderivative_adv(X[4:N+4], simulation)-q0_antiderivative_adv(X[3:N+3], simulation))/simulation.dx
 
-        elif simulation.ic == 2:
-            y = qexact_adv(simulation.xc, t, simulation)
-
-        elif simulation.ic == 3:
-            y = qexact_adv(simulation.xc, t, simulation)
-
-        elif simulation.ic == 4:
-            y = qexact_adv(simulation.xc, t, simulation)
+        elif simulation.ic >= 2 :
+            y = qexact_adv(simulation.xc[3:N+3], t, simulation)
     return y
  
 ####################################################################################
@@ -209,4 +209,6 @@ def velocity_adv_1d(x, t, simulation):
         u = 0.5
     elif simulation.ic == 4:
         u = 0.5
+    elif simulation.ic == 5:
+        u = np.sin(np.pi*x)**2
     return u
