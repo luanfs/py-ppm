@@ -52,8 +52,8 @@ class simulation_par_1d:
             name = 'Sine wave'
 
         elif ic == 2:
-            x0 = -1.0
-            xf =  1.0
+            x0 = -0.5
+            xf =  0.5
             name = 'Gaussian wave'
 
         elif ic == 3:
@@ -204,7 +204,7 @@ def velocity_adv_1d(x, t, simulation):
     if simulation.ic == 1:
         u = 0.1
     elif simulation.ic == 2:
-        u = 0.1       
+        u = 0.2      
     elif simulation.ic == 3:
         u = 0.5
     elif simulation.ic == 4:
