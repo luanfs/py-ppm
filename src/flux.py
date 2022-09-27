@@ -16,19 +16,38 @@
 # (luan.santos@usp.br)
 ####################################################################################
 import numpy as np
-def numerical_flux(Q, q_R, q_L, dq, q6, u_edges, simulation):
+
+####################################################################################
+# Routine to call the correct numerical flux
+####################################################################################
+def numerical_flux(Q, q_R, q_L, dq, q6, u_edges, F, a, simulation):
+    if simulation.mono == 1: # Applies PPM with monotonization
+        flux_ppm(Q, q_R, q_L, dq, q6, u_edges, F, simulation)
+
+    elif simulation.mono == 0: # No monotonization 
+        if simulation.fvmethod == 'PPM':
+           flux_ppm_stencil(Q, u_edges, F, a, simulation)
+        else:
+           print('Not implemented yet! bye')
+           exit()
+
+    return F
+
+####################################################################################
+# Compute the flux operator from PPM using the parabola coefficients
+# Inputs: Q (average values),  u_edges (velocity at edges)
+####################################################################################
+def flux_ppm(Q, q_R, q_L, dq, q6, u_edges, F, simulation):
     N = simulation.N
 
     # Numerical fluxes at edges
     f_L = np.zeros(N+7) # Left
     f_R = np.zeros(N+7) # Right
 
-    # Aux. variables
-    F = np.zeros(N+7) # Numerical flux
-
     # Compute the fluxes (formula 1.12 from Collela and Woodward 1984)
     c = u_edges*(simulation.dt/simulation.dx) #cfl number
     c2 = c*c
+
     # Flux at left edges
     f_L[3:N+4] = q_R[2:N+3] - c[3:N+4]*0.5*(dq[2:N+3] - (1.0-(2.0/3.0)*c[3:N+4])*q6[2:N+3])
 
@@ -39,24 +58,29 @@ def numerical_flux(Q, q_R, q_L, dq, q6, u_edges, simulation):
     # F - Formula 1.13 from Collela and Woodward 1984)
     F[u_edges >= 0] = f_L[u_edges >= 0]
     F[u_edges <= 0] = f_R[u_edges <= 0]
-    return F
-    
- 
+
+
 ####################################################################################
-# Compute the 1d flux operator from PPM using its stencil
+# Compute the flux operator from PPM using its stencil
 # Inputs: Q (average values),  u_edges (velocity at edges)
 ####################################################################################
-def flux_ppm_stencil(Q, u_edges, simulation):
+def flux_ppm_stencil(Q, u_edges, F, a, simulation):
     N = simulation.N
-    dx = simulation.dx
-    dt = simulation.dt
+    F[3:N+4] =  a[0,3:N+4]*Q[0:N+1] +\
+                a[1,3:N+4]*Q[1:N+2] +\
+                a[2,3:N+4]*Q[2:N+3] +\
+                a[3,3:N+4]*Q[3:N+4] +\
+                a[4,3:N+4]*Q[4:N+5] +\
+                a[5,3:N+4]*Q[5:N+6]
 
-    # CFL at edges - x direction
-    c = np.sign(u_edges)*u_edges*dt/dx
-    c2 = c*c
-
+    F[3:N+4]  = F[3:N+4]/12.0
+ 
+####################################################################################
+# Compute the flux operator PPM stencil coefficients
+# Inputs: c (cfl at egdes), c2 (cfl^2 at edges),  u_edges (velocity at edges)
+####################################################################################
+def flux_ppm_stencil_coefficients(a, c, c2, u_edges, simulation):
     # Stencil coefficients
-    a = np.zeros((6, N+7))
     upositive = u_edges>=0
     unegative = ~upositive
 
@@ -77,23 +101,3 @@ def flux_ppm_stencil(Q, u_edges, simulation):
 
     a[5, upositive] =  0.0
     a[5, unegative] =  c[unegative] - c2[unegative] 
-
-    F = np.zeros((N+7))
-
-    F[3:N+4] =  a[0,3:N+4]*Q[0:N+1] +\
-                a[1,3:N+4]*Q[1:N+2] +\
-                a[2,3:N+4]*Q[2:N+3] +\
-                a[3,3:N+4]*Q[3:N+4] +\
-                a[4,3:N+4]*Q[4:N+5] +\
-                a[5,3:N+4]*Q[5:N+6]
-
-    #F[3,:] = F[N+3,:] #boundary condition
-    #print(np.shape(F[3:N+4,:]))
-    #print(u_edges[3:N+4,:])
-    #print(F[3:N+4,:]/12.0)
-    #exit()
-
-    F[3:N+4]  = u_edges[3:N+4]*F[3:N+4]/12.0
-    #print(F[3:N+4,:])
-    #exit()
-    return F

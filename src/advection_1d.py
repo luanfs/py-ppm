@@ -22,6 +22,7 @@ from parameters_1d import q0_adv, qexact_adv, Qexact_adv, q0_antiderivative_adv,
 from errors import *
 from miscellaneous import diagnostics_adv_1d, print_diagnostics_adv_1d, plot_1dfield_graphs, output_adv
 from timestep import time_step_adv1d_ppm
+from flux import flux_ppm_stencil_coefficients
 
 def adv_1d(simulation, plot):
     N  = simulation.N    # Number of cells
@@ -42,7 +43,11 @@ def adv_1d(simulation, plot):
     u_edges[0:N+7] = velocity_adv_1d(x[0:N+7], 0, simulation)
 
     # CFL number
-    CFL = abs(np.amax(abs(u_edges)*dt/dx))
+ 
+    # CFL at edges - x direction
+    c = np.sign(u_edges)*u_edges*dt/dx
+    c2 = c*c
+    CFL = abs(np.amax(c*dt/dx))
 
     # Number of time steps
     Nsteps = int(Tf/dt)
@@ -69,17 +74,24 @@ def adv_1d(simulation, plot):
     # Plot timestep
     plotstep = 100
 
+    # Aux. variables
+    F = np.zeros(N+7) # Numerical flux
+
+    # Stencil coefficients
+    a = np.zeros((6, N+7))
+    flux_ppm_stencil_coefficients(a, c, c2, u_edges, simulation)
+
     #-------------------Time looping-------------------
     for k in range(1, Nsteps+1):
         # Time
         t = k*dt
 
         # Applies a PPM time step
-        Q, dq, q6, q_L, _ = time_step_adv1d_ppm(Q, u_edges, simulation)
+        Q, dq, q6, q_L, _ = time_step_adv1d_ppm(Q, u_edges, F, a, simulation)
 
         # Velocity update
         u_edges[0:N+7] = velocity_adv_1d(x, t*dt, simulation)
-        
+
         # Output
         output_adv(x, xc, simulation, Q, dq, q6, q_L, error_linf, error_l1, error_l2, plot, k, t, Nsteps, plotstep, total_mass0, CFL)
     # -------------------End of time loop-------------------

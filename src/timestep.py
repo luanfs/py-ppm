@@ -11,21 +11,21 @@ from flux import numerical_flux, flux_ppm_stencil
 
 ####################################################################################
 # Applies a single timestep of PPM for the 1D advection equation
-# Q is an array of size [0:N+5] that store the average values of q.
-# The interior indexes are in [2:N+2], the other indexes are used for
+# Q is an array of size [0:N+6] that store the average values of q.
+# The interior indexes are in [3:N+3], the other indexes are used for
 # periodic boundary conditions.
 ####################################################################################
-def time_step_adv1d_ppm(Q, u_edges, simulation):
+def time_step_adv1d_ppm(Q, u_edges, F, a, simulation):
     N = simulation.N
 
-    # Reconstructs the values of Q using a piecewise parabolic polynomial
+    # Reconstructs the values of Q using a piecewise parabolic polynomial (for monotonic case only)
     dq, q6, q_L, q_R = rec.ppm_reconstruction(Q, simulation)
 
     # Applies monotonization on the parabolas
     monotonization_1d(Q, q_L, q_R, dq, q6, simulation)
 
     # Compute the fluxes
-    F = numerical_flux(Q, q_R, q_L, dq, q6, u_edges, simulation)
+    numerical_flux(Q, q_R, q_L, dq, q6, u_edges, F, a, simulation)
     #F2 = flux_ppm_stencil(Q, u_edges, simulation)
     #print(np.amax(F2[3:N+4]-u_edges[3:N+4]*F[3:N+4]))
 
