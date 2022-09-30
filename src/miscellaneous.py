@@ -81,13 +81,22 @@ def output_adv(x, xc, simulation, Q, dq, q6, q_L, error_linf, error_l1, error_l2
     dx = simulation.dx
     dt = simulation.dt
 
+    # Ghost cells
+    ngl = simulation.ngl
+    ngr = simulation.ngr
+    ng  = simulation.ng
+    
+    # Grid interior indexes
+    i0 = simulation.i0
+    iend = simulation.iend
+
     if plot or k==Nsteps:
         # Compute exact averaged solution
         Q_exact = Qexact_adv(x, t, simulation)
 
         # Relative errors in different metrics
         #error_linf[k], error_l1[k], error_l2[k] = compute_errors(q_parabolic, q_exact)
-        error_linf[k], error_l1[k], error_l2[k] = compute_errors(Q_exact, Q[3:N+3])
+        error_linf[k], error_l1[k], error_l2[k] = compute_errors(Q_exact, Q[i0:iend])
         if error_linf[k] > 10**(4):
             # CFL number
             CFL = abs(np.amax(abs(u_edges)*dt/dx))
@@ -96,7 +105,7 @@ def output_adv(x, xc, simulation, Q, dq, q6, q_L, error_linf, error_l1, error_l2
             exit()
 
         # Diagnostic computation
-        total_mass, mass_change = diagnostics_adv_1d(Q[3:N+3], simulation, total_mass0)
+        total_mass, mass_change = diagnostics_adv_1d(Q[i0:iend], simulation, total_mass0)
 
         if plot:
             # Print diagnostics on the screen
@@ -109,7 +118,7 @@ def output_adv(x, xc, simulation, Q, dq, q6, q_L, error_linf, error_l1, error_l2
             Nplot = 10000
             xplot = np.linspace(x0, xf, Nplot)
             q_parabolic = np.zeros(Nplot)
-            dists = abs(np.add.outer(xplot,-xc[3:N+3]))
+            dists = abs(np.add.outer(xplot,-xc[i0:iend]))
             neighbours = dists.argmin(axis=1)
 
             if k!=Nsteps:

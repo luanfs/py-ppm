@@ -14,12 +14,10 @@ pardir   = "par/"               # Parameter files directory
 ####################################################################################
 # Create the 1d grid
 ####################################################################################
-def grid_1d(x0, xf, N):
-    ngl = 3 # Ghost cells on left
-    ngr = 3 # Ghost cells on right
+def grid_1d(x0, xf, N, ngl, ngr, ng):
     dx  = (xf-x0)/N                # Grid length
-    x   = np.linspace(x0-3.0*dx, xf+3.0*dx, N+1+ngl+ngl) # Cell edges
-    xc  = (x[0:N+ngl+ngl] + x[1:N+1+ngl+ngl])/2    # Cell centers
+    x   = np.linspace(x0-ngl*dx, xf+ngr*dx, N+1+ng) # Cell edges
+    xc  = (x[0:N+ng] + x[1:N+1+ng])/2    # Cell centers
     return x, xc, dx
 
 ####################################################################################
@@ -87,8 +85,17 @@ class simulation_par_1d:
         self.x0 = x0
         self.xf = xf
 
+        # Ghost cells variables
+        self.ngl = 3
+        self.ngr = 3
+        self.ng  = self.ngl + self.ngr
+
+        # Grid interior indexes       
+        self.i0   = self.ngl
+        self.iend = self.ngl + N
+
         # Grid
-        self.x, self.xc, self.dx = grid_1d(x0, xf, N)
+        self.x, self.xc, self.dx = grid_1d(x0, xf, N, self.ngl, self.ngr, self.ng)
 
         # IC name
         self.icname = name
@@ -183,6 +190,8 @@ def Qexact_adv(x, t, simulation):
     xf = simulation.xf
     ic = simulation.ic  
     N  = simulation.N
+    i0   = simulation.i0
+    iend = simulation.iend
 
     if simulation.ic >= 1 and simulation.ic <= 5 : # constant speed
         u = velocity_adv_1d(x, t, simulation)
@@ -191,10 +200,10 @@ def Qexact_adv(x, t, simulation):
         #X[mask] = (X[mask]-x0)%(xf-x0) + x0 # maps back to [x0,xf]
         #X[N] = xf
         if simulation.ic == 1:
-            y = (q0_antiderivative_adv(X[4:N+4], simulation)-q0_antiderivative_adv(X[3:N+3], simulation))/simulation.dx
+            y = (q0_antiderivative_adv(X[i0+1:iend+1], simulation)-q0_antiderivative_adv(X[i0:iend], simulation))/simulation.dx
 
         elif simulation.ic >= 2 :
-            y = qexact_adv(simulation.xc[3:N+3], t, simulation)
+            y = qexact_adv(simulation.xc[i0:iend], t, simulation)
     return y
  
 ####################################################################################
@@ -204,7 +213,7 @@ def velocity_adv_1d(x, t, simulation):
     if simulation.ic == 1:
         u = 0.1
     elif simulation.ic == 2:
-        u = 0.2      
+        u = 0.1   
     elif simulation.ic == 3:
         u = 0.5
     elif simulation.ic == 4:
