@@ -1,15 +1,16 @@
 ####################################################################################
-# 
+#
 # Module to compute the error convergence in L_inf, L1 and L2 norms
 # for the advection equation using the Piecewise Parabolic Method (PPM)
 # Luan da Fonseca Santos - April 2022
-# 
+#
 ####################################################################################
 
 from advection_1d import adv_1d
 import numpy as np
 from errors import *
-from parameters_1d import simulation_par_1d, graphdir, velocity_adv_1d
+from parameters_1d import simulation_adv_par_1d, graphdir
+from advection_ic  import velocity_adv_1d
 
 def error_analysis_adv1d(simulation):
     # Initial condition
@@ -58,7 +59,7 @@ def error_analysis_adv1d(simulation):
     # Let us test and compute the error
     for i in range(0, Ntest):
         # Update simulation parameters
-        simulation = simulation_par_1d(int(N[i]), dt[i], Tf, ic, tc, mono)
+        simulation = simulation_adv_par_1d(int(N[i]), dt[i], Tf, ic, tc, mono)
 
         # Run advection routine and get the errors
         error_linf[i], error_l1[i], error_l2[i] =  adv_1d(simulation, False)

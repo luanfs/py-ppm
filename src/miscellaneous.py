@@ -8,11 +8,12 @@
 
 import os
 import numpy as np
-from parameters_1d import qexact_adv, Qexact_adv, graphdir
 import matplotlib.pyplot as plt
 from reconstruction_1d import ppm_reconstruction
+from advection_ic      import Qexact_adv, qexact_adv
 from errors import *
 
+graphdir = 'graphs/'
 ####################################################################################
 # Create a folder
 # Reference: https://gist.github.com/keithweaver/562d3caa8650eefe7f84fa074e9ca949
@@ -72,7 +73,7 @@ def plot_1dfield_graphs(fields, labels, xplot, ymin, ymax, filename, title):
     plt.title(title)
     plt.savefig(filename)
     plt.close()
-    
+
 ####################################################################################
 # Output and plot
 ####################################################################################
@@ -85,7 +86,7 @@ def output_adv(x, xc, simulation, Q, dq, q6, q_L, error_linf, error_l1, error_l2
     ngl = simulation.ngl
     ngr = simulation.ngr
     ng  = simulation.ng
-    
+
     # Grid interior indexes
     i0 = simulation.i0
     iend = simulation.iend
@@ -129,7 +130,7 @@ def output_adv(x, xc, simulation, Q, dq, q6, q_L, error_linf, error_l1, error_l2
                 dq, q6, q_L,_ = ppm_reconstruction(Q, simulation) #update parabola coeffs for final step
 
             # Compute exact solution
-            q_exact = qexact_adv(xplot, time, simulation) 
+            q_exact = qexact_adv(xplot, time, simulation)
 
             # Compute the parabola
             for i in range(0, N):
@@ -147,6 +148,9 @@ def output_adv(x, xc, simulation, Q, dq, q6, q_L, error_linf, error_l1, error_l2
             # Plot the solution graph
             qmin = str("{:.2e}".format(np.amin(q_parabolic)))
             qmax = str("{:.2e}".format(np.amax(q_parabolic)))
+            CFL  = str("{:.2e}".format(CFL))
+            time = str("{:.2e}".format(time))
+
             title = '1D advection - '+icname+' - time='+str(time)+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.fvmethod+', mono = '+simulation.monot+ ', Min = '+ qmin +', Max = '+qmax
             filename = graphdir+'1d_adv_tc'+str(tc)+'_ic'+str(ic)+'_t'+str(k-1)+'_N'+str(N)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'.png'
             plot_1dfield_graphs([q_exact, q_parabolic], ['Exact', 'Parabolic'], xplot, ymin, ymax, filename, title)

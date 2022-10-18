@@ -18,11 +18,12 @@
 ####################################################################################
 
 import numpy as np
-from parameters_1d import q0_adv, qexact_adv, Qexact_adv, q0_antiderivative_adv, graphdir, velocity_adv_1d
-from errors import *
-from miscellaneous import diagnostics_adv_1d, print_diagnostics_adv_1d, plot_1dfield_graphs, output_adv
-from timestep import time_step_adv1d_ppm
-from flux import flux_ppm_stencil_coefficients
+from parameters_1d       import graphdir
+from advection_ic        import q0_adv, qexact_adv, Qexact_adv, q0_antiderivative_adv, velocity_adv_1d
+from errors              import *
+from miscellaneous       import diagnostics_adv_1d, print_diagnostics_adv_1d, plot_1dfield_graphs, output_adv
+from advection_timestep  import time_step_adv1d_ppm
+from flux                import flux_ppm_stencil_coefficients
 
 def adv_1d(simulation, plot):
     N  = simulation.N    # Number of cells
@@ -42,7 +43,7 @@ def adv_1d(simulation, plot):
     ngl = simulation.ngl
     ngr = simulation.ngr
     ng  = simulation.ng
-    
+
     # Grid interior indexes
     i0 = simulation.i0
     iend = simulation.iend
@@ -52,7 +53,7 @@ def adv_1d(simulation, plot):
     u_edges[0:N+ng+1] = velocity_adv_1d(x[0:N+ng+1], 0, simulation)
 
     # CFL number
- 
+
     # CFL at edges - x direction
     c = np.sign(u_edges)*u_edges*dt/dx
     c2 = c*c
@@ -82,7 +83,7 @@ def adv_1d(simulation, plot):
     error_l2   = np.zeros(Nsteps+1)
 
     # Plot timestep
-    plotstep = 100
+    plotstep = int(Nsteps/5)
 
     # Aux. variables
     F = np.zeros(N+ng+1) # Numerical flux
@@ -108,6 +109,7 @@ def adv_1d(simulation, plot):
 
     #-------------------Final plot and outputs -------------------
     if plot:
+        CFL = str("{:.2e}".format(CFL))
         # Plot the error graph
         title = simulation.title +'- '+icname+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.fvmethod+', mono = '+simulation.monot
         filename = graphdir+'1d_adv_tc'+str(tc)+'_ic'+str(ic)+'_N'+str(N)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'_erros.png'

@@ -8,16 +8,14 @@
 
 import numpy as np
 import reconstruction_1d as rec
-from parameters_1d import  q0_adv, qexact_adv, q0_antiderivative_adv, simulation_par_1d, graphdir
+from parameters_1d import  simulation_recon_par_1d, graphdir
+from advection_ic  import  q0_adv, qexact_adv, q0_antiderivative_adv
 from errors import *
 from monotonization_1d import monotonization_1d
 
 def error_analysis_recon_1d(simulation):
     # Initial condition
     ic = simulation.ic
-
-    # Test case
-    tc = simulation.tc
 
     # Monotonization method
     mono = simulation.mono
@@ -52,11 +50,11 @@ def error_analysis_recon_1d(simulation):
     x0 = simulation.x0
     xf = simulation.xf
     xplot = np.linspace(x0, xf, Nplot)
-    
+
     # Let us test and compute the error!
     for i in range(0, Ntest):
         # Update simulation parameters
-        simulation = simulation_par_1d(int(Nc[i]), 1.0, 1.0, ic, tc, mono)
+        simulation = simulation_recon_par_1d(int(Nc[i]), ic, mono)
         N  = simulation.N
         x  = simulation.x
         xc = simulation.xc
@@ -72,7 +70,7 @@ def error_analysis_recon_1d(simulation):
             Q[3:N+3] = (q0_antiderivative_adv(x[4:N+4], simulation) - q0_antiderivative_adv(x[3:N+3], simulation))/dx
         elif (simulation.ic == 2):
             Q[3:N+3] = q0_adv(xc[3:N+3], simulation)
-       
+
         # Periodic boundary conditions
         Q[N+3:N+6] = Q[3:6]
         Q[0:3]     = Q[N:N+3]
@@ -98,27 +96,27 @@ def error_analysis_recon_1d(simulation):
         error_linf[i], error_l1[i], error_l2[i] = compute_errors(q_exact, q_parabolic)
         error_ed_linf[i], error_ed_l1[i], error_ed_l2[i] = compute_errors(q_exact_edges[3:N+3], q_L[3:N+3])
         print('\nParameters: N = '+str(N))
-        
+
         # Output
         #print_errors_simul(error_linf, error_l1, error_l2, i)
         print_errors_simul(error_ed_linf, error_ed_l1, error_ed_l2, i)
 
     # Plot the error graph
     title = 'Parabola errors\n ' + simulation.title + '- ' + simulation.fvmethod + ' - ' + simulation.icname + ' - monotonization = ' + simulation.monot
-    filename = graphdir+'1d_tc'+str(tc)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'_ic'+str(ic)+'_parabola_errors.png'
+    filename = graphdir+'recon_1d_'+simulation.fvmethod+'_mono'+simulation.monot+'_ic'+str(ic)+'_parabola_errors.png'
     plot_errors_loglog(Nc, error_linf, error_l1, error_l2, filename, title)
 
     title2 = 'Edge errors\n' + simulation.title + '- ' + simulation.fvmethod + ' - ' + simulation.icname + ' - monotonization = ' + simulation.monot
-    filename2 = graphdir+'1d_tc'+str(tc)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'_ic'+str(ic)+'_edge_errors.png'
+    filename2 = graphdir+'recon_1d_'+simulation.fvmethod+'_mono'+simulation.monot+'_ic'+str(ic)+'_edge_errors.png'
     plot_errors_loglog(Nc, error_ed_linf, error_ed_l1, error_ed_l2, filename2, title2)
 
     # Plot the convergence rate - parabola
     title = 'Convergence rate parabola- ' + simulation.fvmethod + ' - ' + simulation.icname + ' - monotonization = ' + simulation.monot
-    filename = graphdir+'1d_tc'+str(tc)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'_ic'+str(ic)+'_convergence_rate_parabola.png'
+    filename = graphdir+'recon_1d_'+simulation.fvmethod+'_mono'+simulation.monot+'_ic'+str(ic)+'_convergence_rate_parabola.png'
     plot_convergence_rate(Nc, error_linf, error_l1, error_l2, filename, title)
 
     # Plot the convergence rate - edges
     title = 'Convergence rate at edges - ' + simulation.fvmethod + ' - ' + simulation.icname + ' - monotonization = ' + simulation.monot
-    filename = graphdir+'1d_tc'+str(tc)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'_ic'+str(ic)+'_convergence_rate_ed.png'
+    filename = graphdir+'recon_1d_'+simulation.fvmethod+'_mono'+simulation.monot+'_ic'+str(ic)+'_convergence_rate_ed.png'
     plot_convergence_rate(Nc, error_ed_linf, error_ed_l1, error_ed_l2, filename, title)
     print('Convergence graphs has been ploted in '+filename+' and in '+filename2)
