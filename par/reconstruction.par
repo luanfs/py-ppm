@@ -1,0 +1,14 @@
+#Parameters 
+#Function
+1
+#Monotonization method (0 or 1)
+0
+#-----------Description of parameters -------------------------------------
+#Possible initial functions
+#  case(1) - sine wave
+#  case(2) - gaussian wave
+#  case(3) - triangular wave
+#  case(4) - rectangular wave
+#Possible monotonization methods
+#  case(0) - none
+#  case(1) - Collela and Woodward 84 (CW84)

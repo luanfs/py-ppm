@@ -1,26 +1,10 @@
 #Parameters 
 #Number of cells N 
 25
-#Total period definition (seconds)
-160
-#Time step (seconds)
-0.4
-#Initial condition
-4
-#Test case
-1
-#Monotonization method (0 or 1)
-1
+#Problem to be solved
+2
 #-----------Description of parameters -------------------------------------
-#Possible initial conditions
-#  case(1) - sine wave
-#  case(2) - gaussian wave
-#  case(3) - triangular wave
-#  case(4) - rectangular wave
-#Possible test cases
-#  case(1) - Advection simulation
-#  case(2) - Convergence of error for advection equation
-#  case(3) - Convergence of error for PPM reconstruction
-#Possible monotonization methods
-#  case(0) - none
-#  case(1) - Collela and Woodward 84 (CW84)
+#Possible problem
+#  case(1) - reconstruction (see reconstruction.par)
+#  case(2) - linear advection equation (see advection.par)
+#  case(3) - shallow water equations (see sw.par)
