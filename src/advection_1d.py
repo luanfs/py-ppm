@@ -21,7 +21,9 @@ import numpy as np
 from parameters_1d       import graphdir
 from advection_ic        import q0_adv, qexact_adv, Qexact_adv, q0_antiderivative_adv, velocity_adv_1d
 from errors              import *
-from miscellaneous       import diagnostics_adv_1d, print_diagnostics_adv_1d, plot_1dfield_graphs, output_adv
+from output              import print_diagnostics_adv_1d, output_adv
+from diagnostics         import diagnostics_adv_1d
+from plot                import plot_1dfield_graphs
 from advection_timestep  import time_step_adv1d_ppm
 from flux                import flux_ppm_stencil_coefficients
 
