@@ -73,7 +73,7 @@ def get_adv_parameters_1d(filename):
         confpar.readline()
         tc = confpar.readline()
         confpar.readline()
-        mono = confpar.readline()
+        flux_method = confpar.readline()
         confpar.readline()
 
         # Close the file
@@ -84,7 +84,7 @@ def get_adv_parameters_1d(filename):
         dt = float(dt)
         ic = int(ic)
         tc = int(tc)
-        mono = int(mono)
+        flux_method = int(flux_method)
 
         #Print the parameters on the screen
         print("\n--------------------------------------------------------")
@@ -92,13 +92,13 @@ def get_adv_parameters_1d(filename):
         print("Test case", tc, "\n")
         print("Initial condition", ic,"\n")
         print("Time step: ", dt)
-        print("Mononization scheme: ", mono)
+        print("Flux scheme: ", flux_method)
         print("--------------------------------------------------------\n")
 
     else:   # The file does not exist
         print("ERROR in get_grid_parameters: file "+ filename +" not found in /par.")
         exit()
-    return dt, Tf, tc, ic, mono
+    return dt, Tf, tc, ic, flux_method
 
 def get_recon_parameters_1d(filename):
     # The standard file filename.par must exist in par/ directory
@@ -113,7 +113,7 @@ def get_recon_parameters_1d(filename):
         confpar.readline()
         ic = confpar.readline()
         confpar.readline()
-        mono = confpar.readline()
+        flux_method = confpar.readline()
         confpar.readline()
 
         # Close the file
@@ -121,16 +121,16 @@ def get_recon_parameters_1d(filename):
 
         # Convert from str to int
         ic = int(ic)
-        mono = int(mono)
+        flux_method = int(flux_method)
 
         #Print the parameters on the screen
         print("\n--------------------------------------------------------")
         print("Parameters from file", file_path,"\n")
         print("Function: ", ic,"\n")
-        print("Mononization scheme: ", mono)
+        print("Flux scheme: ", flux_method)
         print("--------------------------------------------------------\n")
 
     else:   # The file does not exist
         print("ERROR in get_grid_parameters: file "+ filename +" not found in /par.")
         exit()
-    return  ic, mono
+    return  ic, flux_method

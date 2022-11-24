@@ -71,7 +71,7 @@ def output_adv(x, xc, simulation, Q, dq, q6, q_L, error_linf, error_l1, error_l2
             neighbours = dists.argmin(axis=1)
 
             if k!=Nsteps:
-                # the parabola coeffs are from the previous step
+                # the parabola coeffs must be taken from the previous step
                 time = t-dt
             else:
                 time = t
@@ -89,16 +89,16 @@ def output_adv(x, xc, simulation, Q, dq, q6, q_L, error_linf, error_l1, error_l2
             ymin = np.amin(q_exact)
             ymax = np.amax(q_exact)
             icname = simulation.icname
-            mono   = simulation.mono  # Monotonization scheme
+            flux_method_name = simulation.flux_method_name # Monotonization scheme
             tc = simulation.tc
             ic = simulation.ic
 
             # Plot the solution graph
-            qmin = str("{:.2e}".format(np.amin(q_parabolic)))
-            qmax = str("{:.2e}".format(np.amax(q_parabolic)))
+            qmin = str("{:.2e}".format(np.amin(Q)))
+            qmax = str("{:.2e}".format(np.amax(Q)))
             CFL  = str("{:.2e}".format(CFL))
             time = str("{:.2e}".format(time))
 
-            title = '1D advection - '+icname+' - time='+str(time)+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.fvmethod+', mono = '+simulation.monot+ ', Min = '+ qmin +', Max = '+qmax
-            filename = graphdir+'1d_adv_tc'+str(tc)+'_ic'+str(ic)+'_t'+str(k-1)+'_N'+str(N)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'.png'
+            title = '1D advection - '+icname+' - time='+str(time)+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.flux_method_name+ ', Min = '+ qmin +', Max = '+qmax
+            filename = graphdir+'1d_adv_tc'+str(tc)+'_ic'+str(ic)+'_t'+str(k-1)+'_N'+str(N)+'_'+simulation.flux_method_name+'.png'
             plot_1dfield_graphs([q_exact, q_parabolic], ['Exact', 'Parabolic'], xplot, ymin, ymax, filename, title)

@@ -17,8 +17,8 @@ def error_analysis_recon_1d(simulation):
     # Initial condition
     ic = simulation.ic
 
-    # Monotonization method
-    mono = simulation.mono
+    # Flux method
+    flux_method = simulation.flux_method
 
     # Interval
     x0 = simulation.x0
@@ -54,26 +54,35 @@ def error_analysis_recon_1d(simulation):
     # Let us test and compute the error!
     for i in range(0, Ntest):
         # Update simulation parameters
-        simulation = simulation_recon_par_1d(int(Nc[i]), ic, mono)
+        simulation = simulation_recon_par_1d(int(Nc[i]), ic, flux_method)
         N  = simulation.N
         x  = simulation.x
         xc = simulation.xc
         dx = simulation.dx
+        # Ghost cells
+        ngl = simulation.ngl
+        ngr = simulation.ngr
+        ng  = simulation.ng
+
+        # Grid interior indexes
+        i0 = simulation.i0
+        iend = simulation.iend
+
         q_parabolic = np.zeros(Nplot)
-        dists = abs(np.add.outer(xplot,-xc[3:N+3]))
+        dists = abs(np.add.outer(xplot,-xc[i0:iend]))
         neighbours = dists.argmin(axis=1)
 
         # Compute average values of Q (initial condition)
-        Q = np.zeros(N+6)
+        Q = np.zeros(N+ng)
 
         if (simulation.ic == 0 or simulation.ic == 1 or simulation.ic == 3 or simulation.ic == 4 or simulation.ic == 5):
-            Q[3:N+3] = (q0_antiderivative_adv(x[4:N+4], simulation) - q0_antiderivative_adv(x[3:N+3], simulation))/dx
+            Q[i0:iend] = (q0_antiderivative_adv(x[i0+1:iend+1], simulation) - q0_antiderivative_adv(x[i0:iend], simulation))/dx
         elif (simulation.ic == 2):
-            Q[3:N+3] = q0_adv(xc[3:N+3], simulation)
+            Q[i0:iend] = q0_adv(xc[i0:iend], simulation)
 
         # Periodic boundary conditions
-        Q[N+3:N+6] = Q[3:6]
-        Q[0:3]     = Q[N:N+3]
+        Q[iend:N+ng] = Q[i0:i0+ngr]
+        Q[0:i0]      = Q[N:N+ngl]
 
         # Reconstructs the values of Q using a piecewise parabolic polynomial
         dq, q6, q_L, q_R = rec.ppm_reconstruction(Q, simulation)
@@ -102,21 +111,21 @@ def error_analysis_recon_1d(simulation):
         print_errors_simul(error_ed_linf, error_ed_l1, error_ed_l2, i)
 
     # Plot the error graph
-    title = 'Parabola errors\n ' + simulation.title + '- ' + simulation.fvmethod + ' - ' + simulation.icname + ' - monotonization = ' + simulation.monot
-    filename = graphdir+'recon_1d_'+simulation.fvmethod+'_mono'+simulation.monot+'_ic'+str(ic)+'_parabola_errors.png'
+    title = 'Parabola errors\n ' + simulation.title + '- ' + simulation.flux_method_name + ' - ' + simulation.icname
+    filename = graphdir+'recon_1d_'+simulation.flux_method_name+'_ic'+str(ic)+'_parabola_errors.png'
     plot_errors_loglog(Nc, error_linf, error_l1, error_l2, filename, title)
 
-    title2 = 'Edge errors\n' + simulation.title + '- ' + simulation.fvmethod + ' - ' + simulation.icname + ' - monotonization = ' + simulation.monot
-    filename2 = graphdir+'recon_1d_'+simulation.fvmethod+'_mono'+simulation.monot+'_ic'+str(ic)+'_edge_errors.png'
+    title2 = 'Edge errors\n' + simulation.title + '- ' + simulation.flux_method_name + ' - ' + simulation.icname
+    filename2 = graphdir+'recon_1d_'+simulation.flux_method_name+'_ic'+str(ic)+'_edge_errors.png'
     plot_errors_loglog(Nc, error_ed_linf, error_ed_l1, error_ed_l2, filename2, title2)
 
     # Plot the convergence rate - parabola
-    title = 'Convergence rate parabola- ' + simulation.fvmethod + ' - ' + simulation.icname + ' - monotonization = ' + simulation.monot
-    filename = graphdir+'recon_1d_'+simulation.fvmethod+'_mono'+simulation.monot+'_ic'+str(ic)+'_convergence_rate_parabola.png'
+    title = 'Convergence rate parabola- ' + simulation.flux_method_name + ' - ' + simulation.icname
+    filename = graphdir+'recon_1d_'+simulation.flux_method_name+'_ic'+str(ic)+'_convergence_rate_parabola.png'
     plot_convergence_rate(Nc, error_linf, error_l1, error_l2, filename, title)
 
     # Plot the convergence rate - edges
-    title = 'Convergence rate at edges - ' + simulation.fvmethod + ' - ' + simulation.icname + ' - monotonization = ' + simulation.monot
-    filename = graphdir+'recon_1d_'+simulation.fvmethod+'_mono'+simulation.monot+'_ic'+str(ic)+'_convergence_rate_ed.png'
+    title = 'Convergence rate at edges - ' + simulation.flux_method_name + ' - ' + simulation.icname
+    filename = graphdir+'recon_1d_'+simulation.flux_method_name+'_ic'+str(ic)+'_convergence_rate_ed.png'
     plot_convergence_rate(Nc, error_ed_linf, error_ed_l1, error_ed_l2, filename, title)
     print('Convergence graphs has been ploted in '+filename+' and in '+filename2)

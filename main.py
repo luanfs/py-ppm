@@ -30,14 +30,14 @@ N, problem = conf.get_parameters()
 # Select problem to be solved
 if problem == 1:
     # Reconstruction error analysis
-    ic, mono = conf.get_recon_parameters_1d('reconstruction.par')
-    simulation = simulation_recon_par_1d(N, ic, mono)
+    ic, flux_method = conf.get_recon_parameters_1d('reconstruction.par')
+    simulation = simulation_recon_par_1d(N, ic, flux_method)
     error_analysis_recon_1d(simulation)
 
 elif problem == 2:
     # Advection equation
-    dt, Tf, tc, ic, mono = conf.get_adv_parameters_1d('advection.par')
-    simulation = simulation_adv_par_1d(N, dt, Tf, ic, tc, mono)
+    dt, Tf, tc, ic, flux_method = conf.get_adv_parameters_1d('advection.par')
+    simulation = simulation_adv_par_1d(N, dt, Tf, ic, tc, flux_method)
     if tc == 1:
         # Advection routine
         adv_1d(simulation, True)

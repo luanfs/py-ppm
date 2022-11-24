@@ -21,15 +21,11 @@ import numpy as np
 # Routine to call the correct numerical flux
 ####################################################################################
 def numerical_flux(Q, q_R, q_L, dq, q6, u_edges, F, a, simulation):
-    if simulation.mono == 1: # Applies PPM with monotonization
+    if simulation.flux_method == 2 or simulation.flux_method == 3: # Applies PPM with monotonization or hybrid PPM
         flux_ppm(Q, q_R, q_L, dq, q6, u_edges, F, simulation)
 
-    elif simulation.mono == 0: # No monotonization 
-        if simulation.fvmethod == 'PPM':
-           flux_ppm_stencil(Q, u_edges, F, a, simulation)
-        else:
-           print('Not implemented yet! bye')
-           exit()
+    elif simulation.flux_method == 1: # PPM
+        flux_ppm_stencil(Q, u_edges, F, a, simulation)
 
     return F
 
@@ -74,7 +70,7 @@ def flux_ppm_stencil(Q, u_edges, F, a, simulation):
                 a[5,3:N+4]*Q[5:N+6]
 
     F[3:N+4]  = F[3:N+4]/12.0
- 
+
 ####################################################################################
 # Compute the flux operator PPM stencil coefficients
 # Inputs: c (cfl at egdes), c2 (cfl^2 at edges),  u_edges (velocity at edges)
@@ -88,16 +84,16 @@ def flux_ppm_stencil_coefficients(a, c, c2, u_edges, simulation):
     a[0, unegative] =  0.0
 
     a[1, upositive] = -1.0 - 5.0*c[upositive] + 6.0*c2[upositive]
-    a[1, unegative] = -1.0 + 2.0*c[unegative] - c2[unegative] 
+    a[1, unegative] = -1.0 + 2.0*c[unegative] - c2[unegative]
 
     a[2, upositive] =  7.0 + 15.0*c[upositive] - 10.0*c2[upositive]
-    a[2, unegative] =  7.0 - 13.0*c[unegative] + 6.0*c2[unegative] 
+    a[2, unegative] =  7.0 - 13.0*c[unegative] + 6.0*c2[unegative]
 
     a[3, upositive] =  7.0 - 13.0*c[upositive] + 6.0*c2[upositive]
-    a[3, unegative] =  7.0 + 15.0*c[unegative] - 10.0*c2[unegative] 
+    a[3, unegative] =  7.0 + 15.0*c[unegative] - 10.0*c2[unegative]
 
     a[4, upositive] = -1.0 + 2.0*c[upositive] - c2[upositive]
-    a[4, unegative] = -1.0 - 5.0*c[unegative] + 6.0*c2[unegative] 
+    a[4, unegative] = -1.0 - 5.0*c[unegative] + 6.0*c2[unegative]
 
     a[5, upositive] =  0.0
-    a[5, unegative] =  c[unegative] - c2[unegative] 
+    a[5, unegative] =  c[unegative] - c2[unegative]

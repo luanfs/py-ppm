@@ -39,7 +39,7 @@ def adv_1d(simulation, plot):
     Tf = simulation.Tf   # Total period definition
     tc = simulation.tc
     icname = simulation.icname
-    mono   = simulation.mono  # Monotonization scheme
+    flux_method = simulation.flux_method # Flux scheme
 
     # Ghost cells
     ngl = simulation.ngl
@@ -53,8 +53,6 @@ def adv_1d(simulation, plot):
     # Velocity at edges
     u_edges = np.zeros(N+ng+1)
     u_edges[0:N+ng+1] = velocity_adv_1d(x[0:N+ng+1], 0, simulation)
-
-    # CFL number
 
     # CFL at edges - x direction
     c = np.sign(u_edges)*u_edges*dt/dx
@@ -113,8 +111,8 @@ def adv_1d(simulation, plot):
     if plot:
         CFL = str("{:.2e}".format(CFL))
         # Plot the error graph
-        title = simulation.title +'- '+icname+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.fvmethod+', mono = '+simulation.monot
-        filename = graphdir+'1d_adv_tc'+str(tc)+'_ic'+str(ic)+'_N'+str(N)+'_'+simulation.fvmethod+'_mono'+simulation.monot+'_erros.png'
+        title = simulation.title +'- '+icname+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.flux_method_name
+        filename = graphdir+'1d_adv_tc'+str(tc)+'_ic'+str(ic)+'_N'+str(N)+'_'+simulation.flux_method_name
         plot_time_evolution([error_linf, error_l1, error_l2], Tf, ['$L_\infty}$','$L_1$','$L_2$'], 'Error', filename, title)
         print('\nGraphs have been ploted in '+ graphdir)
         print('Error evolution is shown in '+filename)

@@ -1,14 +1,15 @@
 #Parameters 
 #Function
+4
+#Flux (1, 2 or 3)
 1
-#Monotonization method (0 or 1)
-0
 #-----------Description of parameters -------------------------------------
 #Possible initial functions
 #  case(1) - sine wave
 #  case(2) - gaussian wave
 #  case(3) - triangular wave
 #  case(4) - rectangular wave
-#Possible monotonization methods
-#  case(0) - none
-#  case(1) - Collela and Woodward 84 (CW84)
+#Possible flux methods
+#  case(1) - PPM
+#  case(2) - PPM with monotonization from Collela and Woodward 84 (CW84)
+#  case(3) - Hybrid PPM from Putman and Lin 2007(PL07)

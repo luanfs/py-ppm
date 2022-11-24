@@ -24,7 +24,7 @@ def grid_1d(x0, xf, N, ngl, ngr, ng):
 #  Advection simulation class
 ####################################################################################
 class simulation_adv_par_1d:
-    def __init__(self, N, dt, Tf, ic, tc, mono):
+    def __init__(self, N, dt, Tf, ic, tc, flux_method):
         # Number of cells
         self.N  = N
 
@@ -40,8 +40,8 @@ class simulation_adv_par_1d:
         # Total period definition
         self.Tf = Tf
 
-        # Monotonization
-        self.mono = mono
+        # Flux method
+        self.flux_method = flux_method
 
         # Define the interval extremes, advection velocity, etc
         if ic == 1:
@@ -72,13 +72,15 @@ class simulation_adv_par_1d:
             print("Error - invalid initial condition")
             exit()
 
-        # Monotonization:
-        if mono == 0:
-            monot = 'none'
-        elif mono == 1:
-            monot = 'CW84' # Collela and Woodward 84 paper
+        # Flux scheme
+        if flux_method == 1:
+            flux_method_name = 'PPM'
+        elif flux_method == 2:
+            flux_method_name = 'PPM_mono_CW84' #Monotonization from Collela and Woodward 84 paper
+        elif flux_method == 3:
+            flux_method_name = 'PPM_hybrid' #Monotonization from Collela and Woodward 84 paper
         else:
-           print("Error - invalid monotization method")
+           print("Error - invalid flux method")
            exit()
 
         # Interval endpoints
@@ -100,19 +102,14 @@ class simulation_adv_par_1d:
         # IC name
         self.icname = name
 
-        # Monotonization method
-        self.monot = monot
-
         # Finite volume method
-        self.fvmethod = 'PPM'
+        self.flux_method_name = flux_method_name
 
         # Simulation title
         if tc == 1:
             self.title = '1D Advection '
         elif tc == 2:
             self.title = '1D advection errors '
-        elif tc == 3:
-            self.title = '1D reconstruction errors '
         else:
             print("Error - invalid test case")
             exit()
@@ -122,7 +119,7 @@ class simulation_adv_par_1d:
 #  Reconstruction simulation class
 ####################################################################################
 class simulation_recon_par_1d:
-    def __init__(self, N, ic, mono):
+    def __init__(self, N, ic, flux_method):
         # Number of cells
         self.N  = N
 
@@ -130,7 +127,7 @@ class simulation_recon_par_1d:
         self.ic = ic
 
         # Monotonization
-        self.mono = mono
+        self.flux_method = flux_method
 
         # Define the interval extremes, advection velocity, etc
         if ic == 1:
@@ -161,14 +158,17 @@ class simulation_recon_par_1d:
             print("Error - invalid initial condition")
             exit()
 
-        # Monotonization:
-        if mono == 0:
-            monot = 'none'
-        elif mono == 1:
-            monot = 'CW84' # Collela and Woodward 84 paper
+        # Flux scheme
+        if flux_method == 1:
+            flux_method_name = 'PPM'
+        elif flux_method == 2:
+            flux_method_name = 'PPM_mono_CW84' #Monotonization from Collela and Woodward 84 paper
+        elif flux_method == 3:
+            flux_method_name = 'PPM_hybrid'    #Quasi-fifth order from Putman and Lin 04 paper
         else:
-           print("Error - invalid monotization method")
+           print("Error - invalid flux method")
            exit()
+        print(flux_method)
 
         # Interval endpoints
         self.x0 = x0
@@ -190,10 +190,6 @@ class simulation_recon_par_1d:
         self.icname = name
 
         # Monotonization method
-        self.monot = monot
-
-        # Finite volume method
-        self.fvmethod = 'PPM'
+        self.flux_method_name = flux_method_name
 
         self.title = '1D reconstruction errors '
-
