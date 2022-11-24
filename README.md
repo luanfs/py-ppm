@@ -14,13 +14,12 @@ Requires:
 
 -------------------------------------------------------
 
-1) Configuration parameters (initial condition, number of grid cells, time step, testcase, etc) must be set in par/configuration.par
 
-2) Choose the simulation to be run in configuration.par (1, 2...)
+1) Choose the simulation to be run in configuration.par (1, 2...) and set the parameters in the respective simulation .par file.
 
-3) Run using "python3 main.py" in terminal. 
+2) Run using "python3 main.py" in terminal. 
 
-4) Output is written in graphs/.
+3) Output is written in graphs/.
  
 ----------------------------------------------------------
 References:
