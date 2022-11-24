@@ -1,7 +1,7 @@
 # py-ppm
 Python implementation of PPM (piecewise parabolic method)
 
-Solves the linear advection equation using PPM 
+Solves the linear advection equation using PPM and analyses its reconstruction accuracy.
 
 Luan F. Santos
 (luan.santos@usp.br)
