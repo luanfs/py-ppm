@@ -21,10 +21,10 @@ import numpy as np
 # Routine to call the correct numerical flux
 ####################################################################################
 def numerical_flux(Q, q_R, q_L, dq, q6, u_edges, F, a, simulation):
-    if simulation.flux_method == 2:  # Applies PPM with monotonization
+    if simulation.flux_method_name == 'PPM_mono_CW84': # Applies PPM with monotonization
         flux_ppm(Q, q_R, q_L, dq, q6, u_edges, F, simulation)
 
-    elif simulation.flux_method == 1 or simulation.flux_method == 3: # PPM or hybrid PPM
+    elif simulation.flux_method_name == 'PPM' or simulation.flux_method_name == 'PPM_hybrid': # PPM or hybrid PPM
         flux_ppm_stencil(Q, u_edges, F, a, simulation)
 
     return F

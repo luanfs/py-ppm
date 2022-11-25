@@ -23,9 +23,8 @@ import numpy as np
 def monotonization_1d(Q, q_L, q_R, dq, q6, simulation):
     N = simulation.N
     flux_method = simulation.flux_method
-    if flux_method == 1 or flux_method == 3:
-        return
-    elif flux_method == 2: # CW84 paper monotonization
+
+    if simulation.flux_method_name == 'PPM_mono_CW84': # Applies PPM with monotonization
         # In each cell, check if Q is a local maximum
         # See First equation in formula 1.10 from Collela and Woodward 1984
         local_maximum = (q_R[2:N+4]-Q[2:N+4])*(Q[2:N+4]-q_L[2:N+4])<=0
