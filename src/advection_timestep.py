@@ -7,7 +7,7 @@
 import numpy as np
 import reconstruction_1d as rec
 from monotonization_1d import monotonization_1d
-from flux import numerical_flux, flux_ppm_stencil
+from flux import numerical_flux, flux_ppm_stencil_coefficients
 
 ####################################################################################
 # Applies a single timestep of PPM for the 1D advection equation
@@ -27,12 +27,24 @@ def time_step_adv1d_ppm(Q, u_edges, F, a, simulation):
     i0 = simulation.i0
     iend = simulation.iend
 
+    # Time step
+    dt = simulation.dt
+
+    # Grid size
+    dx = simulation.dx
 
     # Reconstructs the values of Q using a piecewise parabolic polynomial (for monotonic case only)
     dq, q6, q_L, q_R = rec.ppm_reconstruction(Q, simulation)
 
     # Applies monotonization on the parabolas
     monotonization_1d(Q, q_L, q_R, dq, q6, simulation)
+
+    # CFL at edges - x direction
+    c = np.sign(u_edges)*u_edges*dt/dx
+    c2 = c*c
+
+    # Get the stencil coefs
+    flux_ppm_stencil_coefficients(a, c, c2, u_edges, simulation)
 
     # Compute the fluxes
     numerical_flux(Q, q_R, q_L, dq, q6, u_edges, F, a, simulation)

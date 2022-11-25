@@ -21,10 +21,10 @@ import numpy as np
 # Routine to call the correct numerical flux
 ####################################################################################
 def numerical_flux(Q, q_R, q_L, dq, q6, u_edges, F, a, simulation):
-    if simulation.flux_method == 2 or simulation.flux_method == 3: # Applies PPM with monotonization or hybrid PPM
+    if simulation.flux_method == 2:  # Applies PPM with monotonization
         flux_ppm(Q, q_R, q_L, dq, q6, u_edges, F, simulation)
 
-    elif simulation.flux_method == 1: # PPM
+    elif simulation.flux_method == 1 or simulation.flux_method == 3: # PPM or hybrid PPM
         flux_ppm_stencil(Q, u_edges, F, a, simulation)
 
     return F
@@ -62,6 +62,7 @@ def flux_ppm(Q, q_R, q_L, dq, q6, u_edges, F, simulation):
 ####################################################################################
 def flux_ppm_stencil(Q, u_edges, F, a, simulation):
     N = simulation.N
+
     F[3:N+4] =  a[0,3:N+4]*Q[0:N+1] +\
                 a[1,3:N+4]*Q[1:N+2] +\
                 a[2,3:N+4]*Q[2:N+3] +\
@@ -69,7 +70,6 @@ def flux_ppm_stencil(Q, u_edges, F, a, simulation):
                 a[4,3:N+4]*Q[4:N+5] +\
                 a[5,3:N+4]*Q[5:N+6]
 
-    F[3:N+4]  = F[3:N+4]/12.0
 
 ####################################################################################
 # Compute the flux operator PPM stencil coefficients
@@ -80,20 +80,45 @@ def flux_ppm_stencil_coefficients(a, c, c2, u_edges, simulation):
     upositive = u_edges>=0
     unegative = ~upositive
 
-    a[0, upositive] =  c[upositive] - c2[upositive]
-    a[0, unegative] =  0.0
+    if simulation.flux_method_name == 'PPM':
+        a[0, upositive] =  c[upositive] - c2[upositive]
+        a[0, unegative] =  0.0
 
-    a[1, upositive] = -1.0 - 5.0*c[upositive] + 6.0*c2[upositive]
-    a[1, unegative] = -1.0 + 2.0*c[unegative] - c2[unegative]
+        a[1, upositive] = -1.0 - 5.0*c[upositive] + 6.0*c2[upositive]
+        a[1, unegative] = -1.0 + 2.0*c[unegative] - c2[unegative]
 
-    a[2, upositive] =  7.0 + 15.0*c[upositive] - 10.0*c2[upositive]
-    a[2, unegative] =  7.0 - 13.0*c[unegative] + 6.0*c2[unegative]
+        a[2, upositive] =  7.0 + 15.0*c[upositive] - 10.0*c2[upositive]
+        a[2, unegative] =  7.0 - 13.0*c[unegative] + 6.0*c2[unegative]
 
-    a[3, upositive] =  7.0 - 13.0*c[upositive] + 6.0*c2[upositive]
-    a[3, unegative] =  7.0 + 15.0*c[unegative] - 10.0*c2[unegative]
+        a[3, upositive] =  7.0 - 13.0*c[upositive] + 6.0*c2[upositive]
+        a[3, unegative] =  7.0 + 15.0*c[unegative] - 10.0*c2[unegative]
 
-    a[4, upositive] = -1.0 + 2.0*c[upositive] - c2[upositive]
-    a[4, unegative] = -1.0 - 5.0*c[unegative] + 6.0*c2[unegative]
+        a[4, upositive] = -1.0 + 2.0*c[upositive] - c2[upositive]
+        a[4, unegative] = -1.0 - 5.0*c[unegative] + 6.0*c2[unegative]
 
-    a[5, upositive] =  0.0
-    a[5, unegative] =  c[unegative] - c2[unegative]
+        a[5, upositive] =  0.0
+        a[5, unegative] =  c[unegative] - c2[unegative]
+
+        a[:,:] = a[:,:]/12.0
+
+    elif simulation.flux_method_name == 'PPM_hybrid':
+        a[0, upositive] =  2.0 - c[upositive] - c2[upositive]
+        a[0, unegative] =  0.0
+
+        a[1, upositive] = -13.0 -      c[upositive] + 14.0*c2[upositive]
+        a[1, unegative] =  -3.0 +  4.0*c[unegative] -      c2[unegative]
+
+        a[2, upositive] =  47.0 + 39.0*c[upositive] - 26.0*c2[upositive]
+        a[2, unegative] =  27.0 - 41.0*c[unegative] + 14.0*c2[unegative]
+
+        a[3, upositive] =  27.0 - 41.0*c[upositive] + 14.0*c2[upositive]
+        a[3, unegative] =  47.0 + 39.0*c[unegative] - 26.0*c2[unegative]
+
+        a[4, upositive] =  -3.0 +  4.0*c[upositive] -      c2[upositive]
+        a[4, unegative] = -13.0 -      c[unegative] + 14.0*c2[unegative]
+
+        a[5, upositive] =  0.0
+        a[5, unegative] =  2.0 - c[unegative] - c2[unegative]
+
+        a[:,:] = a[:,:]/60.0
+

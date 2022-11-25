@@ -23,7 +23,7 @@ import numpy as np
 def monotonization_1d(Q, q_L, q_R, dq, q6, simulation):
     N = simulation.N
     flux_method = simulation.flux_method
-    if flux_method == 1:
+    if flux_method == 1 or flux_method == 3:
         return
     elif flux_method == 2: # CW84 paper monotonization
         # In each cell, check if Q is a local maximum

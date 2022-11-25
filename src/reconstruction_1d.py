@@ -96,4 +96,5 @@ def ppm_reconstruction(Q, simulation):
     dq[2:N+4] = q_R[2:N+4] - q_L[2:N+4]
     q6[2:N+4] = 6*Q[2:N+4] - 3*(q_R[2:N+4] + q_L[2:N+4])
 
+
     return dq, q6, q_L, q_R
