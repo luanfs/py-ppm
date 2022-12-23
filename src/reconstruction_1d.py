@@ -128,10 +128,10 @@ def ppm_reconstruction(Q, simulation):
         dQ_max  = np.zeros(N+ng)
         dQ_mono = np.zeros(N+ng)
 
-        dQ[i0-2:iend+2] = 0.25*(Q[i0-1:iend+3] - Q[i0-3:iend+1])
-        dQ_min[i0-2:iend+2]  = np.maximum(np.maximum(Q[i0-3:iend+1], Q[i0-2:iend+2]), Q[i0-1:iend+3]) - Q[i0-2:iend+2]
-        dQ_max[i0-2:iend+2]  = Q[i0-2:iend+2] - np.minimum(np.minimum(Q[i0-3:iend+1], Q[i0-2:iend+2]), Q[i0-1:iend+3])
-        dQ_mono[i0-2:iend+2] = np.minimum(np.minimum(abs(dQ[i0-2:iend+2]), dQ_min[i0-2:iend+2]), dQ_max[i0-2:iend+2]) * np.sign(dQ[i0-2:iend+2])
+        dQ[i0-3:iend+3] = 0.25*(Q[i0-2:iend+4] - Q[i0-4:iend+2])
+        dQ_min[i0-3:iend+3]  = np.maximum(np.maximum(Q[i0-4:iend+2], Q[i0-3:iend+3]), Q[i0-2:iend+4]) - Q[i0-3:iend+3]
+        dQ_max[i0-3:iend+3]  = Q[i0-3:iend+3] - np.minimum(np.minimum(Q[i0-4:iend+2], Q[i0-3:iend+3]), Q[i0-2:iend+4])
+        dQ_mono[i0-3:iend+3] = np.minimum(np.minimum(abs(dQ[i0-3:iend+3]), dQ_min[i0-3:iend+3]), dQ_max[i0-3:iend+3]) * np.sign(dQ[i0-3:iend+3])
         #dQ_mono[i0-2:iend+2] = dQ[i0-2:iend+2]
 
         # Formula B2 from Lin 04
@@ -141,7 +141,6 @@ def ppm_reconstruction(Q, simulation):
         # Assign values of Q_R and Q_L
         q_R[i0-1:iend+1] = Q_edges[i0:iend+2]
         q_L[i0-1:iend+1] = Q_edges[i0-1:iend+1]
-
 
         # Formula B3 from Lin 04
         q_L[i0-1:iend+1] = Q[i0-1:iend+1] - np.minimum(2.0*abs(dQ_mono[i0-1:iend+1]), abs(q_L[i0-1:iend+1]-Q[i0-1:iend+1])) * np.sign(2.0*dQ_mono[i0-1:iend+1])
@@ -167,7 +166,6 @@ def ppm_reconstruction(Q, simulation):
         Q_min[i0-1:iend+1] = np.minimum(np.minimum(Q[i0-1:iend+1], Q_mp[i0-1:iend+1]), Q_lc[i0-1:iend+1])
         Q_max[i0-1:iend+1] = np.maximum(np.maximum(Q[i0-1:iend+1], Q_mp[i0-1:iend+1]), Q_lc[i0-1:iend+1])
         q_R[i0-1:iend+1] = np.minimum(np.maximum(q_R[i0-1:iend+1], Q_min[i0-1:iend+1]),Q_max[i0-1:iend+1])
-
 
     # Compute the polynomial coefs
     # q(x) = q_L + z*(dq + q6*(1-z)) z in [0,1]

@@ -91,9 +91,12 @@ class simulation_adv_par_1d:
         self.xf = xf
 
         # Ghost cells variables
-        if flux_method <= 4:
+        if flux_method <= 3:
             self.ngl = 3
             self.ngr = 3
+        elif flux_method == 4:
+            self.ngl = 4
+            self.ngr = 4
         self.ng  = self.ngl + self.ngr
 
         # Grid interior indexes
