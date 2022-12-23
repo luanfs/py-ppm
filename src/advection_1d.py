@@ -25,7 +25,6 @@ from output              import print_diagnostics_adv_1d, output_adv
 from diagnostics         import diagnostics_adv_1d
 from plot                import plot_1dfield_graphs
 from advection_timestep  import time_step_adv1d_ppm
-from flux                import flux_ppm_stencil_coefficients
 
 def adv_1d(simulation, plot):
     N  = simulation.N    # Number of cells
@@ -88,17 +87,13 @@ def adv_1d(simulation, plot):
     # Aux. variables
     F = np.zeros(N+ng+1) # Numerical flux
 
-    # Stencil coefficients
-    a = np.zeros((6, N+7))
-    flux_ppm_stencil_coefficients(a, c, c2, u_edges, simulation)
-
     #-------------------Time looping-------------------
     for k in range(1, Nsteps+1):
         # Time
         t = k*dt
 
         # Applies a PPM time step
-        Q, dq, q6, q_L, _ = time_step_adv1d_ppm(Q, u_edges, F, a, simulation)
+        Q, dq, q6, q_L, _ = time_step_adv1d_ppm(Q, u_edges, F, simulation)
 
         # Velocity update
         u_edges[0:N+ng+1] = velocity_adv_1d(x, t*dt, simulation)

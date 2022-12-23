@@ -82,8 +82,8 @@ def output_adv(x, xc, simulation, Q, dq, q6, q_L, error_linf, error_l1, error_l2
 
             # Compute the parabola
             for i in range(0, N):
-                z = (xplot[neighbours==i]-x[i+3])/dx # Maps to [0,1]
-                q_parabolic[neighbours==i] = q_L[i+3] + dq[i+3]*z+ z*(1.0-z)*q6[i+3]
+                z = (xplot[neighbours==i]-x[i+i0])/dx # Maps to [0,1]
+                q_parabolic[neighbours==i] = q_L[i+i0] + dq[i+i0]*z+ z*(1.0-z)*q6[i+i0]
 
             # Additional plotting variables
             ymin = np.amin(q_exact)

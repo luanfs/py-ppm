@@ -1,6 +1,6 @@
 #Parameters 
 #Function
-4
+1
 #Flux (1, 2 or 3)
 1
 #-----------Description of parameters -------------------------------------
@@ -13,3 +13,4 @@
 #  case(1) - PPM
 #  case(2) - PPM with monotonization from Collela and Woodward 84 (CW84)
 #  case(3) - Hybrid PPM from Putman and Lin 2007(PL07)
+#  case(4) - PPM with monotonization from Lin 2004 (L04)

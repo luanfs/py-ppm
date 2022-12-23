@@ -18,6 +18,34 @@
 import numpy as np
 
 ####################################################################################
+# Compute the flux operator from PPM using the parabola coefficients
+# Inputs: Q (average values),  u_edges (velocity at edges)
+####################################################################################
+def flux_ppm(Q, q_R, q_L, dq, q6, u_edges, F, simulation):
+    N = simulation.N
+    ng = simulation.ng
+    i0 = simulation.i0
+    iend = simulation.iend
+
+    # Numerical fluxes at edges
+    f_L = np.zeros(N+ng+1) # Left
+    f_R = np.zeros(N+ng+1) # Right
+
+    # Compute the fluxes (formula 1.12 from Collela and Woodward 1984)
+    c = u_edges*(simulation.dt/simulation.dx) #cfl number
+
+    # Flux at left edges
+    f_L[i0:iend+1] = q_R[i0-1:iend] - c[i0:iend+1]*0.5*(dq[i0-1:iend] - (1.0-(2.0/3.0)*c[i0:iend+1])*q6[i0-1:iend])
+
+    # Flux at right edges
+    f_R[i0:iend+1] = q_L[i0:iend+1] - c[i0:iend+1]*0.5*(dq[i0:iend+1] + (1.0+2.0/3.0*c[i0:iend+1])*q6[i0:iend+1])
+
+    # F - Formula 1.13 from Collela and Woodward 1984)
+    F[u_edges >= 0] = f_L[u_edges >= 0]
+    F[u_edges <= 0] = f_R[u_edges <= 0]
+
+"""
+####################################################################################
 # Routine to call the correct numerical flux
 ####################################################################################
 def numerical_flux(Q, q_R, q_L, dq, q6, u_edges, F, a, simulation):
@@ -28,32 +56,6 @@ def numerical_flux(Q, q_R, q_L, dq, q6, u_edges, F, a, simulation):
         flux_ppm_stencil(Q, u_edges, F, a, simulation)
 
     return F
-
-####################################################################################
-# Compute the flux operator from PPM using the parabola coefficients
-# Inputs: Q (average values),  u_edges (velocity at edges)
-####################################################################################
-def flux_ppm(Q, q_R, q_L, dq, q6, u_edges, F, simulation):
-    N = simulation.N
-
-    # Numerical fluxes at edges
-    f_L = np.zeros(N+7) # Left
-    f_R = np.zeros(N+7) # Right
-
-    # Compute the fluxes (formula 1.12 from Collela and Woodward 1984)
-    c = u_edges*(simulation.dt/simulation.dx) #cfl number
-    c2 = c*c
-
-    # Flux at left edges
-    f_L[3:N+4] = q_R[2:N+3] - c[3:N+4]*0.5*(dq[2:N+3] - (1.0-(2.0/3.0)*c[3:N+4])*q6[2:N+3])
-
-    # Flux at right edges
-    c = -c
-    f_R[3:N+4] = q_L[3:N+4] + c[3:N+4]*0.5*(dq[3:N+4] + (1.0-2.0/3.0*c[3:N+4])*q6[3:N+4])
-
-    # F - Formula 1.13 from Collela and Woodward 1984)
-    F[u_edges >= 0] = f_L[u_edges >= 0]
-    F[u_edges <= 0] = f_R[u_edges <= 0]
 
 
 ####################################################################################
@@ -121,4 +123,4 @@ def flux_ppm_stencil_coefficients(a, c, c2, u_edges, simulation):
         a[5, unegative] =  2.0 - c[unegative] - c2[unegative]
 
         a[:,:] = a[:,:]/60.0
-
+"""

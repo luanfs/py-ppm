@@ -11,7 +11,6 @@ import reconstruction_1d as rec
 from parameters_1d import  simulation_recon_par_1d, graphdir
 from advection_ic  import  q0_adv, qexact_adv, q0_antiderivative_adv
 from errors import *
-from monotonization_1d import monotonization_1d
 
 def error_analysis_recon_1d(simulation):
     # Initial condition
@@ -87,13 +86,10 @@ def error_analysis_recon_1d(simulation):
         # Reconstructs the values of Q using a piecewise parabolic polynomial
         dq, q6, q_L, q_R = rec.ppm_reconstruction(Q, simulation)
 
-        # Applies monotonization on the parabolas
-        monotonization_1d(Q, q_L, q_R, dq, q6, simulation)
-
         # Compute the parabola
         for k in range(0, N):
-            z = (xplot[neighbours==k]-x[k+3])/dx # Maps to [0,1]
-            q_parabolic[neighbours==k] = q_L[k+3] + dq[k+3]*z+ z*(1.0-z)*q6[k+3]
+            z = (xplot[neighbours==k]-x[k+i0])/dx # Maps to [0,1]
+            q_parabolic[neighbours==k] = q_L[k+i0] + dq[k+i0]*z+ z*(1.0-z)*q6[k+i0]
 
         # Compute exact solution
         q_exact = qexact_adv(xplot, 0, simulation)
@@ -103,7 +99,7 @@ def error_analysis_recon_1d(simulation):
 
         # Relative errors in different metrics
         error_linf[i], error_l1[i], error_l2[i] = compute_errors(q_exact, q_parabolic)
-        error_ed_linf[i], error_ed_l1[i], error_ed_l2[i] = compute_errors(q_exact_edges[3:N+3], q_L[3:N+3])
+        error_ed_linf[i], error_ed_l1[i], error_ed_l2[i] = compute_errors(q_exact_edges[i0:iend], q_L[i0:iend])
         print('\nParameters: N = '+str(N))
 
         # Output

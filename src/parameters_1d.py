@@ -79,8 +79,11 @@ class simulation_adv_par_1d:
             flux_method_name = 'PPM_mono_CW84' #Monotonization from Collela and Woodward 84 paper
         elif flux_method == 3:
             flux_method_name = 'PPM_hybrid' #Monotonization from Collela and Woodward 84 paper
+        elif flux_method == 4:
+            flux_method_name = 'PPM_mono_L04' #Monotonization from Lin 04 paper
+
         else:
-           print("Error - invalid flux method")
+           print("Error - invalid flux method", flux_method)
            exit()
 
         # Interval endpoints
@@ -88,8 +91,9 @@ class simulation_adv_par_1d:
         self.xf = xf
 
         # Ghost cells variables
-        self.ngl = 3
-        self.ngr = 3
+        if flux_method <= 4:
+            self.ngl = 3
+            self.ngr = 3
         self.ng  = self.ngl + self.ngr
 
         # Grid interior indexes
@@ -164,11 +168,14 @@ class simulation_recon_par_1d:
         elif flux_method == 2:
             flux_method_name = 'PPM_mono_CW84' #Monotonization from Collela and Woodward 84 paper
         elif flux_method == 3:
-            flux_method_name = 'PPM_hybrid'    #Quasi-fifth order from Putman and Lin 04 paper
+            flux_method_name = 'PPM_hybrid'    #Quasi-fifth order from Putman and Lin 07 paper
+        elif flux_method == 4:
+            flux_method_name = 'PPM_mono_L04' #Monotonization from Lin 04 paper
+
+
         else:
            print("Error - invalid flux method")
            exit()
-        print(flux_method)
 
         # Interval endpoints
         self.x0 = x0
