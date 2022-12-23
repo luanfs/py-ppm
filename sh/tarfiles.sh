@@ -17,7 +17,8 @@ others="main.py\
 
 files="$sourcefiles $parfiles $scripts $others"
 
-output="py-ppm$version.tar.bz2"
+#output="py-ppm$version.tar.bz2"
+output="py-ppm.tar.bz2"
 
 tar cjfv $output $files
 

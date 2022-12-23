@@ -5,7 +5,8 @@
 date=` date +%F `
 version=` date +%y.%m.%d `
 
-output="py-ppm$version.tar.bz2"
+#output="py-ppm$version.tar.bz2"
+output="py-ppm.tar.bz2"
 bkpdir="ppm" 
 
 #Edit place to sync relative to system used
