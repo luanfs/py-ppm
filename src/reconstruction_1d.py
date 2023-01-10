@@ -148,24 +148,24 @@ def ppm_reconstruction(Q, simulation):
         # Formula B4 from Lin 04
         q_R[i0-1:iend+1] = Q[i0-1:iend+1] + np.minimum(2.0*abs(dQ_mono[i0-1:iend+1]), abs(q_R[i0-1:iend+1]-Q[i0-1:iend+1])) * np.sign(2.0*dQ_mono[i0-1:iend+1])
 
-        Q_min  = np.zeros(N+ng)
-        Q_max  = np.zeros(N+ng)
-        Q_mp   = np.zeros(N+ng)
-        Q_lc   = np.zeros(N+ng)
+        #Q_min  = np.zeros(N+ng)
+        #Q_max  = np.zeros(N+ng)
+        #Q_mp   = np.zeros(N+ng)
+        #Q_lc   = np.zeros(N+ng)
 
         # Formula B5 from Lin 04
-        Q_mp[i0-1:iend+1] = Q[i0-1:iend+1] - 2.0*dQ_mono[i0-1:iend+1]
-        Q_lc[i0-1:iend+1] = Q[i0-1:iend+1] + 1.5*(dQ_mono[i0+1:iend+3]-dQ_mono[i0-1:iend+1]) - dQ_mono[i0-1:iend+1]
-        Q_min[i0-1:iend+1] = np.minimum(np.minimum(Q[i0-1:iend+1], Q_mp[i0-1:iend+1]), Q_lc[i0-1:iend+1])
-        Q_max[i0-1:iend+1] = np.maximum(np.maximum(Q[i0-1:iend+1], Q_mp[i0-1:iend+1]), Q_lc[i0-1:iend+1])
-        q_L[i0-1:iend+1] = np.minimum(np.maximum(q_L[i0-1:iend+1], Q_min[i0-1:iend+1]),Q_max[i0-1:iend+1])
+        #Q_mp[i0-1:iend+1] = Q[i0-1:iend+1] - 2.0*dQ_mono[i0-1:iend+1]
+        #Q_lc[i0-1:iend+1] = Q[i0-1:iend+1] + 1.5*(dQ_mono[i0+1:iend+3]-dQ_mono[i0-1:iend+1]) - dQ_mono[i0-1:iend+1]
+        #Q_min[i0-1:iend+1] = np.minimum(np.minimum(Q[i0-1:iend+1], Q_mp[i0-1:iend+1]), Q_lc[i0-1:iend+1])
+        #Q_max[i0-1:iend+1] = np.maximum(np.maximum(Q[i0-1:iend+1], Q_mp[i0-1:iend+1]), Q_lc[i0-1:iend+1])
+        #q_L[i0-1:iend+1] = np.minimum(np.maximum(q_L[i0-1:iend+1], Q_min[i0-1:iend+1]),Q_max[i0-1:iend+1])
 
         # Formula B6 from Lin 04
-        Q_mp[i0-1:iend+1] = Q[i0-1:iend+1] + 2.0*dQ_mono[i0-1:iend+1]
-        Q_lc[i0-1:iend+1] = Q[i0-1:iend+1] + 1.5*(dQ_mono[i0-1:iend+1]-dQ_mono[i0-3:iend-1]) - dQ_mono[i0-1:iend+1]
-        Q_min[i0-1:iend+1] = np.minimum(np.minimum(Q[i0-1:iend+1], Q_mp[i0-1:iend+1]), Q_lc[i0-1:iend+1])
-        Q_max[i0-1:iend+1] = np.maximum(np.maximum(Q[i0-1:iend+1], Q_mp[i0-1:iend+1]), Q_lc[i0-1:iend+1])
-        q_R[i0-1:iend+1] = np.minimum(np.maximum(q_R[i0-1:iend+1], Q_min[i0-1:iend+1]),Q_max[i0-1:iend+1])
+        #Q_mp[i0-1:iend+1] = Q[i0-1:iend+1] + 2.0*dQ_mono[i0-1:iend+1]
+        #Q_lc[i0-1:iend+1] = Q[i0-1:iend+1] + 1.5*(dQ_mono[i0-1:iend+1]-dQ_mono[i0-3:iend-1]) - dQ_mono[i0-1:iend+1]
+        #Q_min[i0-1:iend+1] = np.minimum(np.minimum(Q[i0-1:iend+1], Q_mp[i0-1:iend+1]), Q_lc[i0-1:iend+1])
+        #Q_max[i0-1:iend+1] = np.maximum(np.maximum(Q[i0-1:iend+1], Q_mp[i0-1:iend+1]), Q_lc[i0-1:iend+1])
+        #q_R[i0-1:iend+1] = np.minimum(np.maximum(q_R[i0-1:iend+1], Q_min[i0-1:iend+1]),Q_max[i0-1:iend+1])
 
     # Compute the polynomial coefs
     # q(x) = q_L + z*(dq + q6*(1-z)) z in [0,1]

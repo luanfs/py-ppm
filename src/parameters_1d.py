@@ -68,6 +68,10 @@ class simulation_adv_par_1d:
             x0 = -1.0
             xf =  1.0
             name = 'Gaussian wave - variable speed'
+        elif ic == 6:
+            x0 = 0.0
+            xf = 1.0
+            name = 'Gaussian wave - variable speed'
         else:
             print("Error - invalid initial condition")
             exit()

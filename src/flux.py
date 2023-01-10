@@ -44,7 +44,7 @@ def flux_ppm(Q, q_R, q_L, dq, q6, u_edges, F, simulation):
     F[u_edges >= 0] = f_L[u_edges >= 0]
     F[u_edges <= 0] = f_R[u_edges <= 0]
 
-"""
+
 ####################################################################################
 # Routine to call the correct numerical flux
 ####################################################################################
@@ -123,4 +123,3 @@ def flux_ppm_stencil_coefficients(a, c, c2, u_edges, simulation):
         a[5, unegative] =  2.0 - c[unegative] - c2[unegative]
 
         a[:,:] = a[:,:]/60.0
-"""

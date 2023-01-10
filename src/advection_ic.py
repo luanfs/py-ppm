@@ -112,4 +112,6 @@ def velocity_adv_1d(x, t, simulation):
         u = 0.5
     elif simulation.ic == 5:
         u = np.sin(np.pi*x)**2
+    elif simulation.ic == 6:
+        u = 1.0
     return u

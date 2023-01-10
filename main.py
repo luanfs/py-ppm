@@ -18,6 +18,7 @@ from parameters_1d            import simulation_adv_par_1d, simulation_recon_par
 from advection_1d             import adv_1d
 from advection_1d_error       import error_analysis_adv1d
 from reconstruction_1d_error  import error_analysis_recon_1d
+from von_neumman              import stability_analysis
 
 # Create directories
 createDirs()
@@ -47,6 +48,10 @@ elif problem == 2:
 
 elif problem == 3:
     print('Not implemented yet!')
+
+# Von Neumman stability analysis
+elif problem == 4:
+    stability_analysis()
 
 else:
     print('Invalid test case.')

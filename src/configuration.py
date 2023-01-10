@@ -37,6 +37,12 @@ def get_parameters():
             problem_name = 'advection'
         elif problem == 3:
             problem_name = 'shallow water'
+        elif problem == 4:
+            problem_name = 'von neumann'
+        else:
+            print('ERROR in get_parameters: invalid problem')
+            exit()
+
 
         # Close the file
         confpar.close()
