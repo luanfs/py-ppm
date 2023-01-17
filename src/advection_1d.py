@@ -66,7 +66,7 @@ def adv_1d(simulation, plot):
 
     if (simulation.ic == 0 or simulation.ic == 1 or simulation.ic == 3 or simulation.ic == 4):
         Q[i0:iend] = (q0_antiderivative_adv(x[i0+1:iend+1], simulation) - q0_antiderivative_adv(x[i0:iend], simulation))/dx
-    elif (simulation.ic == 2 or simulation.ic == 5):
+    elif (simulation.ic == 2 or simulation.ic >= 5):
         Q[i0:iend] = q0_adv(xc[i0:iend],simulation)
 
     # Periodic boundary conditions
@@ -96,7 +96,13 @@ def adv_1d(simulation, plot):
         Q, dq, q6, q_L, _ = time_step_adv1d_ppm(Q, u_edges, F, simulation)
 
         # Velocity update
-        u_edges[0:N+ng+1] = velocity_adv_1d(x, t*dt, simulation)
+        u_edges[0:N+ng+1] = velocity_adv_1d(x, t, simulation)
+
+        # CFL at edges - x direction
+        #c = np.sign(u_edges)*u_edges*dt/dx
+        #c2 = c*c
+        #CFL = np.amax(c)
+        #print(c)
 
         # Output
         output_adv(x, xc, simulation, Q, dq, q6, q_L, error_linf, error_l1, error_l2, plot, k, t, Nsteps, plotstep, total_mass0, CFL)

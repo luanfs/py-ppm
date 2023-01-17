@@ -36,48 +36,77 @@ def error_analysis_adv1d(simulation):
     N = np.zeros(Ntest)
     N[0] = 10
 
+    # Array of time steps
+    dt = np.zeros(Ntest)
     if simulation.ic >= 1 and simulation.ic <= 4: # constant velocity
         u = velocity_adv_1d(x0, 0, simulation)
         # Period
-        Tf = (simulation.xf-simulation.x0)/(abs(u))
-        # Array of time steps
-        dt = np.zeros(Ntest)
+        Tf = 5.0#(simulation.xf-simulation.x0)/(abs(u))
+
         dt[0] = CFL/(N[0]*abs(u))*(xf-x0)
+
+    elif simulation.ic==5: #variable velocity
+        u0 = 0.2
+        dt[0] = CFL/(N[0])*(xf-x0)/u0
+        Tf = 5.0
+    elif simulation.ic==6: #variable velocity
+        u0 = 0.2
+        dt[0] = CFL/(N[0])*(xf-x0)/u0
+        Tf = 5.0
     else:
+        print("ERROR: invalid IC ", simulation.ic)
         exit()
 
     # Errors array
-    error_linf = np.zeros(Ntest)
-    error_l1   = np.zeros(Ntest)
-    error_l2   = np.zeros(Ntest)
+    fluxes = (1,2,3,4)
+    error_linf = np.zeros((Ntest, len(fluxes)))
+    error_l1   = np.zeros((Ntest, len(fluxes)))
+    error_l2   = np.zeros((Ntest, len(fluxes)))
 
     # Compute number of cells and time step for each simulation
     for i in range(1, Ntest):
         N[i]  = N[i-1]*2.0
         dt[i] = dt[i-1]*0.5
 
-    # Let us test and compute the error
-    for i in range(0, Ntest):
-        # Update simulation parameters
-        simulation = simulation_adv_par_1d(int(N[i]), dt[i], Tf, ic, tc, flux_method)
+    for flux in fluxes:
+        # Let us test and compute the error
+        for i in range(0, Ntest):
+            # Update simulation parameters
+            simulation = simulation_adv_par_1d(int(N[i]), dt[i], Tf, ic, tc, flux)
 
-        # Run advection routine and get the errors
-        error_linf[i], error_l1[i], error_l2[i] =  adv_1d(simulation, False)
-        print('\nParameters: N = '+str(int(N[i]))+', dt = '+str(dt[i]))
+            # Run advection routine and get the errors
+            error_linf[i,flux-1], error_l1[i,flux-1], error_l2[i,flux-1] =  adv_1d(simulation, False)
+            print('\nParameters: N = '+str(int(N[i]))+', dt = '+str(dt[i]))
 
-        # Output
-        print_errors_simul(error_linf, error_l1, error_l2, i)
+            # Output
+            print_errors_simul(error_linf[:,flux-1], error_l1[:,flux-1], error_l2[:,flux-1], i)
+
+        # Plot the errors
+        title = simulation.title + ' - ' + simulation.flux_method_name + ' - ' + simulation.icname
+        filename = graphdir+'1d_adv_tc'+str(tc)+'_'+simulation.flux_method_name+'_ic'+str(ic)+'_parabola_errors.pdf'
+        plot_errors_loglog(N, [error_linf[:,flux-1], error_l1[:,flux-1], error_l2[:,flux-1]], ['$L_\infty$', '$L_1$','$L_2$'], filename, title)
+
+        # Plot the convergence rate
+        title = 'Convergence rate - ' + simulation.flux_method_name + ' - ' + simulation.icname
+        filename = graphdir+'1d_adv_tc'+str(tc)+'_'+simulation.flux_method_name+'_ic'+str(ic)+'_convergence_rate.pdf'
+
+        plot_convergence_rate(N, [error_linf[:,flux-1], error_l1[:,flux-1], error_l2[:,flux-1]],['$L_\infty$', '$L_1$','$L_2$'], filename, title)
+
+        # Print final message
+        print('\nGraphs have been ploted in '+graphdir)
+        print('Convergence graphs has been ploted in '+filename)
 
     # Plot the errors
-    title = simulation.title + '- ' + simulation.flux_method_name + ' - ' + simulation.icname
-    filename = graphdir+'1d_adv_tc'+str(tc)+'_'+simulation.flux_method_name+'_ic'+str(ic)+'_parabola_errors.png'
-    plot_errors_loglog(N, error_linf, error_l1, error_l2, filename, title)
+    title = simulation.title + ' - ' + simulation.icname
+    filename = graphdir+'1d_adv_tc'+str(tc)+'_ic'+str(ic)+'_parabola_errors.pdf'
+    plot_errors_loglog(N, [error_linf[:,0],error_linf[:,1],error_linf[:,2],error_linf[:,3]], ['PPM', 'PPM_mono_CW84','PPM_hybrid','PPM_mono_L04'], filename, title)
 
     # Plot the convergence rate
-    title = 'Convergence rate - ' + simulation.flux_method_name + ' - ' + simulation.icname
-    filename = graphdir+'1d_adv_tc'+str(tc)+'_'+simulation.flux_method_name+'_ic'+str(ic)+'_convergence_rate.png'
-    plot_convergence_rate(N, error_linf, error_l1, error_l2, filename, title)
+    title = 'Convergence rate - ' + simulation.icname
+    filename = graphdir+'1d_adv_tc'+str(tc)+'_ic'+str(ic)+'_convergence_rate.pdf'
+    plot_convergence_rate(N, [error_linf[:,0],error_linf[:,1],error_linf[:,2],error_linf[:,3]], ['PPM', 'PPM_mono_CW84','PPM_hybrid','PPM_mono_L04'], filename, title)
 
     # Print final message
     print('\nGraphs have been ploted in '+graphdir)
     print('Convergence graphs has been ploted in '+filename)
+

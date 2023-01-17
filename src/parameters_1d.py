@@ -45,33 +45,35 @@ class simulation_adv_par_1d:
 
         # Define the interval extremes, advection velocity, etc
         if ic == 1:
-            x0 = -1.0
-            xf =  1.0
+            x0 = 0.0
+            xf = 1.0
             name = 'Sine wave'
 
         elif ic == 2:
-            x0 = -0.5
-            xf =  0.5
+            x0 = 0.0
+            xf = 1.0
             name = 'Gaussian wave'
 
         elif ic == 3:
-            x0 = 0
-            xf = 40
+            x0 = 0.0
+            xf = 1.0
             name = 'Triangular wave'
 
         elif ic == 4:
-            x0 = 0
-            xf = 40
+            x0 = 0.0
+            xf = 1.0
             name = 'Rectangular wave'
 
-        elif ic == 5:
-            x0 = -1.0
-            xf =  1.0
-            name = 'Gaussian wave - variable speed'
-        elif ic == 6:
+        elif ic == 5 or ic == 6:
+            x0 = 0.0
+            xf = 1.0
+            name = 'Gaussian'
+
+        elif ic == 10:
             x0 = 0.0
             xf = 1.0
             name = 'Gaussian wave - variable speed'
+
         else:
             print("Error - invalid initial condition")
             exit()
@@ -142,28 +144,28 @@ class simulation_recon_par_1d:
 
         # Define the interval extremes, advection velocity, etc
         if ic == 1:
-            x0 = -1.0
-            xf =  1.0
+            x0 = 0.0
+            xf = 1.0
             name = 'Sine wave'
 
         elif ic == 2:
-            x0 = -0.5
-            xf =  0.5
+            x0 = 0.0
+            xf = 1.0
             name = 'Gaussian wave'
 
         elif ic == 3:
-            x0 = 0
-            xf = 40
+            x0 = 0.0
+            xf = 1.0
             name = 'Triangular wave'
 
         elif ic == 4:
-            x0 = 0
-            xf = 40
+            x0 = 0.0
+            xf = 1.0
             name = 'Rectangular wave'
 
         elif ic == 5:
-            x0 = -1.0
-            xf =  1.0
+            x0 = 0.0
+            xf = 1.0
             name = 'Gaussian wave - variable speed'
         else:
             print("Error - invalid initial condition")

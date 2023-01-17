@@ -48,7 +48,7 @@ def output_adv(x, xc, simulation, Q, dq, q6, q_L, error_linf, error_l1, error_l2
         error_linf[k], error_l1[k], error_l2[k] = compute_errors(Q_exact, Q[i0:iend])
         if error_linf[k] > 10**(4):
             # CFL number
-            CFL = abs(np.amax(abs(u_edges)*dt/dx))
+            #CFL = abs(np.amax(abs(u_edges)*dt/dx))
             print('\nStopping due to large errors.')
             print('The CFL number is', CFL)
             exit()

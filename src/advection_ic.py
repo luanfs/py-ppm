@@ -21,23 +21,24 @@ def q0_adv(x, simulation):
 ####################################################################################
 def q0_antiderivative_adv(x, simulation):
     if simulation.ic == 1:
-        y = -np.cos(2.0*np.pi*x)/(2.0*np.pi) + 1.0*x
+        k = 5 #wavenumber
+        y = -np.cos(k*2.0*np.pi*x)/(k*2.0*np.pi) + 1.0*x
 
     elif simulation.ic == 3:
-        mask1 = np.logical_and(x>=15.0,x<=20.0)
-        mask2 = np.logical_and(x>=20.0,x<=25.0)
+        mask1 = np.logical_and(x>=0.4,x<=0.5)
+        mask2 = np.logical_and(x>=0.5,x<=0.6)
         y = x*0
-        y[mask1==True] = (x[mask1==True]-15.0)**2/10
-        y[mask2==True] = 5.0 - (25.0-x[mask2==True])**2/10.0
-        mask3 = x>25.0
-        y[mask3==True] = 5
+        y[mask1==True] = (x[mask1==True]-0.4)**2/0.2
+        y[mask2==True] =0.1-(0.6-x[mask2==True])**2/0.2
+        mask3 = x>0.6
+        y[mask3==True] = 0.1
 
     elif simulation.ic == 4:
-        mask = np.logical_and(x>=15.0, x<=25.0)
+        mask = np.logical_and(x>=0.4, x<=0.6)
         y = x*0
-        y[mask==True] = x[mask==True] - 15.0
-        mask2 = x>25.0
-        y[mask2==True] = 10
+        y[mask==True] = x[mask==True] - 0.4
+        mask2 = x>0.6
+        y[mask2==True] = 0.2
 
     return y
 
@@ -49,29 +50,43 @@ def qexact_adv(x, t, simulation):
     xf = simulation.xf
     ic = simulation.ic
 
-    if simulation.ic >= 1 and simulation.ic <= 5 : # constant speed
+    if simulation.ic >= 1 and simulation.ic <= 4 : # constant speed
         u = velocity_adv_1d(x, t, simulation)
         X = x-u*t
         mask = (X != xf)
         X[mask] = (X[mask]-x0)%(xf-x0) + x0 # maps back to [x0,xf]
 
         if simulation.ic == 1:
-            y = np.sin(2.0*np.pi*X) + 1.0
+            k = 5.0 #wavenumber
+            y = np.sin(k*2.0*np.pi*X) + 1.0
 
-        elif simulation.ic == 2 or simulation.ic == 5:
-            y = np.exp(-10*(np.sin(-np.pi*X))**2)
+        elif simulation.ic == 2:
+            y = np.exp(-10*(np.cos(-np.pi*X))**2)
 
         elif simulation.ic == 3:
-            mask1 = np.logical_and(X>=15.0,X<=20.0)
-            mask2 = np.logical_and(X>=20.0,X<=25.0)
+            mask1 = np.logical_and(X>=0.4,X<=0.5)
+            mask2 = np.logical_and(X>=0.5,X<=0.6)
             y = x*0
-            y[mask1==True] = ( X[mask1==True] - 15.0)/5.0
-            y[mask2==True] = (-X[mask2==True] + 25.0)/5.0
+            y[mask1==True] = ( X[mask1==True] - 0.4)/0.1
+            y[mask2==True] = (-X[mask2==True] + 0.6)/0.1
 
         elif simulation.ic == 4:
-            mask = np.logical_and(X>=15.0,X<=25.0)
+            mask = np.logical_and(X>=0.4,X<=0.6)
             y = x*0
             y[mask==True] = 1.0
+
+    elif simulation.ic == 5: # variable spped
+        T = 5.0
+        u0 = 0.2
+        X = x-u0*np.sin(1.0*np.pi*t/T)*T/(1.0*np.pi)
+        y = np.exp(-10*(np.cos(-np.pi*X))**2)
+
+    elif simulation.ic == 6: # variable spped
+        T = 5.0
+        u0 = 0.2
+        X = x#-u0*np.sin(2.0*np.pi*t/T)*T/(2.0*np.pi)
+        y = np.exp(-10*(np.cos(-np.pi*X))**2)
+
     return y
 
 ####################################################################################
@@ -85,7 +100,7 @@ def Qexact_adv(x, t, simulation):
     i0   = simulation.i0
     iend = simulation.iend
 
-    if simulation.ic >= 1 and simulation.ic <= 5 : # constant speed
+    if simulation.ic >= 1 and simulation.ic <= 4 : # constant speed
         u = velocity_adv_1d(x, t, simulation)
         X = x-u*t
         #mask = (X != xf)
@@ -96,6 +111,9 @@ def Qexact_adv(x, t, simulation):
 
         elif simulation.ic >= 2 :
             y = qexact_adv(simulation.xc[i0:iend], t, simulation)
+
+    if simulation.ic == 5 or simulation.ic == 6: # variable speed
+        y = qexact_adv(simulation.xc[i0:iend], t, simulation)
     return y
 
 ####################################################################################
@@ -103,15 +121,21 @@ def Qexact_adv(x, t, simulation):
 ####################################################################################
 def velocity_adv_1d(x, t, simulation):
     if simulation.ic == 1:
-        u = 0.1
+        u = 0.2
     elif simulation.ic == 2:
-        u = 0.1
+        u = 0.2
     elif simulation.ic == 3:
-        u = 0.5
+        u = 0.2
     elif simulation.ic == 4:
-        u = 0.5
+        u = 0.2
     elif simulation.ic == 5:
-        u = np.sin(np.pi*x)**2
+        T = 5.0
+        u0 = 0.2
+        u = u0*np.cos(1.0*np.pi*t/T)*np.ones(np.shape(x))
     elif simulation.ic == 6:
+        T = 5.0
+        u0 = 0.2
+        u = u0*np.cos(1.0*np.pi*t/T)*np.sin(np.pi*x)**2
+    elif simulation.ic == 10:
         u = 1.0
     return u

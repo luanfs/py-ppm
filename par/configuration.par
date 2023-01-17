@@ -1,6 +1,6 @@
 #Parameters 
 #Number of cells N 
-50
+25
 #Problem to be solved
 2
 #-----------Description of parameters -------------------------------------
@@ -8,3 +8,4 @@
 #  case(1) - reconstruction (see reconstruction.par)
 #  case(2) - linear advection equation (see advection.par)
 #  case(3) - shallow water equations (see sw.par)
+#  case(4) - von neumman analysis

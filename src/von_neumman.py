@@ -27,7 +27,7 @@ def stability_analysis():
     N = 100
 
     # Test case
-    ic = 6
+    ic = 10
     tc = 1
 
     # Angles
