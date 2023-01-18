@@ -89,9 +89,10 @@ def output_adv(x, xc, simulation, Q, dq, q6, q_L, error_linf, error_l1, error_l2
             ymin = np.amin(q_exact)
             ymax = np.amax(q_exact)
             icname = simulation.icname
-            recon_name = simulation.recon_name # Monotonization scheme
+            recon_name = simulation.recon_name
             tc = simulation.tc
             ic = simulation.ic
+            vf = simulation.vf
 
             # Plot the solution graph
             qmin = str("{:.2e}".format(np.amin(Q)))
@@ -99,6 +100,7 @@ def output_adv(x, xc, simulation, Q, dq, q6, q_L, error_linf, error_l1, error_l2
             CFL  = str("{:.2e}".format(CFL))
             time = str("{:.2e}".format(time))
 
-            title = '1D advection - '+icname+' - time='+str(time)+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.recon_name+ ', Min = '+ qmin +', Max = '+qmax
-            filename = graphdir+'1d_adv_tc'+str(tc)+'_ic'+str(ic)+'_t'+str(k-1)+'_N'+str(N)+'_'+simulation.recon_name+'.png'
+            title = '1D advection - '+icname+' , '+simulation.vfname+', CFL='+str(CFL)+', N='+str(N)+\
+            '\nTime='+str(time)+', '+simulation.recon_name+ ', Min = '+ qmin +', Max = '+qmax
+            filename = graphdir+'1d_adv_tc'+str(tc)+'_ic'+str(ic)+'_vf'+str(vf)+'_t'+str(k-1)+'_N'+str(N)+'_'+simulation.recon_name+'.png'
             plot_1dfield_graphs([q_exact, q_parabolic], ['Exact', 'Parabolic'], xplot, ymin, ymax, filename, title)

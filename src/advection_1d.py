@@ -107,7 +107,7 @@ def adv_1d(simulation, plot):
         CFL = str("{:.2e}".format(CFL))
         # Plot the error graph
         title = simulation.title +'- '+icname+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.recon_name
-        filename = graphdir+'1d_adv_tc'+str(tc)+'_ic'+str(ic)+'_N'+str(N)+'_'+simulation.recon_name
+        filename = graphdir+'1d_adv_tc'+str(tc)+'_ic'+str(ic)+'_vf'+str(simulation.vf)+'_N'+str(N)+'_'+simulation.recon_name
         plot_time_evolution([error_linf, error_l1, error_l2], Tf, ['$L_\infty}$','$L_1$','$L_2$'], 'Error', filename, title)
         print('\nGraphs have been ploted in '+ graphdir)
         print('Error evolution is shown in '+filename)

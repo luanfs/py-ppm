@@ -4,19 +4,23 @@
 #Time step (seconds)
 0.001
 #Initial condition
-3
+2
+#Velocity
+1
 #Test case
 1
 #Reconstruction (1, 2, 3 or 4)
-1
+2
 #-----------Description of parameters -------------------------------------
 #Possible initial conditions
 #  case(1) - sine wave
 #  case(2) - gaussian wave
 #  case(3) - triangular wave
 #  case(4) - rectangular wave
-#  case(5) - gaussian wave - variable velocity cos(pi*t/5)
-#  case(6) - gaussian wave - variable velocity cos(pi*t/)*sin(pi*x)
+#Possible velocity fields
+#  case(1) - constant velocity
+#  case(2) - variable velocity cos(pi*t/5)
+#  case(3) - variable velocity cos(pi*t/)*sin(pi*x)
 #Possible test cases
 #  case(1) - Advection simulation
 #  case(2) - Convergence of error for advection equation

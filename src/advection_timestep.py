@@ -40,6 +40,7 @@ def time_step_adv1d_ppm(Q, u_edges, F, simulation):
 
     # Update the values of Q_average (formula 1.12 from Collela and Woodward 1984)
     Q[i0:iend] = Q[i0:iend] - (simulation.dt/simulation.dx)*(u_edges[i0+1:iend+1]*F[i0+1:iend+1] - u_edges[i0:iend]*F[i0:iend])
+
     # Periodic boundary conditions
     Q[iend:N+ng] = Q[i0:i0+ngr]
     Q[0:i0]      = Q[N:N+ngl]

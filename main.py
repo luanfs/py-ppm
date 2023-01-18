@@ -31,14 +31,14 @@ N, problem = conf.get_parameters()
 # Select problem to be solved
 if problem == 1:
     # Reconstruction error analysis
-    ic, flux_method = conf.get_recon_parameters_1d('reconstruction.par')
-    simulation = simulation_recon_par_1d(N, ic, flux_method)
+    ic, recon = conf.get_recon_parameters_1d('reconstruction.par')
+    simulation = simulation_recon_par_1d(N, ic, recon)
     error_analysis_recon_1d(simulation)
 
 elif problem == 2:
     # Advection equation
-    dt, Tf, tc, ic, flux_method = conf.get_adv_parameters_1d('advection.par')
-    simulation = simulation_adv_par_1d(N, dt, Tf, ic, tc, flux_method)
+    dt, Tf, tc, ic, vf, recon = conf.get_adv_parameters_1d('advection.par')
+    simulation = simulation_adv_par_1d(N, dt, Tf, ic, vf, tc, recon)
     if tc == 1:
         # Advection routine
         adv_1d(simulation, True)
@@ -46,6 +46,7 @@ elif problem == 2:
         # Advection error analysis
         error_analysis_adv1d(simulation)
 
+# Shallow water equations
 elif problem == 3:
     print('Not implemented yet!')
 
