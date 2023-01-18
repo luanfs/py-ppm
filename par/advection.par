@@ -4,10 +4,10 @@
 #Time step (seconds)
 0.001
 #Initial condition
-2
+3
 #Test case
 1
-#Flux (1, 2, 3, 4)
+#Reconstruction (1, 2, 3 or 4)
 1
 #-----------Description of parameters -------------------------------------
 #Possible initial conditions
@@ -15,12 +15,12 @@
 #  case(2) - gaussian wave
 #  case(3) - triangular wave
 #  case(4) - rectangular wave
-#  case(5) - gaussian wave - variable velocity
-#  case(6) - gaussian wave - variable velocity
+#  case(5) - gaussian wave - variable velocity cos(pi*t/5)
+#  case(6) - gaussian wave - variable velocity cos(pi*t/)*sin(pi*x)
 #Possible test cases
 #  case(1) - Advection simulation
 #  case(2) - Convergence of error for advection equation
-#Possible flux methods
+#Possible reconstruction methods
 #  case(1) - PPM
 #  case(2) - PPM with monotonization from Collela and Woodward 84 (CW84)
 #  case(3) - Hybrid PPM from Putman and Lin 2007(PL07)

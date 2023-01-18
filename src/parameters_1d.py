@@ -24,7 +24,7 @@ def grid_1d(x0, xf, N, ngl, ngr, ng):
 #  Advection simulation class
 ####################################################################################
 class simulation_adv_par_1d:
-    def __init__(self, N, dt, Tf, ic, tc, flux_method):
+    def __init__(self, N, dt, Tf, ic, tc, recon):
         # Number of cells
         self.N  = N
 
@@ -41,7 +41,7 @@ class simulation_adv_par_1d:
         self.Tf = Tf
 
         # Flux method
-        self.flux_method = flux_method
+        self.recon = recon
 
         # Define the interval extremes, advection velocity, etc
         if ic == 1:
@@ -79,17 +79,17 @@ class simulation_adv_par_1d:
             exit()
 
         # Flux scheme
-        if flux_method == 1:
-            flux_method_name = 'PPM'
-        elif flux_method == 2:
-            flux_method_name = 'PPM_mono_CW84' #Monotonization from Collela and Woodward 84 paper
-        elif flux_method == 3:
-            flux_method_name = 'PPM_hybrid' #Monotonization from Collela and Woodward 84 paper
-        elif flux_method == 4:
-            flux_method_name = 'PPM_mono_L04' #Monotonization from Lin 04 paper
+        if recon == 1:
+            recon_name = 'PPM'
+        elif recon == 2:
+            recon_name = 'PPM_mono_CW84' #Monotonization from Collela and Woodward 84 paper
+        elif recon == 3:
+            recon_name = 'PPM_hybrid' #Monotonization from Collela and Woodward 84 paper
+        elif recon == 4:
+            recon_name = 'PPM_mono_L04' #Monotonization from Lin 04 paper
 
         else:
-           print("Error - invalid flux method", flux_method)
+           print("Error - invalid flux method", recon)
            exit()
 
         # Interval endpoints
@@ -97,10 +97,10 @@ class simulation_adv_par_1d:
         self.xf = xf
 
         # Ghost cells variables
-        if flux_method <= 3:
+        if recon <= 3:
             self.ngl = 3
             self.ngr = 3
-        elif flux_method == 4:
+        elif recon == 4:
             self.ngl = 4
             self.ngr = 4
         self.ng  = self.ngl + self.ngr
@@ -116,7 +116,7 @@ class simulation_adv_par_1d:
         self.icname = name
 
         # Finite volume method
-        self.flux_method_name = flux_method_name
+        self.recon_name = recon_name
 
         # Simulation title
         if tc == 1:
@@ -132,7 +132,7 @@ class simulation_adv_par_1d:
 #  Reconstruction simulation class
 ####################################################################################
 class simulation_recon_par_1d:
-    def __init__(self, N, ic, flux_method):
+    def __init__(self, N, ic, recon):
         # Number of cells
         self.N  = N
 
@@ -140,7 +140,7 @@ class simulation_recon_par_1d:
         self.ic = ic
 
         # Monotonization
-        self.flux_method = flux_method
+        self.recon = recon
 
         # Define the interval extremes, advection velocity, etc
         if ic == 1:
@@ -172,14 +172,14 @@ class simulation_recon_par_1d:
             exit()
 
         # Flux scheme
-        if flux_method == 1:
-            flux_method_name = 'PPM'
-        elif flux_method == 2:
-            flux_method_name = 'PPM_mono_CW84' #Monotonization from Collela and Woodward 84 paper
-        elif flux_method == 3:
-            flux_method_name = 'PPM_hybrid'    #Quasi-fifth order from Putman and Lin 07 paper
-        elif flux_method == 4:
-            flux_method_name = 'PPM_mono_L04' #Monotonization from Lin 04 paper
+        if recon == 1:
+            recon_name = 'PPM'
+        elif recon == 2:
+            recon_name = 'PPM_mono_CW84' #Monotonization from Collela and Woodward 84 paper
+        elif recon == 3:
+            recon_name = 'PPM_hybrid'    #Quasi-fifth order from Putman and Lin 07 paper
+        elif recon == 4:
+            recon_name = 'PPM_mono_L04' #Monotonization from Lin 04 paper
 
 
         else:
@@ -206,6 +206,6 @@ class simulation_recon_par_1d:
         self.icname = name
 
         # Monotonization method
-        self.flux_method_name = flux_method_name
+        self.recon_name = recon_name
 
         self.title = '1D reconstruction errors '

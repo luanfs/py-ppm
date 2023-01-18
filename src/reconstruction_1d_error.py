@@ -17,7 +17,7 @@ def error_analysis_recon_1d(simulation):
     ic = simulation.ic
 
     # Flux method
-    flux_method = simulation.flux_method
+    recon = simulation.recon
 
     # Interval
     x0 = simulation.x0
@@ -53,7 +53,7 @@ def error_analysis_recon_1d(simulation):
     # Let us test and compute the error!
     for i in range(0, Ntest):
         # Update simulation parameters
-        simulation = simulation_recon_par_1d(int(Nc[i]), ic, flux_method)
+        simulation = simulation_recon_par_1d(int(Nc[i]), ic, recon)
         N  = simulation.N
         x  = simulation.x
         xc = simulation.xc
@@ -107,21 +107,21 @@ def error_analysis_recon_1d(simulation):
         print_errors_simul(error_ed_linf, error_ed_l1, error_ed_l2, i)
 
     # Plot the error graph
-    title = 'Parabola errors\n ' + simulation.title + '- ' + simulation.flux_method_name + ' - ' + simulation.icname
-    filename = graphdir+'recon_1d_'+simulation.flux_method_name+'_ic'+str(ic)+'_parabola_errors.pdf'
+    title = 'Parabola errors\n ' + simulation.title + '- ' + simulation.recon_name + ' - ' + simulation.icname
+    filename = graphdir+'recon_1d_'+simulation.recon_name+'_ic'+str(ic)+'_parabola_errors.pdf'
     plot_errors_loglog(Nc, [error_linf, error_l1, error_l2], ['$L_\infty$', '$L_1$','$L_2$'], filename, title)
 
-    title2 = 'Edge errors\n' + simulation.title + '- ' + simulation.flux_method_name + ' - ' + simulation.icname
-    filename2 = graphdir+'recon_1d_'+simulation.flux_method_name+'_ic'+str(ic)+'_edge_errors.pdf'
+    title2 = 'Edge errors\n' + simulation.title + '- ' + simulation.recon_name + ' - ' + simulation.icname
+    filename2 = graphdir+'recon_1d_'+simulation.recon_name+'_ic'+str(ic)+'_edge_errors.pdf'
     plot_errors_loglog(Nc, [error_ed_linf, error_ed_l1, error_ed_l2], ['$L_\infty$', '$L_1$','$L_2$'], filename2, title2)
 
     # Plot the convergence rate - parabola
-    title = 'Convergence rate parabola- ' + simulation.flux_method_name + ' - ' + simulation.icname
-    filename = graphdir+'recon_1d_'+simulation.flux_method_name+'_ic'+str(ic)+'_convergence_rate_parabola.pdf'
+    title = 'Convergence rate parabola- ' + simulation.recon_name + ' - ' + simulation.icname
+    filename = graphdir+'recon_1d_'+simulation.recon_name+'_ic'+str(ic)+'_convergence_rate_parabola.pdf'
     plot_convergence_rate(Nc, [error_linf, error_l1, error_l2],['$L_\infty$', '$L_1$','$L_2$'], filename, title)
 
     # Plot the convergence rate - edges
-    title = 'Convergence rate at edges - ' + simulation.flux_method_name + ' - ' + simulation.icname
-    filename = graphdir+'recon_1d_'+simulation.flux_method_name+'_ic'+str(ic)+'_convergence_rate_ed.pdf'
+    title = 'Convergence rate at edges - ' + simulation.recon_name + ' - ' + simulation.icname
+    filename = graphdir+'recon_1d_'+simulation.recon_name+'_ic'+str(ic)+'_convergence_rate_ed.pdf'
     plot_convergence_rate(Nc, [error_ed_linf, error_ed_l1, error_ed_l2], ['$L_\infty$', '$L_1$','$L_2$'], filename, title)
     print('Convergence graphs has been ploted in '+filename+' and in '+filename2)

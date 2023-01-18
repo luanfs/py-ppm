@@ -36,7 +36,7 @@ def ppm_reconstruction(Q, simulation):
     dq  = np.zeros(N+ng)
     q6  = np.zeros(N+ng)
 
-    if simulation.flux_method_name == 'PPM': # PPM from CW84 paper
+    if simulation.recon_name == 'PPM': # PPM from CW84 paper
         # Values of Q at right edges (q_(j+1/2)) - Formula 1.9 from Collela and Woodward 1984
         Q_edges = np.zeros(N+ng+1)
         Q_edges[i0-1:iend+2] = (7.0/12.0)*(Q[i0-1:iend+2] + Q[i0-2:iend+1]) - (Q[i0:iend+3] + Q[i0-3:iend])/12.0
@@ -46,7 +46,7 @@ def ppm_reconstruction(Q, simulation):
         q_L[i0-1:iend+1] = Q_edges[i0-1:iend+1]
 
 
-    elif simulation.flux_method_name == 'PPM_hybrid': # Hybrid PPM from PL07
+    elif simulation.recon_name == 'PPM_hybrid': # Hybrid PPM from PL07
         # coeffs from equations 41 and 42 from PL07
         a1 =   2.0/60.0
         a2 = -13.0/60.0
@@ -57,7 +57,7 @@ def ppm_reconstruction(Q, simulation):
         q_R[i0-1:iend+1] = a1*Q[i0-3:iend-1] + a2*Q[i0-2:iend] + a3*Q[i0-1:iend+1] + a4*Q[i0:iend+2] + a5*Q[i0+1:iend+3]
         q_L[i0-1:iend+1] = a5*Q[i0-3:iend-1] + a4*Q[i0-2:iend] + a3*Q[i0-1:iend+1] + a2*Q[i0:iend+2] + a1*Q[i0+1:iend+3]
 
-    elif simulation.flux_method_name == 'PPM_mono_CW84':  #PPM with monotonization from CW84
+    elif simulation.recon_name == 'PPM_mono_CW84':  #PPM with monotonization from CW84
         # Compute the slopes dQ0 (centered finite difference)
         # Formula 1.7 from Collela and Woodward 1984 and Figure 2 from Carpenter et al 1990.
         dQ0 = np.zeros(N+ng)
@@ -121,7 +121,7 @@ def ppm_reconstruction(Q, simulation):
         q_R[i0-1:iend+1][overshoot_move_right] = 3.0*Q[i0-1:iend+1][overshoot_move_right] - 2.0*q_L[i0-1:iend+1][overshoot_move_right]
 
 
-    elif simulation.flux_method_name == 'PPM_mono_L04':  #PPM with monotonization from Lin 04 paper
+    elif simulation.recon_name == 'PPM_mono_L04':  #PPM with monotonization from Lin 04 paper
         # Formula B1 from Lin 04
         dQ      = np.zeros(N+ng)
         dQ_min  = np.zeros(N+ng)
@@ -147,25 +147,6 @@ def ppm_reconstruction(Q, simulation):
 
         # Formula B4 from Lin 04
         q_R[i0-1:iend+1] = Q[i0-1:iend+1] + np.minimum(2.0*abs(dQ_mono[i0-1:iend+1]), abs(q_R[i0-1:iend+1]-Q[i0-1:iend+1])) * np.sign(2.0*dQ_mono[i0-1:iend+1])
-
-        #Q_min  = np.zeros(N+ng)
-        #Q_max  = np.zeros(N+ng)
-        #Q_mp   = np.zeros(N+ng)
-        #Q_lc   = np.zeros(N+ng)
-
-        # Formula B5 from Lin 04
-        #Q_mp[i0-1:iend+1] = Q[i0-1:iend+1] - 2.0*dQ_mono[i0-1:iend+1]
-        #Q_lc[i0-1:iend+1] = Q[i0-1:iend+1] + 1.5*(dQ_mono[i0+1:iend+3]-dQ_mono[i0-1:iend+1]) - dQ_mono[i0-1:iend+1]
-        #Q_min[i0-1:iend+1] = np.minimum(np.minimum(Q[i0-1:iend+1], Q_mp[i0-1:iend+1]), Q_lc[i0-1:iend+1])
-        #Q_max[i0-1:iend+1] = np.maximum(np.maximum(Q[i0-1:iend+1], Q_mp[i0-1:iend+1]), Q_lc[i0-1:iend+1])
-        #q_L[i0-1:iend+1] = np.minimum(np.maximum(q_L[i0-1:iend+1], Q_min[i0-1:iend+1]),Q_max[i0-1:iend+1])
-
-        # Formula B6 from Lin 04
-        #Q_mp[i0-1:iend+1] = Q[i0-1:iend+1] + 2.0*dQ_mono[i0-1:iend+1]
-        #Q_lc[i0-1:iend+1] = Q[i0-1:iend+1] + 1.5*(dQ_mono[i0-1:iend+1]-dQ_mono[i0-3:iend-1]) - dQ_mono[i0-1:iend+1]
-        #Q_min[i0-1:iend+1] = np.minimum(np.minimum(Q[i0-1:iend+1], Q_mp[i0-1:iend+1]), Q_lc[i0-1:iend+1])
-        #Q_max[i0-1:iend+1] = np.maximum(np.maximum(Q[i0-1:iend+1], Q_mp[i0-1:iend+1]), Q_lc[i0-1:iend+1])
-        #q_R[i0-1:iend+1] = np.minimum(np.maximum(q_R[i0-1:iend+1], Q_min[i0-1:iend+1]),Q_max[i0-1:iend+1])
 
     # Compute the polynomial coefs
     # q(x) = q_L + z*(dq + q6*(1-z)) z in [0,1]

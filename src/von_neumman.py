@@ -14,7 +14,7 @@ import matplotlib.ticker as tck
 
 def stability_analysis():
     # Flux method
-    flux_methods = (1, 3)
+    recons = (1, 3)
 
     # CFL number for all simulations
     CFL = (1.0,0.8,0.60,0.5, 0.3, 0.1)
@@ -37,13 +37,13 @@ def stability_analysis():
     # amplification factor
     rho = np.zeros((len(CFL),N))
 
-    for flux_method in flux_methods:
+    for recon in recons:
         l = 0
         for cfl in CFL:
             dt = cfl/N
 
             # Update simulation parameters
-            simulation = simulation_adv_par_1d(N, dt, 1.0, ic, tc, flux_method)
+            simulation = simulation_adv_par_1d(N, dt, 1.0, ic, tc, recon)
 
             # Ghost cells
             ng  = simulation.ng
@@ -96,14 +96,14 @@ def stability_analysis():
         plt.ylim(-0.1, 1.1)
         plt.xlabel(r'$k \Delta \theta$ - dimensionless wavenumber')
         plt.ylabel(r'$\rho(k)$ - Amplification factor')
-        plt.title('Scheme: '+simulation.flux_method_name)
+        plt.title('Scheme: '+simulation.recon_name)
         ax = plt.gca()
         ax.grid(True)
         ax.xaxis.set_major_locator(plt.MultipleLocator(np.pi / 2))
         ax.xaxis.set_minor_locator(plt.MultipleLocator(np.pi / 12))
         ax.xaxis.set_major_formatter(plt.FuncFormatter(multiple_formatter()))
         plt.legend(title="CFL")
-        filename = 'stability_'+simulation.flux_method_name
+        filename = 'stability_'+simulation.recon_name
         plt.savefig(graphdir+filename+'.pdf', format='pdf')
         plt.close()
 

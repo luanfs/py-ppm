@@ -17,7 +17,7 @@ def error_analysis_adv1d(simulation):
     ic = simulation.ic
 
     # Flux method
-    flux_method = simulation.flux_method
+    recon = simulation.recon
 
     # Test case
     tc = simulation.tc
@@ -82,13 +82,13 @@ def error_analysis_adv1d(simulation):
             print_errors_simul(error_linf[:,flux-1], error_l1[:,flux-1], error_l2[:,flux-1], i)
 
         # Plot the errors
-        title = simulation.title + ' - ' + simulation.flux_method_name + ' - ' + simulation.icname
-        filename = graphdir+'1d_adv_tc'+str(tc)+'_'+simulation.flux_method_name+'_ic'+str(ic)+'_parabola_errors.pdf'
+        title = simulation.title + ' - ' + simulation.recon_name + ' - ' + simulation.icname
+        filename = graphdir+'1d_adv_tc'+str(tc)+'_'+simulation.recon_name+'_ic'+str(ic)+'_parabola_errors.pdf'
         plot_errors_loglog(N, [error_linf[:,flux-1], error_l1[:,flux-1], error_l2[:,flux-1]], ['$L_\infty$', '$L_1$','$L_2$'], filename, title)
 
         # Plot the convergence rate
-        title = 'Convergence rate - ' + simulation.flux_method_name + ' - ' + simulation.icname
-        filename = graphdir+'1d_adv_tc'+str(tc)+'_'+simulation.flux_method_name+'_ic'+str(ic)+'_convergence_rate.pdf'
+        title = 'Convergence rate - ' + simulation.recon_name + ' - ' + simulation.icname
+        filename = graphdir+'1d_adv_tc'+str(tc)+'_'+simulation.recon_name+'_ic'+str(ic)+'_convergence_rate.pdf'
 
         plot_convergence_rate(N, [error_linf[:,flux-1], error_l1[:,flux-1], error_l2[:,flux-1]],['$L_\infty$', '$L_1$','$L_2$'], filename, title)
 

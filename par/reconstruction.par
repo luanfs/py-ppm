@@ -1,7 +1,7 @@
 #Parameters 
 #Function
 1
-#Flux (1, 2 or 3)
+#Reconstruction (1, 2, 3 or 4)
 1
 #-----------Description of parameters -------------------------------------
 #Possible initial functions
@@ -9,7 +9,7 @@
 #  case(2) - gaussian wave
 #  case(3) - triangular wave
 #  case(4) - rectangular wave
-#Possible flux methods
+#Possible reconstruction methods
 #  case(1) - PPM
 #  case(2) - PPM with monotonization from Collela and Woodward 84 (CW84)
 #  case(3) - Hybrid PPM from Putman and Lin 2007(PL07)
