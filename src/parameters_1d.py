@@ -211,9 +211,10 @@ class simulation_recon_par_1d:
 #  Parabola class
 ####################################################################################
 class ppm_parabola:
-    def __init__(self, N, ng, simulation):
+    def __init__(self, simulation):
         # Number of cells
-        self.N  = N
+        N  = simulation.N
+        ng = simulation.ng
 
         # parabola coefficients
         # Notation from Colella and  Woodward 1984

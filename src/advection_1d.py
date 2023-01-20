@@ -64,7 +64,7 @@ def adv_1d(simulation, plot):
     Q = np.zeros(N+ng)
 
     # PPM parabola
-    px = ppm_parabola(N, ng, simulation)
+    px = ppm_parabola(simulation)
 
     if (simulation.ic == 0 or simulation.ic == 1 or simulation.ic == 3 or simulation.ic == 4):
         Q[i0:iend] = (q0_antiderivative_adv(x[i0+1:iend+1], simulation) - q0_antiderivative_adv(x[i0:iend], simulation))/dx

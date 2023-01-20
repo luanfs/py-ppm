@@ -69,7 +69,7 @@ def error_analysis_recon_1d(simulation):
         iend = simulation.iend
 
         # PPM parabola
-        px = ppm_parabola(N, ng, simulation)
+        px = ppm_parabola(simulation)
 
         # Plot vars
         q_parabolic = np.zeros(Nplot)
