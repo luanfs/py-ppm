@@ -39,7 +39,7 @@ def time_step_adv1d_ppm(Q, u_edges, cx, px, x, t, simulation):
     ppm_reconstruction(Q, px, simulation)
 
     # Compute the fluxes
-    flux_ppm(Q, cx, px, simulation)
+    flux_ppm(px, cx, simulation)
 
     # Update the values of Q_average (formula 1.12 from Collela and Woodward 1984)
     Q[i0:iend] = Q[i0:iend] - (simulation.dt/simulation.dx)*(u_edges[i0+1:iend+1]*px.f_upw[i0+1:iend+1] - u_edges[i0:iend]*px.f_upw[i0:iend])

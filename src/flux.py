@@ -22,7 +22,7 @@ import numpy as np
 # Inputs: Q (average values),  u_edges (velocity at edges)
 ####################################################################################
 
-def flux_ppm(Q, cx, px, simulation):
+def flux_ppm(px, cx, simulation):
     N = simulation.N
     ng = simulation.ng
     i0 = simulation.i0
