@@ -18,7 +18,7 @@
 ####################################################################################
 
 import numpy as np
-from parameters_1d       import graphdir
+from parameters_1d       import graphdir, ppm_parabola
 from advection_ic        import q0_adv, qexact_adv, Qexact_adv, q0_antiderivative_adv, velocity_adv_1d
 from errors              import *
 from output              import print_diagnostics_adv_1d, output_adv
@@ -54,15 +54,17 @@ def adv_1d(simulation, plot):
     u_edges[0:N+ng+1] = velocity_adv_1d(x[0:N+ng+1], 0, simulation)
 
     # CFL at edges - x direction
-    c = np.sign(u_edges)*u_edges*dt/dx
-    c2 = c*c
-    CFL = np.amax(c)
+    cx = u_edges*dt/dx
+    CFL = np.amax(abs(cx))
 
     # Number of time steps
     Nsteps = int(Tf/dt)
 
     # Compute average values of Q (initial condition)
     Q = np.zeros(N+ng)
+
+    # PPM parabola
+    px = ppm_parabola(N, ng, simulation)
 
     if (simulation.ic == 0 or simulation.ic == 1 or simulation.ic == 3 or simulation.ic == 4):
         Q[i0:iend] = (q0_antiderivative_adv(x[i0+1:iend+1], simulation) - q0_antiderivative_adv(x[i0:iend], simulation))/dx
@@ -84,22 +86,16 @@ def adv_1d(simulation, plot):
     # Plot timestep
     plotstep = int(Nsteps/5)
 
-    # Aux. variables
-    F = np.zeros(N+ng+1) # Numerical flux
-
     #-------------------Time looping-------------------
     for k in range(1, Nsteps+1):
         # Time
         t = k*dt
 
-        # Applies a PPM time step
-        Q, dq, q6, q_L, _ = time_step_adv1d_ppm(Q, u_edges, F, simulation)
-
-        # Velocity update
-        u_edges[0:N+ng+1] = velocity_adv_1d(x, t, simulation)
+        # PPM time step
+        time_step_adv1d_ppm(Q, u_edges, cx, px, x, t, simulation)
 
         # Output
-        output_adv(x, xc, simulation, Q, dq, q6, q_L, error_linf, error_l1, error_l2, plot, k, t, Nsteps, plotstep, total_mass0, CFL)
+        output_adv(x, xc, simulation, Q, px, error_linf, error_l1, error_l2, plot, k, t, Nsteps, plotstep, total_mass0, CFL)
     # -------------------End of time loop-------------------
 
     #-------------------Final plot and outputs -------------------

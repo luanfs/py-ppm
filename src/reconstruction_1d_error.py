@@ -8,7 +8,7 @@
 
 import numpy as np
 import reconstruction_1d as rec
-from parameters_1d import  simulation_recon_par_1d, graphdir
+from parameters_1d import  simulation_recon_par_1d, graphdir, ppm_parabola
 from advection_ic  import  q0_adv, qexact_adv, q0_antiderivative_adv
 from errors import *
 
@@ -58,6 +58,7 @@ def error_analysis_recon_1d(simulation):
         x  = simulation.x
         xc = simulation.xc
         dx = simulation.dx
+
         # Ghost cells
         ngl = simulation.ngl
         ngr = simulation.ngr
@@ -67,6 +68,10 @@ def error_analysis_recon_1d(simulation):
         i0 = simulation.i0
         iend = simulation.iend
 
+        # PPM parabola
+        px = ppm_parabola(N, ng, simulation)
+
+        # Plot vars
         q_parabolic = np.zeros(Nplot)
         dists = abs(np.add.outer(xplot,-xc[i0:iend]))
         neighbours = dists.argmin(axis=1)
@@ -84,12 +89,12 @@ def error_analysis_recon_1d(simulation):
         Q[0:i0]      = Q[N:N+ngl]
 
         # Reconstructs the values of Q using a piecewise parabolic polynomial
-        dq, q6, q_L, q_R = rec.ppm_reconstruction(Q, simulation)
+        rec.ppm_reconstruction(Q, px, simulation)
 
         # Compute the parabola
         for k in range(0, N):
             z = (xplot[neighbours==k]-x[k+i0])/dx # Maps to [0,1]
-            q_parabolic[neighbours==k] = q_L[k+i0] + dq[k+i0]*z+ z*(1.0-z)*q6[k+i0]
+            q_parabolic[neighbours==k] = px.q_L[k+i0] + px.dq[k+i0]*z+ z*(1.0-z)*px.q6[k+i0]
 
         # Compute exact solution
         q_exact = qexact_adv(xplot, 0, simulation)
@@ -99,7 +104,7 @@ def error_analysis_recon_1d(simulation):
 
         # Relative errors in different metrics
         error_linf[i], error_l1[i], error_l2[i] = compute_errors(q_exact, q_parabolic)
-        error_ed_linf[i], error_ed_l1[i], error_ed_l2[i] = compute_errors(q_exact_edges[i0:iend], q_L[i0:iend])
+        error_ed_linf[i], error_ed_l1[i], error_ed_l2[i] = compute_errors(q_exact_edges[i0:iend], px.q_L[i0:iend])
         print('\nParameters: N = '+str(N))
 
         # Output

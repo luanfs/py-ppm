@@ -6,9 +6,8 @@
 # (luan.santos@usp.br)
 ####################################################################################
 import numpy as np
-from parameters_1d import simulation_adv_par_1d, graphdir
+from parameters_1d import simulation_adv_par_1d, graphdir, ppm_parabola
 from advection_timestep import time_step_adv1d_ppm
-from flux import flux_ppm_stencil_coefficients, flux_ppm_stencil
 import matplotlib.pyplot as plt
 import matplotlib.ticker as tck
 
@@ -37,18 +36,25 @@ def stability_analysis():
     # amplification factor
     rho = np.zeros((len(CFL),N))
 
+    # constant velocity field
+    vf = 1
+
     for recon in recons:
         l = 0
         for cfl in CFL:
             dt = cfl/N
 
             # Update simulation parameters
-            simulation = simulation_adv_par_1d(N, dt, 1.0, ic, tc, recon)
+            simulation = simulation_adv_par_1d(N, dt, 1.0, ic, vf, tc, recon)
 
+            x = simulation.x
             # Ghost cells
             ng  = simulation.ng
             ngr  = simulation.ngr
             ngl  = simulation.ngl
+
+            # PPM parabola
+            px = ppm_parabola(N,ng,simulation)
 
             # Grid interior indexes
             i0 = simulation.i0
@@ -60,7 +66,7 @@ def stability_analysis():
             Qimag = np.zeros(N+ng)
             Q_old = np.zeros(N+ng, dtype = np.complex)
             u_edges = np.ones(N+ng+1)
-            F = np.ones(N+ng+1)
+            cx = np.ones(N+ng+1)
 
             for k in range(1,N+1):
                 # k is the wavenumber
@@ -75,8 +81,8 @@ def stability_analysis():
                 Qimag[:] = Q_old.imag[:]
 
                 # apply ppm operator
-                time_step_adv1d_ppm(Qreal, u_edges, F, simulation)
-                time_step_adv1d_ppm(Qimag, u_edges, F, simulation)
+                time_step_adv1d_ppm(Qreal, u_edges, cx, px, x, 0.0, simulation)
+                time_step_adv1d_ppm(Qimag, u_edges, cx, px, x, 0.0, simulation)
                 Q = Qreal + 1j*Qimag
 
                 # compute amplification factor

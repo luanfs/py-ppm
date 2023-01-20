@@ -43,7 +43,7 @@ class simulation_adv_par_1d:
         # Total period definition
         self.Tf = Tf
 
-        # Flux method
+        # Reconstruction method
         self.recon = recon
 
         # Define the interval extremes, advection velocity, etc
@@ -60,8 +60,10 @@ class simulation_adv_par_1d:
             name = 'Rectangular wave'
         elif ic == 5:
             name = 'Constant field'
+        elif ic == 10:
+            name = 'Constant field'
         else:
-            print("Error - invalid initial condition:", ic)
+            print("Error in simulation_adv_par_1d - invalid initial condition:", ic)
             exit()
 
         # IC name
@@ -75,7 +77,7 @@ class simulation_adv_par_1d:
         elif vf == 3:
             name = 'variable velocity 2'
         else:
-            print("Error - invalid velocity:", vf)
+            print("Error in simulation_adv_par_1d- invalid velocity:", vf)
             exit()
 
         # vf name
@@ -92,7 +94,7 @@ class simulation_adv_par_1d:
             recon_name = 'PPM_mono_L04' #Monotonization from Lin 04 paper
 
         else:
-           print("Error - invalid reconstruction method", recon)
+           print("Error in simulation_adv_par_1d - invalid reconstruction method", recon)
            exit()
 
         # Interval endpoints
@@ -124,7 +126,7 @@ class simulation_adv_par_1d:
         elif tc == 2:
             self.title = '1D advection errors '
         else:
-            print("Error - invalid test case")
+            print("Error in simulation_adv_par_1d- invalid test case")
             exit()
 
 
@@ -204,3 +206,43 @@ class simulation_recon_par_1d:
         self.recon_name = recon_name
 
         self.title = '1D reconstruction errors '
+
+####################################################################################
+#  Parabola class
+####################################################################################
+class ppm_parabola:
+    def __init__(self, N, ng, simulation):
+        # Number of cells
+        self.N  = N
+
+        # parabola coefficients
+        # Notation from Colella and  Woodward 1984
+        # q(x) = q_L + z*(dq + q6*(1-z)) z in [0,1]
+        self.q_L = np.zeros(N+ng)
+        self.q_R = np.zeros(N+ng)
+        self.dq  = np.zeros(N+ng)
+        self.q6 = np.zeros(N+ng)
+
+        # parabola fluxes
+        self.f_L = np.zeros(N+ng+1)   # flux from left
+        self.f_R = np.zeros(N+ng+1)   # flux from right
+        self.f_upw = np.zeros(N+ng+1) # upwind flux
+
+        # reconstruction name
+        self.recon_name = simulation.recon_name
+
+        # Extra variables for each schem
+        if simulation.recon_name == 'PPM' or simulation.recon_name == 'PPM_mono_CW84' or simulation.recon_name == 'PPM_mono_L04':
+            self.Q_edges =  np.zeros(N+ng+1)
+
+        if simulation.recon_name == 'PPM_mono_CW84':
+            self.dQ  = np.zeros(N+ng)
+            self.dQ0 = np.zeros(N+ng)
+            self.dQ1 = np.zeros(N+ng)
+            self.dQ2 = np.zeros(N+ng)
+
+        if simulation.recon_name == 'PPM_mono_L04':
+            self.dQ      = np.zeros(N+ng)
+            self.dQ_min  = np.zeros(N+ng)
+            self.dQ_max  = np.zeros(N+ng)
+            self.dQ_mono = np.zeros(N+ng)

@@ -1,20 +1,20 @@
 ####################################################################################
 #
-# Piecewise Parabolic Method (PPM) time setp module
+# Piecewise Parabolic Method (PPM) time setup module
 # Luan da Fonseca Santos - June 2022
 ####################################################################################
 
 import numpy as np
 from reconstruction_1d import ppm_reconstruction
 from flux import flux_ppm
-
+from advection_ic import velocity_adv_1d
 ####################################################################################
 # Applies a single timestep of PPM for the 1D advection equation
 # Q is an array of size [0:N+ng] that store the average values of q.
 # The interior indexes are in [i0:iend], the other indexes are used for
 # periodic boundary conditions.
 ####################################################################################
-def time_step_adv1d_ppm(Q, u_edges, F, simulation):
+def time_step_adv1d_ppm(Q, u_edges, cx, px, x, t, simulation):
     N = simulation.N
 
     # Ghost cells
@@ -32,17 +32,22 @@ def time_step_adv1d_ppm(Q, u_edges, F, simulation):
     # Grid size
     dx = simulation.dx
 
+    # CFL number
+    cx[:] = u_edges*(simulation.dt/simulation.dx) #cfl number
+
     # Reconstructs the values of Q using a piecewise parabolic polynomial
-    dq, q6, q_L, q_R = ppm_reconstruction(Q, simulation)
+    ppm_reconstruction(Q, px, simulation)
 
     # Compute the fluxes
-    flux_ppm(Q, q_R, q_L, dq, q6, u_edges, F, simulation)
+    flux_ppm(Q, cx, px, simulation)
 
     # Update the values of Q_average (formula 1.12 from Collela and Woodward 1984)
-    Q[i0:iend] = Q[i0:iend] - (simulation.dt/simulation.dx)*(u_edges[i0+1:iend+1]*F[i0+1:iend+1] - u_edges[i0:iend]*F[i0:iend])
+    Q[i0:iend] = Q[i0:iend] - (simulation.dt/simulation.dx)*(u_edges[i0+1:iend+1]*px.f_upw[i0+1:iend+1] - u_edges[i0:iend]*px.f_upw[i0:iend])
 
     # Periodic boundary conditions
     Q[iend:N+ng] = Q[i0:i0+ngr]
     Q[0:i0]      = Q[N:N+ngl]
 
-    return Q, dq, q6, q_L, F
+    # Velocity and CFL update for next time step
+    if simulation.vf>=2:
+        u_edges[0:N+ng+1] = velocity_adv_1d(x, t, simulation)
