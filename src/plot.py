@@ -17,12 +17,15 @@ def plot_1dfield_graphs(fields, labels, xplot, ymin, ymax, filename, title):
     for k in range(0, n):
         plt.plot(xplot, fields[k], color = colors[k], label = labels[k])
 
-    #plt.ylim(-0.2, 1.2)
+    #plt.ylim(-0.1, 1.1)
+    #plt.ylim(-0.2, 2.2)
     plt.xlabel('x')
     plt.ylabel('y')
     plt.legend()
     plt.title(title)
-    plt.savefig(filename)
+    #figformat = 'pdf'
+    figformat = 'png'
+    plt.savefig(filename+'.'+figformat, format=figformat)
     plt.close()
 
 
