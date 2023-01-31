@@ -38,7 +38,8 @@ def adv_1d(simulation, plot):
     Tf = simulation.Tf   # Total period definition
     tc = simulation.tc
     icname = simulation.icname
-    recon = simulation.recon # Flux scheme
+    recon = simulation.recon # Reconstruction scheme
+    dp = simulation.dp # Departure point scheme
 
     # Ghost cells
     ngl = simulation.ngl
@@ -50,11 +51,14 @@ def adv_1d(simulation, plot):
     iend = simulation.iend
 
     # Velocity at edges
-    u_edges = np.zeros(N+ng+1)
-    u_edges[0:N+ng+1] = velocity_adv_1d(x[0:N+ng+1], 0, simulation)
+    u_edges = np.zeros((N+ng+1, simulation.tl))
+    u_edges[:,0] = velocity_adv_1d(x[0:N+ng+1], 0, simulation)
+
+    if dp == 2:
+        u_edges[:,1] = u_edges[:,0]
 
     # CFL at edges - x direction
-    cx = u_edges*dt/dx
+    cx = u_edges[:,0]*dt/dx
     CFL = np.amax(abs(cx))
 
     # Number of time steps
@@ -88,6 +92,7 @@ def adv_1d(simulation, plot):
 
     #-------------------Time looping-------------------
     for k in range(1, Nsteps+1):
+    #for k in range(1, 10):
         # Time
         t = k*dt
 
@@ -103,7 +108,7 @@ def adv_1d(simulation, plot):
         CFL = str("{:.2e}".format(CFL))
         # Plot the error graph
         title = simulation.title +'- '+icname+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.recon_name
-        filename = graphdir+'1d_adv_tc'+str(tc)+'_ic'+str(ic)+'_vf'+str(simulation.vf)+'_N'+str(N)+'_'+simulation.recon_name
+        filename = graphdir+'1d_adv_tc'+str(tc)+'_ic'+str(ic)+'_vf'+str(simulation.vf)+'_N'+str(N)+'_'+simulation.recon_name+'_dp'+simulation.dp_name
         plot_time_evolution([error_linf, error_l1, error_l2], Tf, ['$L_\infty}$','$L_1$','$L_2$'], 'Error', filename, title)
         print('\nGraphs have been ploted in '+ graphdir)
         print('Error evolution is shown in '+filename)

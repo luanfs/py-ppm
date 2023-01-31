@@ -100,7 +100,7 @@ def output_adv(x, xc, simulation, Q, px, error_linf, error_l1, error_l2, plot, k
             CFL  = str("{:.2e}".format(CFL))
             time = str("{:.2e}".format(time))
 
-            title = '1D advection - '+icname+', '+simulation.vfname+', CFL='+str(CFL)+', N='+str(N)+\
-            '\nTime='+str(time)+', '+simulation.recon_name+ ', Min = '+ qmin +', Max = '+qmax
-            filename = graphdir+'1d_adv_tc'+str(tc)+'_ic'+str(ic)+'_vf'+str(vf)+'_t'+str(k-1)+'_N'+str(N)+'_'+simulation.recon_name
+            title = icname+', velocity = '+str(simulation.vf)+', CFL='+str(CFL)+', N='+str(N)+', time = '+str(time)+'\n'\
+            +simulation.recon_name+', dp = '+str(simulation.dp)+', Min = '+ qmin +', Max = '+qmax
+            filename = graphdir+'1d_adv_tc'+str(tc)+'_ic'+str(ic)+'_vf'+str(vf)+'_t'+str(k-1)+'_N'+str(N)+'_'+simulation.recon_name+'_dp'+simulation.dp_name
             plot_1dfield_graphs([q_exact, q_parabolic], ['Exact', 'Parabolic'], xplot, ymin, ymax, filename, title)

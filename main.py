@@ -37,8 +37,8 @@ if problem == 1:
 
 elif problem == 2:
     # Advection equation
-    dt, Tf, tc, ic, vf, recon = conf.get_adv_parameters_1d('advection.par')
-    simulation = simulation_adv_par_1d(N, dt, Tf, ic, vf, tc, recon)
+    dt, Tf, tc, ic, vf, recon, dp = conf.get_adv_parameters_1d('advection.par')
+    simulation = simulation_adv_par_1d(N, dt, Tf, ic, vf, tc, recon, dp)
     if tc == 1:
         # Advection routine
         adv_1d(simulation, True)

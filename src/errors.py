@@ -16,7 +16,7 @@ def plot_errors_loglog(N, errors, names, filename, title):
     # Plot the error graph
     error_max = 0.0
     colors = ('green', 'red', 'blue', 'purple')
-    markers = ('+','D','o','x')
+    markers = ('*','D','o','x')
     for k in range(0,len(errors)):
         error = errors[k]
         plt.loglog(N, error, color=colors[k], marker=markers[k], label = names[k])
@@ -60,7 +60,7 @@ def plot_convergence_rate(N, errors, names, filename, title):
     plt.xscale('log')
 
     colors = ('green', 'red', 'blue', 'purple')
-    markers = ('+','D','o','x')
+    markers = ('*','D','o','x')
     for k in range(0,len(errors)):
         error = errors[k]
         CR = np.abs(np.log(error[1:n])-np.log(error[0:n-1]))/np.log(2.0)

@@ -83,6 +83,9 @@ def get_adv_parameters_1d(filename):
         confpar.readline()
         recon = confpar.readline()
         confpar.readline()
+        dp = confpar.readline()
+        confpar.readline()
+
 
         # Close the file
         confpar.close()
@@ -94,6 +97,7 @@ def get_adv_parameters_1d(filename):
         vf = int(vf)
         tc = int(tc)
         recon = int(recon)
+        dp = int(dp)
 
         #Print the parameters on the screen
         print("\n--------------------------------------------------------")
@@ -103,6 +107,7 @@ def get_adv_parameters_1d(filename):
         print("Velocity field", vf,"\n")
         print("Time step: ", dt,"\n")
         print("Reconstruction scheme: ", recon, "\n")
+        print("Departure point scheme: ", dp, "\n")
         print("--------------------------------------------------------\n")
 
         # check validity of ic and vf
@@ -117,7 +122,7 @@ def get_adv_parameters_1d(filename):
     else:   # The file does not exist
         print("ERROR in get_grid_parameters: file "+ filename +" not found in /par.")
         exit()
-    return dt, Tf, tc, ic, vf, recon
+    return dt, Tf, tc, ic, vf, recon, dp
 
 def get_recon_parameters_1d(filename):
     # The standard file filename.par must exist in par/ directory

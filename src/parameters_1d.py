@@ -24,7 +24,7 @@ def grid_1d(x0, xf, N, ngl, ngr, ng):
 #  Advection simulation class
 ####################################################################################
 class simulation_adv_par_1d:
-    def __init__(self, N, dt, Tf, ic, vf, tc, recon):
+    def __init__(self, N, dt, Tf, ic, vf, tc, recon, dp):
         # Number of cells
         self.N  = N
 
@@ -45,6 +45,9 @@ class simulation_adv_par_1d:
 
         # Reconstruction method
         self.recon = recon
+
+        # Departure point method
+        self.dp = dp
 
         # Define the interval extremes, advection velocity, etc
         x0 = 0.0
@@ -97,6 +100,25 @@ class simulation_adv_par_1d:
            print("Error in simulation_adv_par_1d - invalid reconstruction method", recon)
            exit()
 
+        # Departure point scheme
+        if dp == 1:
+            dp_name = 'Euler'
+            self.tl = 1 # Time levels
+            # Time level
+            self.t0 = 0
+            self.t1 = 0
+
+        elif dp == 2:
+            dp_name = 'Adams-Bashforth'
+            self.tl = 2 # Time levels
+            # Time level
+            self.t0 = 0
+            self.t1 = 1
+        else:
+           print("Error in simulation_adv_par_1d - invalid departure point scheme", dp)
+           exit()
+
+
         # Interval endpoints
         self.x0 = x0
         self.xf = xf
@@ -117,8 +139,11 @@ class simulation_adv_par_1d:
         # Grid
         self.x, self.xc, self.dx = grid_1d(x0, xf, N, self.ngl, self.ngr, self.ng)
 
-        # Finite volume method
+        # Reconstruction method
         self.recon_name = recon_name
+
+        # Departure point method
+        self.dp_name = dp_name
 
         # Simulation title
         if tc == 1:
