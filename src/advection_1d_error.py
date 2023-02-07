@@ -48,11 +48,10 @@ def error_analysis_adv1d(simulation):
         u = velocity_adv_1d(x0, 0, simulation)
         dt[0] = CFL/(N[0]*abs(u))*(xf-x0)
         Tf = 5.0
-
     elif simulation.vf==2: #variable velocity
-        u0 = 0.2
+        u0 = 1.0
         dt[0] = CFL/(N[0])*(xf-x0)/u0
-        Tf = 5.0
+        Tf = np.pi
     elif simulation.vf==3: #variable velocity
         u0 = 0.2
         dt[0] = CFL/(N[0])*(xf-x0)/u0
@@ -63,6 +62,7 @@ def error_analysis_adv1d(simulation):
 
     # Errors array
     recons = (1,2,3,4)
+    recons = (1,)
     error_linf = np.zeros((Ntest, len(recons)))
     error_l1   = np.zeros((Ntest, len(recons)))
     error_l2   = np.zeros((Ntest, len(recons)))
@@ -100,6 +100,7 @@ def error_analysis_adv1d(simulation):
         print('\nGraphs have been ploted in '+graphdir)
         print('Convergence graphs has been ploted in '+filename)
 
+    exit()
     # Plot the errors
     title = simulation.title + ' - ' + simulation.icname+', velocity = ' + str(simulation.vf)+' dp = '+str(simulation.dp)
     filename = graphdir+'1d_adv_tc'+str(tc)+'_ic'+str(ic)+'_vf'+str(vf)+'_dp'+simulation.dp_name+'_parabola_errors.pdf'

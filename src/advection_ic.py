@@ -59,9 +59,11 @@ def qexact_adv(x, t, simulation):
         X[mask] = (X[mask]-x0)%(xf-x0) + x0 # maps back to [x0,xf]
 
     elif simulation.vf == 2: # variable spped
-        T = 5.0
-        u0 = 0.2
-        X = x-u0*np.sin(1.0*np.pi*t/T)*T/(1.0*np.pi)
+        w = 8*np.pi
+        a = -1/10.0
+        X = x
+        X = X - np.exp(a*t)*(w*np.sin(w*t)+a*np.cos(w*t))/(w*w+a*a)
+        X = X + a/(w*w+a*a)
 
     elif simulation.vf == 3: # variable spped
         #characteristic curve not available for this test :(
@@ -127,11 +129,12 @@ def velocity_adv_1d(x, t, simulation):
     if simulation.vf == 1:
         u = 0.2
     elif simulation.vf == 2:
-        T = 5.0
-        u0 = 0.2
-        u = u0*np.cos(1.0*np.pi*t/T)*np.ones(np.shape(x))
+        w = 8.0*np.pi
+        a = -1/10
+        u = np.exp(a*t)*np.cos(w*t)*np.ones(np.shape(x))
+
     elif simulation.vf == 3:
-        T = 5.0
+        T = 5
         u0 = 0.2
-        u = u0*np.cos(1.0*np.pi*t/T)*np.sin(np.pi*x)**2
+        u = u0*np.cos(np.pi*x)**2*np.cos(1.0*np.pi*t/T)
     return u

@@ -28,6 +28,7 @@ def stability_analysis():
     # Test case
     ic = 10
     tc = 1
+    dp = 1
 
     # Angles
     dtheta = 2.0*np.pi/N
@@ -45,7 +46,7 @@ def stability_analysis():
             dt = cfl/N
 
             # Update simulation parameters
-            simulation = simulation_adv_par_1d(N, dt, 1.0, ic, vf, tc, recon)
+            simulation = simulation_adv_par_1d(N, dt, 1.0, ic, vf, tc, recon, dp)
 
             x = simulation.x
             # Ghost cells
@@ -54,7 +55,7 @@ def stability_analysis():
             ngl  = simulation.ngl
 
             # PPM parabola
-            px = ppm_parabola(N,ng,simulation)
+            px = ppm_parabola(simulation)
 
             # Grid interior indexes
             i0 = simulation.i0
@@ -65,7 +66,7 @@ def stability_analysis():
             Qreal = np.zeros(N+ng)
             Qimag = np.zeros(N+ng)
             Q_old = np.zeros(N+ng, dtype = np.complex)
-            u_edges = np.ones(N+ng+1)
+            u_edges = np.ones((N+ng+1,1))
             cx = np.ones(N+ng+1)
 
             for k in range(1,N+1):
@@ -81,8 +82,8 @@ def stability_analysis():
                 Qimag[:] = Q_old.imag[:]
 
                 # apply ppm operator
-                time_step_adv1d_ppm(Qreal, u_edges, cx, px, x, 0.0, simulation)
-                time_step_adv1d_ppm(Qimag, u_edges, cx, px, x, 0.0, simulation)
+                time_step_adv1d_ppm(Qreal, u_edges, cx, px, x, 0.0, 1, simulation)
+                time_step_adv1d_ppm(Qimag, u_edges, cx, px, x, 0.0, 1, simulation)
                 Q = Qreal + 1j*Qimag
 
                 # compute amplification factor

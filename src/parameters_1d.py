@@ -104,16 +104,12 @@ class simulation_adv_par_1d:
         if dp == 1:
             dp_name = 'Euler'
             self.tl = 1 # Time levels
-            # Time level
-            self.t0 = 0
-            self.t1 = 0
-
         elif dp == 2:
-            dp_name = 'Adams-Bashforth'
+            dp_name = 'AB2'
             self.tl = 2 # Time levels
-            # Time level
-            self.t0 = 0
-            self.t1 = 1
+        elif dp == 3:
+            dp_name = 'AB3'
+            self.tl = 3 # Time levels
         else:
            print("Error in simulation_adv_par_1d - invalid departure point scheme", dp)
            exit()

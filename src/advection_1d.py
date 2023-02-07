@@ -56,6 +56,9 @@ def adv_1d(simulation, plot):
 
     if dp == 2:
         u_edges[:,1] = u_edges[:,0]
+    elif dp == 3:
+        u_edges[:,1] = u_edges[:,0]
+        u_edges[:,2] = u_edges[:,0]
 
     # CFL at edges - x direction
     cx = u_edges[:,0]*dt/dx
@@ -92,12 +95,11 @@ def adv_1d(simulation, plot):
 
     #-------------------Time looping-------------------
     for k in range(1, Nsteps+1):
-    #for k in range(1, 10):
         # Time
         t = k*dt
 
         # PPM time step
-        time_step_adv1d_ppm(Q, u_edges, cx, px, x, t, simulation)
+        time_step_adv1d_ppm(Q, u_edges, cx, px, x, t, k, simulation)
 
         # Output
         output_adv(x, xc, simulation, Q, px, error_linf, error_l1, error_l2, plot, k, t, Nsteps, plotstep, total_mass0, CFL)
