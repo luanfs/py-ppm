@@ -66,7 +66,7 @@ def stability_analysis():
             Qreal = np.zeros(N+ng)
             Qimag = np.zeros(N+ng)
             Q_old = np.zeros(N+ng, dtype = np.complex)
-            u_edges = np.ones((N+ng+1,1))
+            u_edges = np.ones((N+ng+1))
             cx = np.ones(N+ng+1)
 
             for k in range(1,N+1):

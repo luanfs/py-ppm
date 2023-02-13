@@ -4,21 +4,24 @@
 # for departure point calculation
 # Luan Santos 2023
 ####################################################################################
+from advection_ic import velocity_adv_1d
 
-def time_averaged_velocity(u_edges, k, simulation):
+def time_averaged_velocity(u_edges, k, t, simulation):
     # Compute the velocity needed for the departure point
     if simulation.vf>=2:
-        if simulation.dp == 1:
-            u_edges[:,0] = u_edges[:,0]
-        elif simulation.dp == 2:
-            u_edges[:,0] = 1.5*u_edges[:,1]-0.5*u_edges[:,0]
-        elif simulation.dp == 3:
-            if k == 1: # First time step - Euler
-                u_edges[:,0] = u_edges[:,0]
-            elif k == 2: # Second time step - Second order Adams-Bashforth
-                u_edges[:,0] = 1.5*u_edges[:,2]-0.5*u_edges[:,0]
-            elif k>2:
-                u_edges[:,0] = (23.0*u_edges[:,2]-16.0*u_edges[:,1] + 5.0*u_edges[:,0])/12.0
+        if simulation.dp == 2:
+            x = simulation.x
+            dt = simulation.dt
+            dto2 = dt*0.5
+            K1 = velocity_adv_1d(x        , t      , simulation)
+            K2 = velocity_adv_1d(x-dto2*K1, t-dto2, simulation)
+            K3 = velocity_adv_1d(x-dt*2.0*K2+dt*K1, t-dt, simulation)
+            u_edges[:] = (K1 + 4.0*K2 + K3)/6.0
 
-
+            # Fourth-order RK:W
+            #K1 = velocity_adv_1d(x       , t     , simulation)
+            #K2 = velocity_adv_1d(x-dto2*K1, t-dto2, simulation)
+            #K3 = velocity_adv_1d(x-dto2*K2, t-dto2, simulation)
+            #K4 = velocity_adv_1d(x-  dt*K3, t-dt  , simulation)
+            #u_edges[:] = (K1 + 2.0*K2 + 2.0*K3 + K4)/6.0
 

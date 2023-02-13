@@ -51,17 +51,12 @@ def adv_1d(simulation, plot):
     iend = simulation.iend
 
     # Velocity at edges
-    u_edges = np.zeros((N+ng+1, simulation.tl))
-    u_edges[:,0] = velocity_adv_1d(x[0:N+ng+1], 0, simulation)
+    u_edges = np.zeros(N+ng+1)
+    u_edges[:] = velocity_adv_1d(x[0:N+ng+1], 0, simulation)
 
-    if dp == 2:
-        u_edges[:,1] = u_edges[:,0]
-    elif dp == 3:
-        u_edges[:,1] = u_edges[:,0]
-        u_edges[:,2] = u_edges[:,0]
 
     # CFL at edges - x direction
-    cx = u_edges[:,0]*dt/dx
+    cx = u_edges[:]*dt/dx
     CFL = np.amax(abs(cx))
 
     # Number of time steps

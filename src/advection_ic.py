@@ -136,5 +136,6 @@ def velocity_adv_1d(x, t, simulation):
     elif simulation.vf == 3:
         T = 5
         u0 = 0.2
-        u = u0*np.cos(np.pi*x)**2*np.cos(1.0*np.pi*t/T)
+        u = u0*np.sin(np.pi*x)**2*np.cos(1.0*np.pi*t/T)
+        #u = u0*np.cos(2.0*np.pi*x)#*np.cos(1.0*np.pi*t/T)
     return u
