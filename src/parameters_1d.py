@@ -38,7 +38,9 @@ class simulation_adv_par_1d:
         self.tc = tc
 
         # Time step
-        self.dt = dt
+        self.dt    = dt
+        self.dto2  = dt*0.5
+        self.twodt = dt*2.0
 
         # Total period definition
         self.Tf = Tf
@@ -77,8 +79,6 @@ class simulation_adv_par_1d:
            name = 'constant velocity'
         elif vf == 2:
             name = 'variable velocity 1'
-        elif vf == 3:
-            name = 'variable velocity 2'
         else:
             print("Error in simulation_adv_par_1d- invalid velocity:", vf)
             exit()
@@ -109,7 +109,6 @@ class simulation_adv_par_1d:
            print("Error in simulation_adv_par_1d - invalid departure point scheme", dp)
            exit()
 
-
         # Interval endpoints
         self.x0 = x0
         self.xf = xf
@@ -129,6 +128,12 @@ class simulation_adv_par_1d:
 
         # Grid
         self.x, self.xc, self.dx = grid_1d(x0, xf, N, self.ngl, self.ngr, self.ng)
+
+        # RK vars
+        if dp == 2:
+            self.K1 = np.zeros(np.shape(self.x))
+            self.K2 = np.zeros(np.shape(self.x))
+            self.K3 = np.zeros(np.shape(self.x))
 
         # Reconstruction method
         self.recon_name = recon_name

@@ -15,12 +15,12 @@
 # Luan da Fonseca Santos - June 2022
 # (luan.santos@usp.br)
 ####################################################################################
-import numpy as np
 
 ####################################################################################
 # Compute the flux operator from PPM using the parabola coefficients
-# Inputs: Q (average values),  u_edges (velocity at edges)
+# Inputs: Q (average values), cx (CFL at edges)
 ####################################################################################
+import numpy as np
 
 def flux_ppm(px, cx, simulation):
     N = simulation.N

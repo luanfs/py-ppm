@@ -33,7 +33,6 @@ def ppm_reconstruction(Q, px, simulation):
     if px.recon_name == 'PPM': # PPM from CW84 paper
         # Values of Q at right edges (q_(j+1/2)) - Formula 1.9 from Collela and Woodward 1984
         px.Q_edges[i0-1:iend+2] = (7.0/12.0)*(Q[i0-1:iend+2] + Q[i0-2:iend+1]) - (Q[i0:iend+3] + Q[i0-3:iend])/12.0
-
         # Assign values of Q_R and Q_L
         px.q_R[i0-1:iend+1] = px.Q_edges[i0:iend+2]
         px.q_L[i0-1:iend+1] = px.Q_edges[i0-1:iend+1]
