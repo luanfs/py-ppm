@@ -36,7 +36,7 @@ def error_analysis_adv1d(simulation):
     xf = simulation.xf
 
     # Number of tests
-    Ntest = 10
+    Ntest = 7
 
     # Number of cells
     N = np.zeros(Ntest)
@@ -57,10 +57,10 @@ def error_analysis_adv1d(simulation):
         exit()
 
     # Errors array
-    #recons = (1,2,3,4)
-    recons = (simulation.recon,)
-    #deps = (1,2)
-    deps = (simulation.dp,)
+    recons = (1,2,3,4)
+    deps = (1,2)
+    #recons = (simulation.recon,)
+    #deps = (simulation.dp,)
     recon_names = ['PPM', 'PPM_mono_CW84','PPM_hybrid','PPM_mono_L04']
     dp_names = ['Euler', 'RK3']
     error_linf = np.zeros((Ntest, len(recons), len(deps)))
@@ -87,58 +87,30 @@ def error_analysis_adv1d(simulation):
 
                 # Output
                 print_errors_simul(error_linf[:,rec,d], error_l1[:,rec,d], error_l2[:,rec,d], i)
-
-            # Plot the errors
-            title = simulation.title +' - '+ simulation.recon_name + ' - '+simulation.dp_name+ '\n' + simulation.icname+', velocity = ' + str(simulation.vf)
-            filename = graphdir+'1d_adv_tc'+str(tc)+'_'+simulation.recon_name+'_'+simulation.dp_name+'_ic'+str(ic)+'_vf'+str(vf)+'_parabola_errors.pdf'
-            plot_errors_loglog(N, [error_linf[:,rec,d], error_l1[:,rec,d], error_l2[:,rec,d]], ['$L_\infty$', '$L_1$','$L_2$'], filename, title)
-
-            # Plot the convergence rate
-            title = 'Convergence rate - ' + simulation.recon_name + ' - '+simulation.dp_name+ '\n' + simulation.icname+', velocity = ' + str(simulation.vf)
-
-            filename = graphdir+'1d_adv_tc'+str(tc)+'_'+simulation.recon_name+'_'+simulation.dp_name+'_ic'+str(ic)+'_vf'+str(vf)+'_convergence_rate.pdf'
-            plot_convergence_rate(N, [error_linf[:,rec,d], error_l1[:,rec,d], error_l2[:,rec,d]],['$L_\infty$', '$L_1$','$L_2$'], filename, title)
-
             rec = rec+1
-
-        # Plot the errors for different reconstruction methods
-        errors = []
-        rec_names = []
-        for r in range(0,len(recons)):
-            errors.append(error_linf[:,r,d])
-            rec_names.append(recon_names[recons[r]-1])
-
-        title = simulation.title + ' - ' + simulation.icname+', velocity = ' + str(simulation.vf)+' dp = '+str(simulation.dp)
-        filename = graphdir+'1d_adv_tc'+str(tc)+'_ic'+str(ic)+'_vf'+str(vf)+'_dp'+simulation.dp_name+'_parabola_errors.pdf'
-        plot_errors_loglog(N, errors, rec_names, filename, title)
-
-        # Plot the convergence rate
-        title = 'Convergence rate - ' + simulation.icname +', velocity = ' + str(simulation.vf)+', dp = '+str(simulation.dp)
-        filename = graphdir+'1d_adv_tc'+str(tc)+'_ic'+str(ic)+'_vf'+str(vf)+'_dp'+simulation.dp_name+'_convergence_rate.pdf'
-        plot_convergence_rate(N, errors, rec_names, filename, title)
-
         d = d+1
 
-    # plot errors for different DP schemes
-    for r in range(0, len(recons)):
+    # plot errors for different all schemes in  different norms
+    error_list = [error_linf, error_l1, error_l2]
+    norm_list  = ['linf','l1','l2']
+    norm_title  = [r'$L_{\infty}$',r'$L_1$',r'$L_2$']
+
+    e = 0
+    for error in error_list:
         errors = []
         dep_name = []
         for d in range(0, len(deps)):
-            errors.append(error_linf[:,r,d])
-            dep_name.append(dp_names[deps[d]-1])
+            for r in range(0, len(recons)):
+                errors.append(error[:,r,d])
+                dep_name.append(dp_names[deps[d]-1]+'-'+recon_names[recons[r]-1])
 
-        title = simulation.title + ' - ' + simulation.icname+', velocity = ' + str(simulation.vf)+'\n recon = '+recon_names[recons[r]-1]
-        filename = graphdir+'1d_adv_tc'+str(tc)+'_ic'+str(ic)+'_vf'+str(vf)+'_rec'+recon_names[recons[r]-1]+'_parabola_errors.pdf'
+        title = simulation.title + ' - ' + simulation.icname+', velocity = '+ str(simulation.vf)+', norm = '+norm_title[e]
+        filename = graphdir+'1d_adv_tc'+str(tc)+'_ic'+str(ic)+'_vf'+str(vf)+'_norm'+norm_list[e]+'_parabola_errors.pdf'
         plot_errors_loglog(N, errors, dep_name, filename, title)
 
         # Plot the convergence rate
-        title = 'Convergence rate - ' + simulation.icname +', velocity = ' + str(simulation.vf)+ '\n recon = '+recon_names[recons[r]-1]
-        filename = graphdir+'1d_adv_tc'+str(tc)+'_ic'+str(ic)+'_vf'+str(vf)+'_rec'+recon_names[recons[r]-1]+'_convergence_rate.pdf'
+        title = 'Convergence rate - ' + simulation.icname +', velocity = ' + str(simulation.vf)+', norm = '+norm_title[e]
+        filename = graphdir+'1d_adv_tc'+str(tc)+'_ic'+str(ic)+'_vf'+str(vf)+'_norm'+norm_list[e]+'_convergence_rate.pdf'
         plot_convergence_rate(N, errors, dep_name, filename, title)
-
-
-
-    # Print final message
-    print('\nGraphs have been ploted in '+graphdir)
-    print('Convergence graphs has been ploted in '+filename)
+        e = e+1
 

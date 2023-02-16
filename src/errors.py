@@ -15,12 +15,13 @@ import numpy as np
 def plot_errors_loglog(N, errors, names, filename, title):
     # Plot the error graph
     error_max = 0.0
-    colors = ('green', 'red', 'blue', 'purple')
-    markers = ('*','D','o','x')
+    colors = ('green', 'red', 'blue', 'purple', 'orange', 'cyan', 'black', 'gray')
+    markers = ('*','D','o','x', 'h', 'H', 'X', 'd')
     for k in range(0,len(errors)):
         error = errors[k]
         plt.loglog(N, error, color=colors[k], marker=markers[k], label = names[k])
-        error_max = 5*np.amax(abs(error))
+
+    error_max = 5*np.amax(abs(error))
     #plt.ylim(10.0**(-9),error_max)
 
     # Reference lines
@@ -42,7 +43,7 @@ def plot_errors_loglog(N, errors, names, filename, title):
     #plt.loglog(Norder, order2 , '--', color='black', label = '2nd order')
     #plt.loglog(Norder, order3 , '-.', color='black', label = '3rd order')
     #plt.loglog(Norder, order4 , '--', color='black', label = '4rd order')
-    plt.xlabel('N (number of cells)')
+    plt.xlabel(r'$N$ (number of cells in $x$ direction)')
     plt.ylabel('Error')
     plt.legend()
     plt.grid(True, which="both")
@@ -58,16 +59,15 @@ def plot_convergence_rate(N, errors, names, filename, title):
 
     #plt.ylim(0.5, 4.0)
     plt.xscale('log')
-
-    colors = ('green', 'red', 'blue', 'purple')
-    markers = ('*','D','o','x')
+    colors = ('green', 'red', 'blue', 'purple', 'orange', 'cyan', 'black', 'gray')
+    markers = ('*','D','o','x', 'h', 'H', 'X', 'd')
     for k in range(0,len(errors)):
         error = errors[k]
         CR = np.abs(np.log(error[1:n])-np.log(error[0:n-1]))/np.log(2.0)
 
         plt.plot(N[1:n], CR, color=colors[k], marker=markers[k], label = names[k])
 
-    plt.xlabel('N (number of cells)')
+    plt.xlabel(r'$N$ (number of cells in $x$ direction)')
     plt.ylabel('Convergence rate')
     plt.legend()
     plt.grid(True, which="both")
