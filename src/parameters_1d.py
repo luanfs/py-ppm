@@ -88,13 +88,13 @@ class simulation_adv_par_1d:
 
         # Reconstruction scheme
         if recon == 1:
-            recon_name = 'PPM'
+            recon_name = 'PPM-0'
         elif recon == 2:
-            recon_name = 'PPM_mono_CW84' #Monotonization from Collela and Woodward 84 paper
+            recon_name = 'PPM-CW84' #Monotonization from Collela and Woodward 84 paper
         elif recon == 3:
-            recon_name = 'PPM_hybrid' #Hybrid PPM from Putman and Lin 07 paper
+            recon_name = 'PPM-PL07' #Hybrid PPM from Putman and Lin 07 paper
         elif recon == 4:
-            recon_name = 'PPM_mono_L04' #Monotonization from Lin 04 paper
+            recon_name = 'PPM-L04' #Monotonization from Lin 04 paper
 
         else:
            print("Error in simulation_adv_par_1d - invalid reconstruction method", recon)
@@ -102,7 +102,7 @@ class simulation_adv_par_1d:
 
         # Departure point scheme
         if dp == 1:
-            dp_name = 'Euler'
+            dp_name = 'RK1' # Euler
         elif dp == 2:
             dp_name = 'RK3'
         else:
@@ -184,14 +184,13 @@ class simulation_recon_par_1d:
 
         # Flux scheme
         if recon == 1:
-            recon_name = 'PPM'
+            recon_name = 'PPM-0'
         elif recon == 2:
-            recon_name = 'PPM_mono_CW84' #Monotonization from Collela and Woodward 84 paper
+            recon_name = 'PPM-CW84' #Monotonization from Collela and Woodward 84 paper
         elif recon == 3:
-            recon_name = 'PPM_hybrid'    #Quasi-fifth order from Putman and Lin 07 paper
+            recon_name = 'PPM-PL07'    #Quasi-fifth order from Putman and Lin 07 paper
         elif recon == 4:
-            recon_name = 'PPM_mono_L04' #Monotonization from Lin 04 paper
-
+            recon_name = 'PPM-L04' #Monotonization from Lin 04 paper
 
         else:
            print("Error - invalid flux method")
@@ -253,17 +252,17 @@ class ppm_parabola:
         # reconstruction name
         self.recon_name = simulation.recon_name
 
-        # Extra variables for each schem
-        if simulation.recon_name == 'PPM' or simulation.recon_name == 'PPM_mono_CW84' or simulation.recon_name == 'PPM_mono_L04':
+        # Extra variables for each scheme
+        if simulation.recon_name == 'PPM-0' or simulation.recon_name == 'PPM-CW84' or simulation.recon_name == 'PPM-L04':
             self.Q_edges =  np.zeros(N+ng+1)
 
-        if simulation.recon_name == 'PPM_mono_CW84':
+        if simulation.recon_name == 'PPM-CW84':
             self.dQ  = np.zeros(N+ng)
             self.dQ0 = np.zeros(N+ng)
             self.dQ1 = np.zeros(N+ng)
             self.dQ2 = np.zeros(N+ng)
 
-        if simulation.recon_name == 'PPM_mono_L04':
+        if simulation.recon_name == 'PPM-L04':
             self.dQ      = np.zeros(N+ng)
             self.dQ_min  = np.zeros(N+ng)
             self.dQ_max  = np.zeros(N+ng)

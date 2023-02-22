@@ -36,7 +36,7 @@ def error_analysis_adv1d(simulation):
     xf = simulation.xf
 
     # Number of tests
-    Ntest = 7
+    Ntest = 8
 
     # Number of cells
     N = np.zeros(Ntest)
@@ -61,8 +61,8 @@ def error_analysis_adv1d(simulation):
     deps = (1,2)
     #recons = (simulation.recon,)
     #deps = (simulation.dp,)
-    recon_names = ['PPM', 'PPM_mono_CW84','PPM_hybrid','PPM_mono_L04']
-    dp_names = ['Euler', 'RK3']
+    recon_names = ['PPM-0', 'PPM-CW84','PPM-PL07','PPM-L04']
+    dp_names = ['RK1', 'RK3']
     error_linf = np.zeros((Ntest, len(recons), len(deps)))
     error_l1   = np.zeros((Ntest, len(recons), len(deps)))
     error_l2   = np.zeros((Ntest, len(recons), len(deps)))

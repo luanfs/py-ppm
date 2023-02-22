@@ -30,7 +30,7 @@ def ppm_reconstruction(Q, px, simulation):
     i0 = simulation.i0
     iend = simulation.iend
 
-    if px.recon_name == 'PPM': # PPM from CW84 paper
+    if px.recon_name == 'PPM-0': # PPM from CW84 paper
         # Values of Q at right edges (q_(j+1/2)) - Formula 1.9 from Collela and Woodward 1984
         px.Q_edges[i0-1:iend+2] = (7.0/12.0)*(Q[i0-1:iend+2] + Q[i0-2:iend+1]) - (Q[i0:iend+3] + Q[i0-3:iend])/12.0
         # Assign values of Q_R and Q_L
@@ -38,7 +38,7 @@ def ppm_reconstruction(Q, px, simulation):
         px.q_L[i0-1:iend+1] = px.Q_edges[i0-1:iend+1]
 
 
-    elif px.recon_name == 'PPM_hybrid': # Hybrid PPM from PL07
+    elif px.recon_name == 'PPM-PL07': # Hybrid PPM from PL07
         # coeffs from equations 41 and 42 from PL07
         a1 =   2.0/60.0
         a2 = -13.0/60.0
@@ -49,7 +49,7 @@ def ppm_reconstruction(Q, px, simulation):
         px.q_R[i0-1:iend+1] = a1*Q[i0-3:iend-1] + a2*Q[i0-2:iend] + a3*Q[i0-1:iend+1] + a4*Q[i0:iend+2] + a5*Q[i0+1:iend+3]
         px.q_L[i0-1:iend+1] = a5*Q[i0-3:iend-1] + a4*Q[i0-2:iend] + a3*Q[i0-1:iend+1] + a2*Q[i0:iend+2] + a1*Q[i0+1:iend+3]
 
-    elif px.recon_name == 'PPM_mono_CW84':  #PPM with monotonization from CW84
+    elif px.recon_name == 'PPM-CW84':  #PPM with monotonization from CW84
         # Compute the slopes dQ0 (centered finite difference)
         # Formula 1.7 from Collela and Woodward 1984 and Figure 2 from Carpenter et al 1990.
         px.dQ0[i0-2:iend+2] = 0.5*(Q[i0-1:iend+3] - Q[i0-3:iend+1]) # Interior values are in 3:N+3
@@ -107,7 +107,7 @@ def ppm_reconstruction(Q, px, simulation):
         px.q_R[i0-1:iend+1][overshoot_move_right] = 3.0*Q[i0-1:iend+1][overshoot_move_right] - 2.0*px.q_L[i0-1:iend+1][overshoot_move_right]
 
 
-    elif px.recon_name == 'PPM_mono_L04':  #PPM with monotonization from Lin 04 paper
+    elif px.recon_name == 'PPM-L04':  #PPM with monotonization from Lin 04 paper
         # Formula B1 from Lin 04
         px.dQ[i0-3:iend+3] = 0.25*(Q[i0-2:iend+4] - Q[i0-4:iend+2])
         px.dQ_min[i0-3:iend+3]  = np.maximum(np.maximum(Q[i0-4:iend+2], Q[i0-3:iend+3]), Q[i0-2:iend+4]) - Q[i0-3:iend+3]
