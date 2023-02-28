@@ -36,11 +36,11 @@ def error_analysis_adv1d(simulation):
     xf = simulation.xf
 
     # Number of tests
-    Ntest = 8
+    Ntest = 7
 
     # Number of cells
     N = np.zeros(Ntest)
-    N[0] = 10
+    N[0] = 16
 
     # Array of time steps
     dt = np.zeros(Ntest)
@@ -95,22 +95,32 @@ def error_analysis_adv1d(simulation):
     norm_list  = ['linf','l1','l2']
     norm_title  = [r'$L_{\infty}$',r'$L_1$',r'$L_2$']
 
-    e = 0
-    for error in error_list:
-        errors = []
-        dep_name = []
-        for d in range(0, len(deps)):
+    for d in range(0, len(deps)):
+        e = 0
+        for error in error_list:
+            emin, emax = np.amin(error[:]), np.amax(error[:])
+
+            # convergence rate min/max
+            n = len(error)
+            CR = np.abs(np.log(error[1:n])-np.log(error[0:n-1]))/np.log(2.0)
+            CRmin, CRmax = np.amin(CR), np.amax(CR)
+            errors = []
+            dep_name = []
             for r in range(0, len(recons)):
                 errors.append(error[:,r,d])
-                dep_name.append(dp_names[deps[d]-1]+'-'+recon_names[recons[r]-1])
+                dep_name.append(recon_names[recons[r]-1])
 
-        title = simulation.title + ' - ' + simulation.icname+', velocity = '+ str(simulation.vf)+', norm = '+norm_title[e]
-        filename = graphdir+'1d_adv_tc'+str(tc)+'_ic'+str(ic)+'_vf'+str(vf)+'_norm'+norm_list[e]+'_parabola_errors.pdf'
-        plot_errors_loglog(N, errors, dep_name, filename, title)
+            title = simulation.title + ' - ' + simulation.icname+', vf='+ str(simulation.vf)+\
+            ', dp = '+dp_names[deps[d]-1]+', norm='+norm_title[e]
+            filename = graphdir+'1d_adv_tc'+str(tc)+'_ic'+str(ic)+'_vf'+str(vf)+'_dp'+dp_names[deps[d]-1]\
+            +'_norm'+norm_list[e]+'_parabola_errors.pdf'
 
-        # Plot the convergence rate
-        title = 'Convergence rate - ' + simulation.icname +', velocity = ' + str(simulation.vf)+', norm = '+norm_title[e]
-        filename = graphdir+'1d_adv_tc'+str(tc)+'_ic'+str(ic)+'_vf'+str(vf)+'_norm'+norm_list[e]+'_convergence_rate.pdf'
-        plot_convergence_rate(N, errors, dep_name, filename, title)
-        e = e+1
+            plot_errors_loglog(N, errors, dep_name, filename, title, emin, emax)
 
+            # Plot the convergence rate
+            title = 'Convergence rate - ' + simulation.icname +', vf=' + str(simulation.vf)+\
+            ', dp = '+dp_names[deps[d]-1]+', norm='+norm_title[e]
+            filename = graphdir+'1d_adv_tc'+str(tc)+'_ic'+str(ic)+'_vf'+str(vf)+'_dp'+dp_names[deps[d]-1]\
+            +'_norm'+norm_list[e]+'_convergence_rate.pdf'
+            plot_convergence_rate(N, errors, dep_name, filename, title, CRmin, CRmax)
+            e = e+1

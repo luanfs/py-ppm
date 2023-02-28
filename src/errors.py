@@ -12,17 +12,18 @@ import numpy as np
 ####################################################################################
 # Routine that plot the errors in different norms in log-log scale
 ####################################################################################
-def plot_errors_loglog(N, errors, names, filename, title):
+def plot_errors_loglog(N, errors, names, filename, title, emin, emax):
     # Plot the error graph
     error_max = 0.0
-    colors = ('green', 'red', 'blue', 'purple', 'orange', 'cyan', 'black', 'gray')
-    markers = ('*','D','o','x', 'h', 'H', 'X', 'd')
+    colors = ('green', 'red', 'blue', 'purple', 'orange', 'black', 'brown', 'gray')
+    markers = ('*','+','x','*', '+', 'x', '*', '+')
+    lines_style = ('--','-.',':',':','-.','--',':', '--','-.',':')
     for k in range(0,len(errors)):
         error = errors[k]
-        plt.loglog(N, error, color=colors[k], marker=markers[k], label = names[k])
+        plt.loglog(N, error, lines_style[k], color=colors[k], marker=markers[k], label = names[k])
 
-    error_max = 5*np.amax(abs(error))
-    #plt.ylim(10.0**(-9),error_max)
+    if (emin and emax):
+        plt.ylim(0.95*emin, 1.05*emax)
 
     # Reference lines
     nref   = len(N)
@@ -50,22 +51,24 @@ def plot_errors_loglog(N, errors, names, filename, title):
     plt.title(title)
     plt.savefig(filename, format='pdf')
     plt.close()
-
 ####################################################################################
 # Compute and plot the convergence rate
 ####################################################################################
-def plot_convergence_rate(N, errors, names, filename, title):
+def plot_convergence_rate(N, errors, names, filename, title, CRmin=None, CRmax=None):
     n = len(N)
 
-    #plt.ylim(0.5, 4.0)
+    if (CRmin and CRmax):
+        plt.ylim(0.98*CRmin, 1.02*CRmax)
+
     plt.xscale('log')
-    colors = ('green', 'red', 'blue', 'purple', 'orange', 'cyan', 'black', 'gray')
-    markers = ('*','D','o','x', 'h', 'H', 'X', 'd')
+    colors = ('green', 'red', 'blue', 'purple', 'orange', 'black', 'brown', 'gray')
+    markers = ('*','+','x','*', '+', 'x', '*', '+')
+    lines_style = ('--','-.',':',':','-.','--',':', '--','-.',':')
     for k in range(0,len(errors)):
         error = errors[k]
         CR = np.abs(np.log(error[1:n])-np.log(error[0:n-1]))/np.log(2.0)
 
-        plt.plot(N[1:n], CR, color=colors[k], marker=markers[k], label = names[k])
+        plt.plot(N[1:n], CR, lines_style[k], color=colors[k], marker=markers[k], label = names[k])
 
     plt.xlabel(r'$N$ (number of cells in $x$ direction)')
     plt.ylabel('Convergence rate')
@@ -74,7 +77,6 @@ def plot_convergence_rate(N, errors, names, filename, title):
     plt.title(title)
     plt.savefig(filename, format='pdf')
     plt.close()
-
 
 ####################################################################################
 # Print the errors of the ith simulation
