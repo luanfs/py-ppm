@@ -32,7 +32,7 @@ def error_analysis_recon_1d(simulation):
 
     # Reconstruction schemes
     recons = (1,2,3,4)
-    recon_names = ['PPM', 'PPM-CW84','PPM-PL07','PPM-L04']
+    recon_names = ['PPM-0', 'PPM-CW84','PPM-PL07','PPM-L04']
 
     # Errors array
     error_linf = np.zeros((Ntest, len(recons)))
