@@ -7,7 +7,7 @@
 ####################################################################################
 
 import numpy as np
-import reconstruction_1d as rec
+from reconstruction_1d import ppm_reconstruction
 from parameters_1d import  simulation_recon_par_1d, graphdir, ppm_parabola
 from advection_ic  import  q0_adv, qexact_adv, q0_antiderivative_adv
 from errors import *
@@ -24,21 +24,24 @@ def error_analysis_recon_1d(simulation):
     xf = simulation.xf
 
     # Number of tests
-    Ntest = 10
+    Ntest = 7
 
     # Number of cells
     Nc = np.zeros(Ntest)
-    Nc[0] = 10
+    Nc[0] = 16
+
+    # Reconstruction schemes
+    recons = (1,2,3,4)
+    recon_names = ['PPM', 'PPM-CW84','PPM-PL07','PPM-L04']
 
     # Errors array
-    error_linf = np.zeros(Ntest)
-    error_l1   = np.zeros(Ntest)
-    error_l2   = np.zeros(Ntest)
+    error_linf = np.zeros((Ntest, len(recons)))
+    error_l1   = np.zeros((Ntest, len(recons)))
+    error_l2   = np.zeros((Ntest, len(recons)))
+    error_ed_linf = np.zeros((Ntest, len(recons)))
+    error_ed_l1   = np.zeros((Ntest, len(recons)))
+    error_ed_l2   = np.zeros((Ntest, len(recons)))
 
-    # Edges errors
-    error_ed_linf = np.zeros(Ntest)
-    error_ed_l1   = np.zeros(Ntest)
-    error_ed_l2   = np.zeros(Ntest)
 
     # Compute number of cells for each simulation
     for i in range(1, Ntest):
@@ -51,82 +54,98 @@ def error_analysis_recon_1d(simulation):
     xplot = np.linspace(x0, xf, Nplot)
 
     # Let us test and compute the error!
-    for i in range(0, Ntest):
-        # Update simulation parameters
-        simulation = simulation_recon_par_1d(int(Nc[i]), ic, recon)
-        N  = simulation.N
-        x  = simulation.x
-        xc = simulation.xc
-        dx = simulation.dx
+    rec = 0
+    for recon in recons:
+        for i in range(0, Ntest):
+            # Update simulation parameters
+            simulation = simulation_recon_par_1d(int(Nc[i]), ic, recon)
+            N  = simulation.N
+            x  = simulation.x
+            xc = simulation.xc
+            dx = simulation.dx
 
-        # Ghost cells
-        ngl = simulation.ngl
-        ngr = simulation.ngr
-        ng  = simulation.ng
+            # Ghost cells
+            ngl = simulation.ngl
+            ngr = simulation.ngr
+            ng  = simulation.ng
 
-        # Grid interior indexes
-        i0 = simulation.i0
-        iend = simulation.iend
+            # Grid interior indexes
+            i0 = simulation.i0
+            iend = simulation.iend
 
-        # PPM parabola
-        px = ppm_parabola(simulation)
+            # PPM parabola
+            px = ppm_parabola(simulation)
 
-        # Plot vars
-        q_parabolic = np.zeros(Nplot)
-        dists = abs(np.add.outer(xplot,-xc[i0:iend]))
-        neighbours = dists.argmin(axis=1)
+            # Plot vars
+            q_parabolic = np.zeros(Nplot)
+            dists = abs(np.add.outer(xplot,-xc[i0:iend]))
+            neighbours = dists.argmin(axis=1)
 
-        # Compute average values of Q (initial condition)
-        Q = np.zeros(N+ng)
+            # Compute average values of Q (initial condition)
+            Q = np.zeros(N+ng)
 
-        if (simulation.ic == 0 or simulation.ic == 1 or simulation.ic == 3 or simulation.ic == 4 or simulation.ic == 5):
-            Q[i0:iend] = (q0_antiderivative_adv(x[i0+1:iend+1], simulation) - q0_antiderivative_adv(x[i0:iend], simulation))/dx
-        elif (simulation.ic == 2):
-            Q[i0:iend] = q0_adv(xc[i0:iend], simulation)
+            if (simulation.ic == 0 or simulation.ic == 1 or simulation.ic == 3 or simulation.ic == 4 or simulation.ic == 5):
+                Q[i0:iend] = (q0_antiderivative_adv(x[i0+1:iend+1], simulation) - q0_antiderivative_adv(x[i0:iend], simulation))/dx
+            elif (simulation.ic == 2):
+                Q[i0:iend] = q0_adv(xc[i0:iend], simulation)
 
-        # Periodic boundary conditions
-        Q[iend:N+ng] = Q[i0:i0+ngr]
-        Q[0:i0]      = Q[N:N+ngl]
+            # Periodic boundary conditions
+            Q[iend:N+ng] = Q[i0:i0+ngr]
+            Q[0:i0]      = Q[N:N+ngl]
 
-        # Reconstructs the values of Q using a piecewise parabolic polynomial
-        rec.ppm_reconstruction(Q, px, simulation)
+            # Reconstructs the values of Q using a piecewise parabolic polynomial
+            ppm_reconstruction(Q, px, simulation)
 
-        # Compute the parabola
-        for k in range(0, N):
-            z = (xplot[neighbours==k]-x[k+i0])/dx # Maps to [0,1]
-            q_parabolic[neighbours==k] = px.q_L[k+i0] + px.dq[k+i0]*z+ z*(1.0-z)*px.q6[k+i0]
 
-        # Compute exact solution
-        q_exact = qexact_adv(xplot, 0, simulation)
-        q_exact_edges = qexact_adv(x, 0, simulation)
-        ymin = np.amin(q_exact)
-        ymax = np.amax(q_exact)
+            # Compute the parabola
+            for k in range(0, N):
+                z = (xplot[neighbours==k]-x[k+i0])/dx # Maps to [0,1]
+                q_parabolic[neighbours==k] = px.q_L[k+i0] + px.dq[k+i0]*z+ z*(1.0-z)*px.q6[k+i0]
 
-        # Relative errors in different metrics
-        error_linf[i], error_l1[i], error_l2[i] = compute_errors(q_exact, q_parabolic)
-        error_ed_linf[i], error_ed_l1[i], error_ed_l2[i] = compute_errors(q_exact_edges[i0:iend], px.q_L[i0:iend])
-        print('\nParameters: N = '+str(N))
+            # Compute exact solution
+            q_exact = qexact_adv(xplot, 0, simulation)
+            q_exact_edges = qexact_adv(x, 0, simulation)
+            ymin = np.amin(q_exact)
+            ymax = np.amax(q_exact)
 
-        # Output
-        #print_errors_simul(error_linf, error_l1, error_l2, i)
-        print_errors_simul(error_ed_linf, error_ed_l1, error_ed_l2, i)
+            # Relative errors in different metrics
+            error_linf[i,rec], error_l1[i,rec], error_l2[i,rec] = compute_errors(q_exact, q_parabolic)
+            error_ed_linf[i,rec], error_ed_l1[i,rec], error_ed_l2[i,rec] = compute_errors(q_exact_edges[i0:iend], px.q_L[i0:iend])
+            print('\nParameters: N = '+str(N)+', recon='+str(rec))
 
-    # Plot the error graph
-    title = 'Parabola errors\n ' + simulation.title + '- ' + simulation.recon_name + ' - ' + simulation.icname
-    filename = graphdir+'recon_1d_'+simulation.recon_name+'_ic'+str(ic)+'_parabola_errors.pdf'
-    plot_errors_loglog(Nc, [error_linf, error_l1, error_l2], ['$L_\infty$', '$L_1$','$L_2$'], filename, title)
+            # Output
+            #print_errors_simul(error_linf, error_l1, error_l2, i)
+            print_errors_simul(error_ed_linf[:,rec], error_ed_l1[:,rec], error_ed_l2[:,rec], i)
+        rec = rec+1
 
-    title2 = 'Edge errors\n' + simulation.title + '- ' + simulation.recon_name + ' - ' + simulation.icname
-    filename2 = graphdir+'recon_1d_'+simulation.recon_name+'_ic'+str(ic)+'_edge_errors.pdf'
-    plot_errors_loglog(Nc, [error_ed_linf, error_ed_l1, error_ed_l2], ['$L_\infty$', '$L_1$','$L_2$'], filename2, title2)
+    # plot errors for different all schemes in  different norms
+    error_list = [error_ed_linf, error_ed_l1, error_ed_l2]
+    #error_list = [error_linf, error_l1, error_l2]
+    norm_list  = ['linf','l1','l2']
+    norm_title  = [r'$L_{\infty}$',r'$L_1$',r'$L_2$']
 
-    # Plot the convergence rate - parabola
-    title = 'Convergence rate parabola- ' + simulation.recon_name + ' - ' + simulation.icname
-    filename = graphdir+'recon_1d_'+simulation.recon_name+'_ic'+str(ic)+'_convergence_rate_parabola.pdf'
-    plot_convergence_rate(Nc, [error_linf, error_l1, error_l2],['$L_\infty$', '$L_1$','$L_2$'], filename, title)
+    e = 0
+    for error in error_list:
+        emin, emax = np.amin(error[:]), np.amax(error[:])
 
-    # Plot the convergence rate - edges
-    title = 'Convergence rate at edges - ' + simulation.recon_name + ' - ' + simulation.icname
-    filename = graphdir+'recon_1d_'+simulation.recon_name+'_ic'+str(ic)+'_convergence_rate_ed.pdf'
-    plot_convergence_rate(Nc, [error_ed_linf, error_ed_l1, error_ed_l2], ['$L_\infty$', '$L_1$','$L_2$'], filename, title)
-    print('Convergence graphs has been ploted in '+filename+' and in '+filename2)
+        # convergence rate min/max
+        n = len(error)
+        CR = np.abs(np.log(error[1:n])-np.log(error[0:n-1]))/np.log(2.0)
+        CRmin, CRmax = np.amin(CR), np.amax(CR)
+        errors = []
+        dep_name = []
+        for r in range(0, len(recons)):
+            errors.append(error[:,r])
+            dep_name.append(recon_names[recons[r]-1])
+
+        title = simulation.title + ' - ' + simulation.icname+', norm='+norm_title[e]
+        filename = graphdir+'recon_1d_ic'+str(ic)+'_norm'+norm_list[e]+'_parabola_errors.pdf'
+
+        plot_errors_loglog(Nc, errors, dep_name, filename, title, emin, emax)
+
+        # Plot the convergence rate
+        title = 'Convergence rate - ' + simulation.icname+', norm='+norm_title[e]
+        filename = graphdir+'recon_1d_ic'+str(ic)+'_norm'+norm_list[e]+'_convergence_rate.pdf'
+        plot_convergence_rate(Nc, errors, dep_name, filename, title, CRmin, CRmax)
+        e = e+1
+
