@@ -78,7 +78,7 @@ class simulation_adv_par_1d:
         if vf == 1:
            name = 'constant velocity'
         elif vf == 2:
-            name = 'variable velocity 1'
+            name = 'variable velocity'
         else:
             print("Error in simulation_adv_par_1d- invalid velocity:", vf)
             exit()
@@ -104,7 +104,9 @@ class simulation_adv_par_1d:
         if dp == 1:
             dp_name = 'RK1' # Euler
         elif dp == 2:
-            dp_name = 'RK3'
+            dp_name = 'RK2' # 2nd order Runge-Kutta
+        elif dp == 3:
+            dp_name = 'RK3' # 3rd order Runge-Kutta
         else:
            print("Error in simulation_adv_par_1d - invalid departure point scheme", dp)
            exit()
@@ -130,7 +132,7 @@ class simulation_adv_par_1d:
         self.x, self.xc, self.dx = grid_1d(x0, xf, N, self.ngl, self.ngr, self.ng)
 
         # RK vars
-        if dp == 2:
+        if dp == 3:
             self.K1 = np.zeros(np.shape(self.x))
             self.K2 = np.zeros(np.shape(self.x))
             self.K3 = np.zeros(np.shape(self.x))
@@ -186,14 +188,14 @@ class simulation_recon_par_1d:
         if recon == 1:
             recon_name = 'PPM-0'
         elif recon == 2:
-            recon_name = 'PPM-CW84' #Monotonization from Collela and Woodward 84 paper
+            recon_name = 'PPM-CW84' # Monotonization from Collela and Woodward 84 paper
         elif recon == 3:
-            recon_name = 'PPM-PL07'    #Quasi-fifth order from Putman and Lin 07 paper
+            recon_name = 'PPM-PL07' # Quasi-fifth order from Putman and Lin 07 paper
         elif recon == 4:
-            recon_name = 'PPM-L04' #Monotonization from Lin 04 paper
+            recon_name = 'PPM-L04'  # Monotonization from Lin 04 paper
 
         else:
-           print("Error - invalid flux method")
+           print("Error - invalid reconstruction method")
            exit()
 
         # Interval endpoints
@@ -267,3 +269,15 @@ class ppm_parabola:
             self.dQ_min  = np.zeros(N+ng)
             self.dQ_max  = np.zeros(N+ng)
             self.dQ_mono = np.zeros(N+ng)
+
+####################################################################################
+#  Velocity at class
+####################################################################################
+class velocity_edges:
+    def __init__(self, simulation):
+        N = simulation.N
+        ng = simulation.ng
+
+        self.u = np.zeros(N+1+ng)
+        self.u_averaged = np.zeros(N+1+ng) # used for departure point
+        self.u_old      = np.zeros(N+1+ng) # used for departure point

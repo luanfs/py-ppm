@@ -111,11 +111,11 @@ def get_adv_parameters_1d(filename):
         print("--------------------------------------------------------\n")
 
         # check validity of ic and vf
-        if ic >=5:
+        if ic>=4:
             print('ERROR in get_adv_parameters_1d: invalid initial condition')
             exit()
 
-        if vf >=4:
+        if vf>=3:
             print('ERROR in get_adv_parameters_1d: invalid velocity field')
             exit()
 

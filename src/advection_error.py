@@ -49,7 +49,7 @@ def error_analysis_adv1d(simulation):
         dt[0] = CFL/(N[0]*abs(u))*(xf-x0)
         Tf = 5.0
     elif simulation.vf==2: #variable velocity
-        u0 = 0.2
+        u0 = 0.4
         dt[0] = CFL/(N[0])*(xf-x0)/u0
         Tf = 5.0
     else:
@@ -62,7 +62,7 @@ def error_analysis_adv1d(simulation):
     #recons = (simulation.recon,)
     #deps = (simulation.dp,)
     recon_names = ['PPM-0', 'PPM-CW84','PPM-PL07','PPM-L04']
-    dp_names = ['RK1', 'RK3']
+    dp_names = ['RK1', 'RK2','RK3']
     error_linf = np.zeros((Ntest, len(recons), len(deps)))
     error_l1   = np.zeros((Ntest, len(recons), len(deps)))
     error_l2   = np.zeros((Ntest, len(recons), len(deps)))

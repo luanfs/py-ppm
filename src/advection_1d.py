@@ -18,64 +18,30 @@
 ####################################################################################
 
 import numpy as np
-from parameters_1d       import graphdir, ppm_parabola
-from advection_ic        import q0_adv, qexact_adv, Qexact_adv, q0_antiderivative_adv, velocity_adv_1d
 from errors              import *
 from output              import print_diagnostics_adv_1d, output_adv
 from diagnostics         import diagnostics_adv_1d
 from plot                import plot_1dfield_graphs
 from advection_timestep  import time_step_adv1d_ppm
+from advection_vars      import adv_vars
+from parameters_1d       import graphdir
 
 def adv_1d(simulation, plot):
-    N  = simulation.N    # Number of cells
-    ic = simulation.ic   # Initial condition
-    x  = simulation.x    # Grid
-    xc = simulation.xc
-    x0 = simulation.x0
-    xf = simulation.xf
-    dx = simulation.dx   # Grid spacing
     dt = simulation.dt   # Time step
     Tf = simulation.Tf   # Total period definition
-    tc = simulation.tc
-    icname = simulation.icname
-    recon = simulation.recon # Reconstruction scheme
-    dp = simulation.dp # Departure point scheme
-
-    # Ghost cells
-    ngl = simulation.ngl
-    ngr = simulation.ngr
-    ng  = simulation.ng
 
     # Grid interior indexes
     i0 = simulation.i0
     iend = simulation.iend
 
-    # Velocity at edges
-    u_edges = np.zeros(N+ng+1)
-    u_edges[:] = velocity_adv_1d(x[0:N+ng+1], 0, simulation)
-
-
-    # CFL at edges - x direction
-    cx = u_edges[:]*dt/dx
-    CFL = np.amax(abs(cx))
-
     # Number of time steps
     Nsteps = int(Tf/dt)
 
-    # Compute average values of Q (initial condition)
-    Q = np.zeros(N+ng)
+    # Plot timestep
+    plotstep = int(Nsteps/5)
 
-    # PPM parabola
-    px = ppm_parabola(simulation)
-
-    if (simulation.ic == 0 or simulation.ic == 1 or simulation.ic == 3 or simulation.ic == 4):
-        Q[i0:iend] = (q0_antiderivative_adv(x[i0+1:iend+1], simulation) - q0_antiderivative_adv(x[i0:iend], simulation))/dx
-    elif (simulation.ic == 2 or simulation.ic >= 5):
-        Q[i0:iend] = q0_adv(xc[i0:iend],simulation)
-
-    # Periodic boundary conditions
-    Q[iend:N+ng] = Q[i0:i0+ngr]
-    Q[0:i0]      = Q[N:N+ngl]
+    # Get vars
+    Q, U_edges, px, cx, x, xc, CFL = adv_vars(simulation)
 
     # Compute initial mass
     total_mass0, mass_change = diagnostics_adv_1d(Q[i0:iend], simulation, 1.0)
@@ -85,16 +51,13 @@ def adv_1d(simulation, plot):
     error_l1   = np.zeros(Nsteps+1)
     error_l2   = np.zeros(Nsteps+1)
 
-    # Plot timestep
-    plotstep = int(Nsteps/5)
-
     #-------------------Time looping-------------------
     for k in range(1, Nsteps+1):
         # Time
         t = k*dt
 
         # PPM time step
-        time_step_adv1d_ppm(Q, u_edges, cx, px, x, t, k, simulation)
+        time_step_adv1d_ppm(Q, U_edges, cx, px, x, t, k, simulation)
 
         # Output
         output_adv(x, xc, simulation, Q, px, error_linf, error_l1, error_l2, plot, k, t, Nsteps, plotstep, total_mass0, CFL)
@@ -104,8 +67,8 @@ def adv_1d(simulation, plot):
     if plot:
         CFL = str("{:.2e}".format(CFL))
         # Plot the error graph
-        title = simulation.title +'- '+icname+', CFL='+str(CFL)+',\n N='+str(N)+', '+simulation.recon_name
-        filename = graphdir+'1d_adv_tc'+str(tc)+'_ic'+str(ic)+'_vf'+str(simulation.vf)+'_N'+str(N)+'_'+simulation.recon_name+'_dp'+simulation.dp_name
+        title = simulation.title +'- '+simulation.icname+', CFL='+str(CFL)+',\n N='+str(simulation.N)+', '+simulation.recon_name
+        filename = graphdir+'1d_adv_tc'+str(simulation.tc)+'_ic'+str(simulation.ic)+'_vf'+str(simulation.vf)+'_N'+str(simulation.N)+'_'+simulation.recon_name+'_dp'+simulation.dp_name
         plot_time_evolution([error_linf, error_l1, error_l2], Tf, ['$L_\infty}$','$L_1$','$L_2$'], 'Error', filename, title)
         print('\nGraphs have been ploted in '+ graphdir)
         print('Error evolution is shown in '+filename)

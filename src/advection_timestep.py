@@ -16,7 +16,7 @@ from averaged_velocity import time_averaged_velocity
 # The interior indexes are in [i0:iend], the other indexes are used for
 # periodic boundary conditions.
 ####################################################################################
-def time_step_adv1d_ppm(Q, u_edges, cx, px, x, t, k, simulation):
+def time_step_adv1d_ppm(Q, U_edges, cx, px, x, t, k, simulation):
     N = simulation.N
 
     # Ghost cells
@@ -35,10 +35,10 @@ def time_step_adv1d_ppm(Q, u_edges, cx, px, x, t, k, simulation):
     dx = simulation.dx
 
     # Compute the time averaged velocity (needed for departure point)
-    time_averaged_velocity(u_edges, k, t, simulation)
+    time_averaged_velocity(U_edges, k, t, simulation)
 
     # CFL number
-    cx[:] = u_edges[:]*(simulation.dt/simulation.dx) #cfl number
+    cx[:] = U_edges.u_averaged[:]*(simulation.dt/simulation.dx) #cfl number
 
     # Reconstructs the values of Q using a piecewise parabolic polynomial
     ppm_reconstruction(Q, px, simulation)
@@ -47,8 +47,7 @@ def time_step_adv1d_ppm(Q, u_edges, cx, px, x, t, k, simulation):
     flux_ppm(px, cx, simulation)
 
     # Update the values of Q_average (formula 1.12 from Collela and Woodward 1984)
-    Q[i0:iend] = Q[i0:iend] - (simulation.dt/simulation.dx)*\
-    (u_edges[i0+1:iend+1]*px.f_upw[i0+1:iend+1] - u_edges[i0:iend]*px.f_upw[i0:iend])
+    Q[i0:iend] = Q[i0:iend] - (cx[i0+1:iend+1]*px.f_upw[i0+1:iend+1] - cx[i0:iend]*px.f_upw[i0:iend])
 
     # Periodic boundary conditions
     Q[iend:N+ng] = Q[i0:i0+ngr]
@@ -56,5 +55,6 @@ def time_step_adv1d_ppm(Q, u_edges, cx, px, x, t, k, simulation):
 
     # Velocity and CFL update for next time step
     if simulation.vf>=2:
-        u_edges[:] = velocity_adv_1d(x, t, simulation)
+        U_edges.u_old[:] = U_edges.u[:]
+        U_edges.u[:] = velocity_adv_1d(x, t, simulation)
 
