@@ -121,9 +121,12 @@ def Qexact_adv(x, t, simulation):
 def velocity_adv_1d(x, t, simulation):
     if simulation.vf == 1:
         u = 0.2
+
     elif simulation.vf == 2:
         T = 5
         u0 = 0.2
-        u = u0*np.sin(np.pi*x)**2*np.cos(1.0*np.pi*t/T)
+        u1 = 0.2
+        u = u0*np.sin(np.pi*(x-t/T))**2*np.cos(np.pi*t/T) + u1
 
     return u
+

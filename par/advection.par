@@ -1,8 +1,8 @@
 #Parameters 
 #Total period definition (seconds)
-5.0
+2.5
 #Time step (seconds)
-0.001
+0.0625
 #Initial condition
 2
 #Velocity
@@ -10,9 +10,9 @@
 #Test case
 1
 #Reconstruction (1, 2, 3 or 4)
-1
+4
 #Departure point scheme (1, 2 or 3)
-2
+1
 #-----------Description of parameters -------------------------------------
 #Possible initial conditions
 #  case(1) - sine wave
@@ -21,7 +21,7 @@
 #  case(4) - rectangular wave
 #Possible velocity fields
 #  case(1) - constant velocity
-#  case(2) - variable velocity cos(pi*t/5)*sin^2(pi*x)
+#  case(2) - variable velocity
 #Possible test cases
 #  case(1) - Advection simulation
 #  case(2) - Convergence of error for advection equation
