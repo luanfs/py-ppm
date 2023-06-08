@@ -7,7 +7,7 @@
 from advection_ic import velocity_adv_1d
 import numpy as np
 
-def time_averaged_velocity(U_edges, k, t, simulation):
+def time_averaged_velocity(U_edges, simulation, t):
     # Interior grid indexes
     i0   = simulation.i0
     iend = simulation.iend

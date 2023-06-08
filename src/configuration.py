@@ -111,7 +111,7 @@ def get_adv_parameters_1d(filename):
         print("--------------------------------------------------------\n")
 
         # check validity of ic and vf
-        if ic>=4:
+        if ic>4:
             print('ERROR in get_adv_parameters_1d: invalid initial condition')
             exit()
 

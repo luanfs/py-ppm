@@ -16,7 +16,7 @@ from averaged_velocity import time_averaged_velocity
 # The interior indexes are in [i0:iend], the other indexes are used for
 # periodic boundary conditions.
 ####################################################################################
-def time_step_adv1d_ppm(Q, U_edges, cx, px, x, t, k, simulation):
+def time_step_adv1d_ppm(t, k, simulation):
     N = simulation.N
 
     # Ghost cells
@@ -34,27 +34,30 @@ def time_step_adv1d_ppm(Q, U_edges, cx, px, x, t, k, simulation):
     # Grid size
     dx = simulation.dx
 
+    # Periodic boundary conditions
+    simulation.Q[iend:N+ng] = simulation.Q[i0:i0+ngr]
+    simulation.Q[0:i0]      = simulation.Q[N:N+ngl]
+
     # Compute the time averaged velocity (needed for departure point)
-    time_averaged_velocity(U_edges, k, t, simulation)
+    time_averaged_velocity(simulation.U_edges, simulation, t)
 
     # CFL number
-    cx[:] = U_edges.u_averaged[:]*(simulation.dt/simulation.dx) #cfl number
+    simulation.cx[:] = simulation.U_edges.u_averaged[:]*(simulation.dt/simulation.dx) #cfl number
 
     # Reconstructs the values of Q using a piecewise parabolic polynomial
-    ppm_reconstruction(Q, px, simulation)
+    ppm_reconstruction(simulation.Q, simulation.px, simulation)
 
     # Compute the fluxes
-    flux_ppm(px, cx, simulation)
+    flux_ppm(simulation.px, simulation.cx, simulation.U_edges, simulation)
+
+    # divergence
+    simulation.div[i0:iend] = (simulation.px.f_upw[i0+1:iend+1]-simulation.px.f_upw[i0:iend])/dx
 
     # Update the values of Q_average (formula 1.12 from Collela and Woodward 1984)
-    Q[i0:iend] = Q[i0:iend] - (cx[i0+1:iend+1]*px.f_upw[i0+1:iend+1] - cx[i0:iend]*px.f_upw[i0:iend])
-
-    # Periodic boundary conditions
-    Q[iend:N+ng] = Q[i0:i0+ngr]
-    Q[0:i0]      = Q[N:N+ngl]
+    simulation.Q[i0:iend] = simulation.Q[i0:iend] - dt*simulation.div[i0:iend] 
 
     # Velocity and CFL update for next time step
     if simulation.vf>=2:
-        U_edges.u_old[:] = U_edges.u[:]
-        U_edges.u[:] = velocity_adv_1d(x, t, simulation)
+        simulation.U_edges.u_old[:] = simulation.U_edges.u[:]
+        simulation.U_edges.u[:] = velocity_adv_1d(simulation.x, t, simulation)
 

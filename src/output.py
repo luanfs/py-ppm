@@ -25,7 +25,7 @@ def print_diagnostics_adv_1d(error_linf, error_l1, error_l2, mass_change, t, Nst
 ####################################################################################
 # Output and plot
 ####################################################################################
-def output_adv(x, xc, simulation, Q, px, error_linf, error_l1, error_l2, plot, k, t, Nsteps, plotstep, total_mass0, CFL):
+def output_adv(simulation, plot, k, t, Nsteps, plotstep):
     N = simulation.N
     dx = simulation.dx
     dt = simulation.dt
@@ -41,12 +41,12 @@ def output_adv(x, xc, simulation, Q, px, error_linf, error_l1, error_l2, plot, k
 
     if plot or k==Nsteps:
         # Compute exact averaged solution
-        Q_exact = Qexact_adv(x, t, simulation)
+        Q_exact = Qexact_adv(simulation.x, t, simulation)
 
         # Relative errors in different metrics
         #error_linf[k], error_l1[k], error_l2[k] = compute_errors(q_parabolic, q_exact)
-        error_linf[k], error_l1[k], error_l2[k] = compute_errors(Q_exact, Q[i0:iend])
-        if error_linf[k] > 10**(4):
+        simulation.error_linf[k], simulation.error_l1[k], simulation.error_l2[k] = compute_errors(Q_exact, simulation.Q[i0:iend])
+        if simulation.error_linf[k] > 10**(4):
             # CFL number
             #CFL = abs(np.amax(abs(u_edges)*dt/dx))
             print('\nStopping due to large errors.')
@@ -54,16 +54,18 @@ def output_adv(x, xc, simulation, Q, px, error_linf, error_l1, error_l2, plot, k
             exit()
 
         # Diagnostic computation
-        total_mass, mass_change = diagnostics_adv_1d(Q[i0:iend], simulation, total_mass0)
+        simulation.total_mass, simulation.mass_change = diagnostics_adv_1d(simulation.Q[i0:iend], simulation, simulation.total_mass0)
 
         if plot:
             # Print diagnostics on the screen
-            print_diagnostics_adv_1d(error_linf[k], error_l1[k], error_l2[k], mass_change, k, Nsteps)
+            print_diagnostics_adv_1d(simulation.error_linf[k], simulation.error_l1[k], simulation.error_l2[k], simulation.mass_change, k, Nsteps)
 
         if (k-1)%plotstep==0 or k==Nsteps:
             # Plotting variables
             x0 = simulation.x0
             xf = simulation.xf
+            xc = simulation.xc
+            x  = simulation.x
             Nplot = 10000
             xplot = np.linspace(x0, xf, Nplot)
             q_parabolic = np.zeros(Nplot)
@@ -75,7 +77,7 @@ def output_adv(x, xc, simulation, Q, px, error_linf, error_l1, error_l2, plot, k
                 time = t-dt
             else:
                 time = t
-                ppm_reconstruction(Q, px, simulation) #update parabola coeffs for final step
+                ppm_reconstruction(simulation.Q, simulation.px, simulation) #update parabola coeffs for final step
 
             # Compute exact solution
             q_exact = qexact_adv(xplot, time, simulation)
@@ -83,7 +85,7 @@ def output_adv(x, xc, simulation, Q, px, error_linf, error_l1, error_l2, plot, k
             # Compute the parabola
             for i in range(0, N):
                 z = (xplot[neighbours==i]-x[i+i0])/dx # Maps to [0,1]
-                q_parabolic[neighbours==i] = px.q_L[i+i0] + px.dq[i+i0]*z+ z*(1.0-z)*px.q6[i+i0]
+                q_parabolic[neighbours==i] = simulation.px.q_L[i+i0] + simulation.px.dq[i+i0]*z+ z*(1.0-z)*simulation.px.q6[i+i0]
 
             # Additional plotting variables
             ymin = np.amin(q_exact)
@@ -95,9 +97,9 @@ def output_adv(x, xc, simulation, Q, px, error_linf, error_l1, error_l2, plot, k
             vf = simulation.vf
 
             # Plot the solution graph
-            qmin = str("{:.2e}".format(np.amin(Q)))
-            qmax = str("{:.2e}".format(np.amax(Q)))
-            CFL  = str("{:.2e}".format(CFL))
+            qmin = str("{:.2e}".format(np.amin(simulation.Q)))
+            qmax = str("{:.2e}".format(np.amax(simulation.Q)))
+            CFL  = str("{:.2e}".format(simulation.CFL))
             time = str("{:.2e}".format(time))
 
             title = icname+', velocity = '+str(simulation.vf)+', CFL='+str(CFL)+', N='+str(N)+', time = '+str(time)+'\n'\

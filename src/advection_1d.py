@@ -41,15 +41,15 @@ def adv_1d(simulation, plot):
     plotstep = int(Nsteps/5)
 
     # Get vars
-    Q, U_edges, px, cx, x, xc, CFL = adv_vars(simulation)
+    adv_vars(simulation)
 
     # Compute initial mass
-    total_mass0, mass_change = diagnostics_adv_1d(Q[i0:iend], simulation, 1.0)
+    simulation.total_mass0, simulation.mass_change = diagnostics_adv_1d(simulation.Q[i0:iend], simulation, 1.0)
 
     # Error variables
-    error_linf = np.zeros(Nsteps+1)
-    error_l1   = np.zeros(Nsteps+1)
-    error_l2   = np.zeros(Nsteps+1)
+    simulation.error_linf = np.zeros(Nsteps+1)
+    simulation.error_l1   = np.zeros(Nsteps+1)
+    simulation.error_l2   = np.zeros(Nsteps+1)
 
     #-------------------Time looping-------------------
     for k in range(1, Nsteps+1):
@@ -57,21 +57,21 @@ def adv_1d(simulation, plot):
         t = k*dt
 
         # PPM time step
-        time_step_adv1d_ppm(Q, U_edges, cx, px, x, t, k, simulation)
+        time_step_adv1d_ppm(t, k, simulation)
 
         # Output
-        output_adv(x, xc, simulation, Q, px, error_linf, error_l1, error_l2, plot, k, t, Nsteps, plotstep, total_mass0, CFL)
+        output_adv(simulation, plot, k, t, Nsteps, plotstep)
     # -------------------End of time loop-------------------
 
     #-------------------Final plot and outputs -------------------
     if plot:
-        CFL = str("{:.2e}".format(CFL))
+        CFL = str("{:.2e}".format(simulation.CFL))
         # Plot the error graph
         title = simulation.title +'- '+simulation.icname+', CFL='+str(CFL)+',\n N='+str(simulation.N)+', '+simulation.recon_name
         filename = graphdir+'1d_adv_tc'+str(simulation.tc)+'_ic'+str(simulation.ic)+'_vf'+str(simulation.vf)+'_N'+str(simulation.N)+'_'+simulation.recon_name+'_dp'+simulation.dp_name
-        plot_time_evolution([error_linf, error_l1, error_l2], Tf, ['$L_\infty}$','$L_1$','$L_2$'], 'Error', filename, title)
+        plot_time_evolution([simulation.error_linf, simulation.error_l1, simulation.error_l2], Tf, ['$L_\infty}$','$L_1$','$L_2$'], 'Error', filename, title)
         print('\nGraphs have been ploted in '+ graphdir)
         print('Error evolution is shown in '+filename)
     else:
         # Return final errors
-        return error_linf[Nsteps], error_l1[Nsteps], error_l2[Nsteps]
+        return simulation.error_linf[Nsteps], simulation.error_l1[Nsteps], simulation.error_l2[Nsteps]

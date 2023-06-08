@@ -6,7 +6,7 @@
 # (luan.santos@usp.br)
 ####################################################################################
 import numpy as np
-from parameters_1d import simulation_adv_par_1d, graphdir, ppm_parabola
+from parameters_1d import simulation_adv_par_1d, graphdir, ppm_parabola, velocity
 from advection_timestep import time_step_adv1d_ppm
 import matplotlib.pyplot as plt
 import matplotlib.ticker as tck
@@ -82,8 +82,19 @@ def stability_analysis():
                 Qimag[:] = Q_old.imag[:]
 
                 # apply ppm operator
-                time_step_adv1d_ppm(Qreal, u_edges, cx, px, x, 0.0, 1, simulation)
-                time_step_adv1d_ppm(Qimag, u_edges, cx, px, x, 0.0, 1, simulation)
+                simulation.U_edges = velocity(simulation)
+                simulation.U_edges.u[:] = u_edges[:]
+                simulation.U_edges.u_old[:] = u_edges[:]
+                simulation.U_edges.u_averaged[:] = u_edges[:]
+                simulation.px = ppm_parabola(simulation)
+                simulation.Q[:] = Qreal[:]
+                time_step_adv1d_ppm(0.0, 1, simulation)
+                Qreal[:] = simulation.Q[:] 
+
+                simulation.Q[:] = Qimag[:]
+                time_step_adv1d_ppm(0.0, 1, simulation)
+                Qimag[:] = simulation.Q[:]
+
                 Q = Qreal + 1j*Qimag
 
                 # compute amplification factor

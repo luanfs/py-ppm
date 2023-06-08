@@ -22,7 +22,7 @@
 ####################################################################################
 import numpy as np
 
-def flux_ppm(px, cx, simulation):
+def flux_ppm(px, cx, U_edges, simulation):
     N = simulation.N
     ng = simulation.ng
     i0 = simulation.i0
@@ -38,6 +38,7 @@ def flux_ppm(px, cx, simulation):
     # Upwind flux - Formula 1.13 from Collela and Woodward 1984)
     px.f_upw[cx >= 0] = px.f_L[cx >= 0]
     px.f_upw[cx <= 0] = px.f_R[cx <= 0]
+    px.f_upw[:] = U_edges.u_averaged[:]*px.f_upw[:]
 
 """
 ####################################################################################

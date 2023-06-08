@@ -74,7 +74,6 @@ class simulation_adv_par_1d:
         # IC name
         self.icname = name
 
-
         if vf == 1:
            name = 'constant velocity'
         elif vf == 2:
@@ -152,6 +151,30 @@ class simulation_adv_par_1d:
             print("Error in simulation_adv_par_1d- invalid test case")
             exit()
 
+        # Variable of the advection model
+        ng = self.ng
+        self.Q = np.zeros(N+ng)
+
+        # PPM parabola
+        self.px = None
+
+        # Numerical divergence
+        self.div = np.zeros(N+ng)
+
+        # Velocity at edges
+        self.U_edges = None
+
+        # CFL
+        self.cx = np.zeros(N+ng+1)
+        self.CFL = 0.0
+
+        # Mass
+        self.total_mass0 = 0.0
+        self.total_mass  = 0.0
+        self.mass_change = 0.0
+
+        # Errors
+        self.error_linf, self.error_l1, self.error_l2 = None, None, None
 
 ####################################################################################
 #  Reconstruction simulation class
@@ -273,7 +296,7 @@ class ppm_parabola:
 ####################################################################################
 #  Velocity at class
 ####################################################################################
-class velocity_edges:
+class velocity:
     def __init__(self, simulation):
         N = simulation.N
         ng = simulation.ng

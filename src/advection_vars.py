@@ -4,7 +4,7 @@
 ####################################################################################
 
 import numpy as np
-from parameters_1d       import ppm_parabola, velocity_edges
+from parameters_1d       import ppm_parabola, velocity
 from advection_ic        import q0_adv, qexact_adv, Qexact_adv, q0_antiderivative_adv, velocity_adv_1d
 
 def adv_vars(simulation):
@@ -31,28 +31,25 @@ def adv_vars(simulation):
     iend = simulation.iend
 
     # Velocity at edges
-    U_edges = velocity_edges(simulation)
-    U_edges.u[:] = velocity_adv_1d(x[0:N+ng+1], 0, simulation)
-    U_edges.u_old[:] = U_edges.u[:]
+    simulation.U_edges = velocity(simulation)
+    simulation.U_edges.u[:] = velocity_adv_1d(x[0:N+ng+1], 0, simulation)
+    simulation.U_edges.u_old[:] = simulation.U_edges.u[:]
 
     # CFL at edges - x direction
-    cx = U_edges.u[:]*dt/dx
-    CFL = np.amax(abs(cx))
+    simulation.cx = simulation.U_edges.u[:]*dt/dx
+    simulation.CFL = np.amax(abs(simulation.cx))
 
     # Compute average values of Q (initial condition)
-    Q = np.zeros(N+ng)
-
     # PPM parabola
-    px = ppm_parabola(simulation)
+    simulation.px = ppm_parabola(simulation)
 
     if (simulation.ic == 0 or simulation.ic == 1 or simulation.ic == 3 or simulation.ic == 4):
-        Q[i0:iend] = (q0_antiderivative_adv(x[i0+1:iend+1], simulation) - q0_antiderivative_adv(x[i0:iend], simulation))/dx
+        simulation.Q[i0:iend] = (q0_antiderivative_adv(x[i0+1:iend+1], simulation) - q0_antiderivative_adv(x[i0:iend], simulation))/dx
     elif (simulation.ic == 2 or simulation.ic >= 5):
-        Q[i0:iend] = q0_adv(xc[i0:iend],simulation)
+        simulation.Q[i0:iend] = q0_adv(xc[i0:iend],simulation)
 
     # Periodic boundary conditions
-    Q[iend:N+ng] = Q[i0:i0+ngr]
-    Q[0:i0]      = Q[N:N+ngl]
+    simulation.Q[iend:N+ng] = simulation.Q[i0:i0+ngr]
+    simulation.Q[0:i0]      = simulation.Q[N:N+ngl]
 
-
-    return Q, U_edges, px, cx, x, xc, CFL
+    return
