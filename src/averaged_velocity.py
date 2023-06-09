@@ -6,6 +6,7 @@
 ####################################################################################
 from advection_ic import velocity_adv_1d
 import numpy as np
+import numexpr as ne
 
 def time_averaged_velocity(U_edges, simulation, t):
     # Interior grid indexes
@@ -13,6 +14,9 @@ def time_averaged_velocity(U_edges, simulation, t):
     iend = simulation.iend
     N    = simulation.N
     ng   = simulation.ng
+    u = U_edges.u[i0:iend+1]
+    U_edges.upos = ne.evaluate('u>=0')
+    U_edges.uneg = ~U_edges.upos
 
     # Compute the velocity needed for the departure point
     if simulation.vf == 1: # constant velocity
@@ -28,19 +32,17 @@ def time_averaged_velocity(U_edges, simulation, t):
             dto2 = simulation.dto2
             twodt = simulation.twodt
 
-            # First departure point estimate
-            xd = x-dto2*U_edges.u[:]
-
             # Velocity data at edges used for interpolation
-            u_interp = 1.5*U_edges.u[:] - 0.5*U_edges.u_old[:] # extrapolation for time at n+1/2
+            u_interp = ne.evaluate('1.5*u - 0.5*u_old', local_dict=vars(U_edges)) # extrapolation for time at n+1/2
 
             # Linear interpolation
-            #U_edges.u_averaged[i0:iend+1] = np.interp(xd[i0:iend+1], x[i0-1:iend+2], u_interp[i0-1:iend+2])
-            a = (x[i0:iend+1]-xd[i0:iend+1])/simulation.dx
-            upos = U_edges.u[i0:iend+1]>=0
-            uneg = ~upos
-            U_edges.u_averaged[i0:iend+1][upos] = (1.0-a[upos])*u_interp[i0:iend+1][upos] + a[upos]*u_interp[i0-1:iend][upos]
-            U_edges.u_averaged[i0:iend+1][uneg] = -a[uneg]*u_interp[i0+1:iend+2][uneg] + (1.0+a[uneg])*u_interp[i0:iend+1][uneg]
+            upos, uneg = U_edges.upos, U_edges.uneg
+            a = (U_edges.u[i0:iend+1]*dto2)/simulation.dx
+            ap, an = a[upos], u[uneg]
+            u1, u2 = u_interp[i0-1:iend][upos], u_interp[i0:iend+1][upos] 
+            u3, u4 = u_interp[i0:iend+1][uneg], u_interp[i0+1:iend+2][uneg]
+            U_edges.u_averaged[i0:iend+1][upos] = ne.evaluate('(1.0-ap)*u2 + ap*u1')
+            U_edges.u_averaged[i0:iend+1][uneg] = ne.evaluate('-an*u4 + (1.0+an)*u3')
 
         elif simulation.dp == 3:
             x = simulation.x

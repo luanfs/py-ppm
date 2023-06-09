@@ -304,3 +304,5 @@ class velocity:
         self.u = np.zeros(N+1+ng)
         self.u_averaged = np.zeros(N+1+ng) # used for departure point
         self.u_old      = np.zeros(N+1+ng) # used for departure point
+        self.upos = None
+        self.uneg = None
