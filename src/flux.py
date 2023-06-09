@@ -21,6 +21,7 @@
 # Inputs: Q (average values), cx (CFL at edges)
 ####################################################################################
 import numpy as np
+import numexpr as ne
 
 def flux_ppm(px, cx, U_edges, simulation):
     N = simulation.N
@@ -30,16 +31,24 @@ def flux_ppm(px, cx, U_edges, simulation):
 
     # Compute the fluxes (formula 1.12 from Collela and Woodward 1984)
     # Flux at left edges
-    px.f_L[i0:iend+1] = px.q_R[i0-1:iend] - cx[i0:iend+1]*0.5*(px.dq[i0-1:iend] - (1.0-(2.0/3.0)*cx[i0:iend+1])*px.q6[i0-1:iend])
+    c   = cx[i0:iend+1]
+    q_R = px.q_R[i0-1:iend]
+    dq  = px.dq[i0-1:iend]
+    q6  = px.q6[i0-1:iend]
+    px.f_L[i0:iend+1] = ne.evaluate("q_R + c*0.5*(q6-dq) - q6*c*c/3.0")
 
     # Flux at right edges
-    px.f_R[i0:iend+1] = px.q_L[i0:iend+1] - cx[i0:iend+1]*0.5*(px.dq[i0:iend+1] + (1.0+2.0/3.0*cx[i0:iend+1])*px.q6[i0:iend+1])
+    c   = cx[i0:iend+1]
+    q_L = px.q_L[i0:iend+1]
+    dq  = px.dq[i0:iend+1]
+    q6  = px.q6[i0:iend+1]
+    px.f_R[i0:iend+1] = ne.evaluate("q_L - c*0.5*(q6+dq) - q6*c*c/3.0")
 
-    # Upwind flux - Formula 1.13 from Collela and Woodward 1984)
-    px.f_upw[cx >= 0] = px.f_L[cx >= 0]
-    px.f_upw[cx <= 0] = px.f_R[cx <= 0]
+    # F - Formula 1.13 from Collela and Woodward 1984)
+    mask = ne.evaluate('cx >= 0')
+    px.f_upw[mask]  = px.f_L[mask]
+    px.f_upw[~mask] = px.f_R[~mask]
     px.f_upw[:] = U_edges.u_averaged[:]*px.f_upw[:]
-
 """
 ####################################################################################
 # Compute the flux operator from PPM using its stencil
