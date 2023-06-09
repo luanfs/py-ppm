@@ -38,7 +38,7 @@ def time_averaged_velocity(U_edges, simulation, t):
             # Linear interpolation
             upos, uneg = U_edges.upos, U_edges.uneg
             a = (U_edges.u[i0:iend+1]*dto2)/simulation.dx
-            ap, an = a[upos], u[uneg]
+            ap, an = a[upos], a[uneg]
             u1, u2 = u_interp[i0-1:iend][upos], u_interp[i0:iend+1][upos] 
             u3, u4 = u_interp[i0:iend+1][uneg], u_interp[i0+1:iend+2][uneg]
             U_edges.u_averaged[i0:iend+1][upos] = ne.evaluate('(1.0-ap)*u2 + ap*u1')
