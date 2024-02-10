@@ -109,14 +109,15 @@ def ppm_reconstruction(Q, px, simulation):
 
     elif px.recon_name == 'PPM-L04':  #PPM with monotonization from Lin 04 paper
         # Formula B1 from Lin 04
-        px.dQ[i0-3:iend+3] = 0.25*(Q[i0-2:iend+4] - Q[i0-4:iend+2])
-        px.dQ_min[i0-3:iend+3]  = np.maximum(np.maximum(Q[i0-4:iend+2], Q[i0-3:iend+3]), Q[i0-2:iend+4]) - Q[i0-3:iend+3]
-        px.dQ_max[i0-3:iend+3]  = Q[i0-3:iend+3] - np.minimum(np.minimum(Q[i0-4:iend+2], Q[i0-3:iend+3]), Q[i0-2:iend+4])
-        px.dQ_mono[i0-3:iend+3] = np.minimum(np.minimum(abs(px.dQ[i0-3:iend+3]), px.dQ_min[i0-3:iend+3]), px.dQ_max[i0-3:iend+3]) * np.sign(px.dQ[i0-3:iend+3])
+        px.dQ[i0-2:iend+2] = 0.25*(Q[i0-1:iend+3] - Q[i0-3:iend+1])
+        px.dQ_min[i0-2:iend+2]  = np.maximum(np.maximum(Q[i0-3:iend+1], Q[i0-2:iend+2]), Q[i0-1:iend+3]) - Q[i0-2:iend+2]
+        px.dQ_max[i0-2:iend+2]  = Q[i0-2:iend+2] - np.minimum(np.minimum(Q[i0-3:iend+1], Q[i0-2:iend+2]), Q[i0-1:iend+3])
+        px.dQ_mono[i0-2:iend+2] = np.minimum(np.minimum(abs(px.dQ[i0-2:iend+2]), px.dQ_min[i0-2:iend+2]), px.dQ_max[i0-2:iend+2]) * np.sign(px.dQ[i0-2:iend+2])
         #dQ_mono[i0-2:iend+2] = dQ[i0-2:iend+2]
 
         # Formula B2 from Lin 04
         px.Q_edges[i0-1:iend+2] = 0.5*(Q[i0-1:iend+2] + Q[i0-2:iend+1]) - (px.dQ_mono[i0-1:iend+2] - px.dQ_mono[i0-2:iend+1])/3.0
+
 
         # Assign values of Q_R and Q_L
         px.q_R[i0-1:iend+1] = px.Q_edges[i0:iend+2]
