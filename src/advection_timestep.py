@@ -38,12 +38,16 @@ def time_step_adv1d_ppm(t, k, simulation):
     simulation.Q[iend:N+ng] = simulation.Q[i0:i0+ngr]
     simulation.Q[0:i0]      = simulation.Q[N:N+ngl]
 
+    if simulation.vf>=2:
+        simulation.U_edges.u_timecenter[:] = velocity_adv_1d(simulation.x, t-dt*0.5, simulation)
+
     # Compute the time averaged velocity (needed for departure point)
     time_averaged_velocity(simulation.U_edges, simulation, t)
 
     # CFL number
     simulation.cx[:] = simulation.U_edges.u_averaged[:]*(simulation.dt/simulation.dx) #cfl number
 
+    # Compute the time averaged velocity (needed for departure point)
     # Reconstructs the values of Q using a piecewise parabolic polynomial
     ppm_reconstruction(simulation.Q, simulation.px, simulation)
 

@@ -20,11 +20,11 @@ def time_averaged_velocity(U_edges, simulation, t):
 
     # Compute the velocity needed for the departure point
     if simulation.vf == 1: # constant velocity
-        U_edges.u_averaged[:] = U_edges.u[:]
+        U_edges.u_averaged[:] = U_edges.u_timecenter[:]
 
     if simulation.vf>=2:
         if simulation.dp == 1:
-            U_edges.u_averaged[:] = U_edges.u[:]
+            U_edges.u_averaged[:] = U_edges.u_timecenter[:]
 
         elif simulation.dp == 2:
             x = simulation.x
@@ -33,7 +33,8 @@ def time_averaged_velocity(U_edges, simulation, t):
             twodt = simulation.twodt
 
             # Velocity data at edges used for interpolation
-            u_interp = ne.evaluate('1.5*u - 0.5*u_old', local_dict=vars(U_edges)) # extrapolation for time at n+1/2
+            #u_interp = ne.evaluate('1.5*u - 0.5*u_old', local_dict=vars(U_edges)) # extrapolation for time at n+1/2
+            u_interp = U_edges.u_timecenter[:]
 
             # Linear interpolation
             upos, uneg = U_edges.upos, U_edges.uneg
