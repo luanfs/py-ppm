@@ -47,6 +47,7 @@ def error_analysis_adv1d(simulation):
     if simulation.vf == 1: # constant velocity
         u = velocity_adv_1d(x0, 0, simulation)
         dt[0] = CFL/(N[0]*abs(u))*(xf-x0)
+        dt[0] = 0.01
         Tf = 5.0
     elif simulation.vf==2: #variable velocity
         u0 = 0.4
@@ -117,9 +118,9 @@ def error_analysis_adv1d(simulation):
         plot_errors_loglog(N, errors_list, names, filename, title, emin, emax)
 
         # Plot the convergence rate
-        title = 'Convergence rate - ' + simulation.icname +', vf=' + str(simulation.vf)+\
-        ', norm='+norm_title[e]
-        filename = graphdir+'1d_adv_tc'+str(tc)+'_ic'+str(ic)+'_vf'+str(vf)+\
-        '_norm'+norm_list[e]+'_convergence_rate.pdf'
-        plot_convergence_rate(N, errors, names, filename, title, CRmin, CRmax)
+        #title = 'Convergence rate - ' + simulation.icname +', vf=' + str(simulation.vf)+\
+        #', norm='+norm_title[e]
+        #filename = graphdir+'1d_adv_tc'+str(tc)+'_ic'+str(ic)+'_vf'+str(vf)+\
+        #'_norm'+norm_list[e]+'_convergence_rate.pdf'
+        #plot_convergence_rate(N, errors, names, filename, title, CRmin, CRmax)
         e = e+1

@@ -34,6 +34,7 @@ def adv_vars(simulation):
     simulation.U_edges = velocity(simulation)
     simulation.U_edges.u[:] = velocity_adv_1d(x[0:N+ng+1], 0, simulation)
     simulation.U_edges.u_old[:] = simulation.U_edges.u[:]
+    simulation.U_edges.u_timecenter[:] = simulation.U_edges.u[:]
 
     # CFL at edges - x direction
     simulation.cx = simulation.U_edges.u[:]*dt/dx
